@@ -19,7 +19,7 @@ const INTERNAL_COMPONENTS = {
   endPicking: EndPicking,
   check: CheckOrder,
   loading:LoadingOrders,
-  endPicking: EndPicking,
+  importOrdersExcel:ImportOrdersExcel,
 };
 
 

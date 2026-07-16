@@ -11,7 +11,7 @@ import NewPicking from "./NewPicking";
 import CheckOrder from "./CheckOrder";
 import LoadingOrders from "./LoadOrder";
 import EndPicking from "./EndPicking";
-import ImportOrdersExcel from "./ImportOrdersExcel";
+import ImportOrdersExcel from "./importOrdersExcel.";
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,

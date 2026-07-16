@@ -14,7 +14,14 @@ const office = [
   { key:"newOrder", title:"קליטת הזמנה", subtitle:"יצירת הזמנה חדשה", icon:"🧾", color:"blue", url:LINKS.newOrder },
   { key:"customers", title:"לקוחות", subtitle:"ממשק לקוחות", icon:"👥", color:"pink", url:LINKS.customers },
   { key:"orders", title:"הזמנות", subtitle:"כל ההזמנות במערכת", icon:"📋", color:"yellow", url:LINKS.allOrders },
-  { key:"dashboard", title:"דשבורד משרד", subtitle:"תצוגת ניהול משרד", icon:"📊", color:"purple", url:LINKS.officeDashboard }
+  { key:"dashboard", title:"דשבורד משרד", subtitle:"תצוגת ניהול משרד", icon:"📊", color:"purple", url:LINKS.officeDashboard },
+  {
+    key: "importOrdersExcel",
+    title: "קליטת הזמנות מאקסל",
+    subtitle: "העלאת קובץ הזמנות",
+    icon: "📊",
+   color: "green",
+  }
 ];
 export function getMenu(role) {
   if (role === "warehouse") return warehouse;

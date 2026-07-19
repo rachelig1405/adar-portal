@@ -123,11 +123,11 @@ def create_order(order: OrderCreate):
     if order.agent_id:
       fields["סוכן"] = [order.agent_id]
 
-    if order.line:
-     fields["קו אלי"] = {"name": order.line}
+    #if order.line:
+    #  fields["קו אלי"] = {"name": order.line}
 
-    if order.agent_id:
-        fields["סוכן"] = [{"id": order.agent_id}]
+   # if order.agent_id:
+   #     fields["סוכן"] = [{"id": order.agent_id}]
 
     if order.delivery_date:
         fields["תאריך אספקה"] = order.delivery_date

@@ -297,9 +297,9 @@ def find_customer_record_id(
     if not records:
         return None
 
-    return records.get("id")
+    return records[0].get("id")
 
-    return None
+  
 #מציאת סוכן לפי מספר סוכן
 def find_agent_record_id(
     agent_name: str,
@@ -317,7 +317,7 @@ def find_agent_record_id(
     if not records:
         return None
 
-    return records.get("id")
+    return records[0].get("id")
 #עדכון טבלת הזמנות
  
 def update_order_workflow(

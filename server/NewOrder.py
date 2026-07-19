@@ -352,7 +352,7 @@ async def import_orders_excel(
                 })
 
     return {
-     "success": len(errors) == 0,
+     "success": len(successes) == 0,
      "created_count": len(successes),
      "failed_count": len(errors),
      "created": successes,

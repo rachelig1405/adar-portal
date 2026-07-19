@@ -334,8 +334,8 @@ async def import_orders_excel(
                 successes.append({
                     "excel_row": excel_row_number,
                     "order_number": order_number,
-                    "record_id": record["id"],
-            })
+                    "message": "ההזמנה נוספה בהצלחה",
+                })
 
             except HTTPException as error:
                 errors.append({

@@ -11,7 +11,7 @@ AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 AIRTABLE_CUSTOMERS_TABLE = os.getenv("AIRTABLE_CUSTOMERS_TABLE")
 AIRTABLE_AGENTS_TABLE = os.getenv("AIRTABLE_AGENTS_TABLE")
 AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
-from Models import CustomerCreate
+from Models import CustomerCreate,OrderCreate
 def airtable_headers():
     return {
         "Authorization": f"Bearer {AIRTABLE_TOKEN}",

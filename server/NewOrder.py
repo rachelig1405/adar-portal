@@ -16,7 +16,6 @@ from fastapi import FastAPI
 from DB import create_order,find_customer_record_id,find_agent_record_id
 
 
-app = FastAPI()
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
@@ -99,8 +98,7 @@ def normalize_date(value) -> str | None:
     )
 from fastapi import APIRouter, File, UploadFile, HTTPException
 
-router = APIRouter()
-@router.post("/api/orders/import-excel")
+
 async def import_orders_excel(
     file: UploadFile
 ):
@@ -353,11 +351,11 @@ async def import_orders_excel(
                     "error": str(error),
                 })
 
-        return {
-            "success": len(errors) == 0,
-            "created_count": len(successes),
-            "failed_count": len(errors),
-            "created": successes,
-            "errors": errors,
+    return {
+     "success": len(errors) == 0,
+     "created_count": len(successes),
+     "failed_count": len(errors),
+     "created": successes,
+     "errors": errors,
     
             }

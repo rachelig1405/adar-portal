@@ -287,24 +287,17 @@ def find_customer_record_id(
     customer_number: str
 ) -> str | None:
 
-    records = get_customers()
+    records = get_all_airtable_records(
+        AIRTABLE_CUSTOMERS_TABLE,
+        filter_formula=(
+            f'{{מספר לקוח}}="{customer_number}"'
+        ),
+    )
 
-    searched_customer_number = str(
-        customer_number
-    ).strip()
+    if not records:
+        return None
 
-    for record in records:
-        fields = record.get("fields", {})
-
-        record_customer_number = str(
-            fields.get("מספר לקוח", "")
-        ).strip()
-
-        if (
-            record_customer_number
-            == searched_customer_number
-        ):
-            return record.get("id")
+    return records.get("id")
 
     return None
 #מציאת סוכן לפי מספר סוכן

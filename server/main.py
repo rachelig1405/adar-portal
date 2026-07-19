@@ -24,7 +24,7 @@ from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order
 
 
 FRONTEND_URL = os.getenv(
@@ -76,7 +76,7 @@ def get_agents():
 
 @app.post("/api/orders")
 def CreateOrder(order:OrderCreate):
-    return CreateOrder(order=order)
+    return create_order(order=order)
 
 @app.get("/api/employees")
 def GetEmployes():

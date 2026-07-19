@@ -32,12 +32,10 @@ FRONTEND_URL = os.getenv(
     "http://localhost:5173",
 )
 
-allowed_origins = [
-    "http://localhost:5173",
-    FRONTEND_URL,
-]
-app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,7 +43,7 @@ app.add_middleware(
         "http://localhost:5173",
         "https://adar-portal-dxrr.vercel.app",
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"^https://.*\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

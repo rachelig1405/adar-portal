@@ -20,7 +20,8 @@ class OrderCreate(BaseModel):
     picking_rows: int | None = None
     goes_with_us: bool | None = False
     line: str | None = ""
-    warehouse_notes: str | None = ""
+    delivery_notes: str | None = ""
+    warehouse_notes:str | None = ""
 class PickingEnd(BaseModel):
     order_id: str
     amount:float |None=None

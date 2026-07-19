@@ -284,19 +284,29 @@ def get_orders_filter_by_status(    status: str ):
     return orders
 #מציאת לקוח לפי מספר לקוח
 def find_customer_record_id(
-    customer_number: str,
+    customer_number: str
 ) -> str | None:
-    records = get_all_airtable_records(
-        AIRTABLE_CUSTOMERS_TABLE,
-        filter_formula=(
-            f'{{מספר לקוח}}="{customer_number}"'
-        ),
-    )
 
-    if not records:
-        return None
+    records = get_customers()
 
-    return records[0]["id"]
+    searched_customer_number = str(
+        customer_number
+    ).strip()
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        record_customer_number = str(
+            fields.get("מספר לקוח", "")
+        ).strip()
+
+        if (
+            record_customer_number
+            == searched_customer_number
+        ):
+            return record.get("id")
+
+    return None
 #מציאת סוכן לפי מספר סוכן
 def find_agent_record_id(
     agent_name: str,
@@ -314,7 +324,7 @@ def find_agent_record_id(
     if not records:
         return None
 
-    return records[0]["id"]
+    return records.get("id")
 #עדכון טבלת הזמנות
  
 def update_order_workflow(

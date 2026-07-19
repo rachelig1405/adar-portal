@@ -4,3 +4,4 @@ requests
 python-dotenv
 python-multipart
 pydantic
+python-calamine

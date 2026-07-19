@@ -1,5 +1,5 @@
 #קליטת הזמנה  מאקסל
-from main import get_all_airtable_records,create_order,OrderCreate
+from Models import OrderCreate
 from io import BytesIO
 from datetime import date, datetime
 import os
@@ -13,6 +13,8 @@ from pydantic import BaseModel
 from fastapi import File, UploadFile
 from python_calamine import CalamineWorkbook
 from fastapi import FastAPI
+from DB import create_order,find_customer_record_id,find_agent_record_id
+
 
 app = FastAPI()
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
@@ -21,39 +23,7 @@ AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 AIRTABLE_CUSTOMERS_TABLE = os.getenv("AIRTABLE_CUSTOMERS_TABLE")
 AIRTABLE_AGENTS_TABLE = os.getenv("AIRTABLE_AGENTS_TABLE")
 AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
-#מציאת לקוח לפי מספר לקוח
-def find_customer_record_id(
-    customer_number: str,
-) -> str | None:
-    records = get_all_airtable_records(
-        AIRTABLE_CUSTOMERS_TABLE,
-        filter_formula=(
-            f'{{מספר לקוח}}="{customer_number}"'
-        ),
-    )
 
-    if not records:
-        return None
-
-    return records[0]["id"]
-#מציאת סוכן לפי מספר סוכן
-def find_agent_record_id(
-    agent_name: str,
-) -> str | None:
-    if not agent_name:
-        return None
-
-    records = get_all_airtable_records(
-        AIRTABLE_AGENTS_TABLE,
-        filter_formula=(
-            f'{{סוכן}}="{agent_name}"'
-        ),
-    )
-
-    if not records:
-        return None
-
-    return records[0]["id"]
 def normalize_header(value) -> str:
     if value is None:
         return ""
@@ -127,9 +97,12 @@ def normalize_date(value) -> str | None:
     raise ValueError(
         f"תאריך לא תקין: {text}"
     )
-@app.post("/api/orders/import-excel")
+from fastapi import APIRouter, File, UploadFile, HTTPException
+
+router = APIRouter()
+@router.post("/api/orders/import-excel")
 async def import_orders_excel(
-    file: UploadFile = File(...),
+    file: UploadFile
 ):
     if not file.filename:
         raise HTTPException(

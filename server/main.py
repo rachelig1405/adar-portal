@@ -184,6 +184,10 @@ async def upload_order_file(
         "success": True,
         "result": result,
     }
+from fastapi import File, UploadFile
+
 @app.post("/api/orders/import-excel")
-def importOrdersFromExcel(file: UploadFile = File(...),):
-    return import_orders_excel(file=file)
+async def importOrdersFromExcel(
+    file: UploadFile = File(...)
+):
+    return await import_orders_excel(file)

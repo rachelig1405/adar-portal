@@ -16,7 +16,7 @@ def workday_assignment(max_date:date,order_id:str):
     f')',view="ימים בשיבוץ")
     workday=None
     if records:
-        workday=find_workday_record_id(records[0].get("fields", {}).get("יום עבודה"))
+        workday=records[0].get("id")
         if order_id:
             result = update_order_workflow(
             order_id=order_id,

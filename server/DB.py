@@ -2,7 +2,7 @@ import os
 import requests
 from fastapi import FastAPI, HTTPException
 
-from datetime import datetime, timezone
+from datetime import datetime, timezone,date
 
 from zoneinfo import ZoneInfo
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
@@ -11,6 +11,7 @@ AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 AIRTABLE_CUSTOMERS_TABLE = os.getenv("AIRTABLE_CUSTOMERS_TABLE")
 AIRTABLE_AGENTS_TABLE = os.getenv("AIRTABLE_AGENTS_TABLE")
 AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
+AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
 from Models import CustomerCreate,OrderCreate
 def airtable_headers():
     return {
@@ -154,18 +155,20 @@ def create_order(order: OrderCreate):
     if response.status_code not in [200, 201]:
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
-    return {"success": True, "record": response.json()}
+    return {"success": True, "record": response.json(),"record_id": response.json()["id"]}
 #החזרת כל הטבלה לפי פומרמולה
 def get_all_airtable_records(
     table_name: str,
     *,
     filter_formula: str | None = None,
     fields: list[str] | None = None,
+    view: str | None = None,
 ):
     url = (
         f"https://api.airtable.com/v0/"
         f"{AIRTABLE_BASE_ID}/{table_name}"
     )
+    params = {}
 
     records = []
     offset = None
@@ -183,6 +186,8 @@ def get_all_airtable_records(
 
         if offset:
             params["offset"] = offset
+        if view:
+            params["view"] = view
 
         response = requests.get(
             url,
@@ -318,7 +323,19 @@ def find_agent_record_id(
         return None
 
     return records[0].get("id")
-#עדכון טבלת הזמנות
+#מציאת רשומת יום עבוד לפי יום עבודה
+def find_workday_record_id(workday:date):
+    if not workday:
+        return None
+    records=get_all_airtable_records(
+        AIRTABLE_WORKDAY_TABLE,
+        filter_formula=(
+            f'{{יום עבודה}}="{workday}"'
+        ))
+    if not records:
+            return None
+
+    return records[0].get("id")
  
 def update_order_workflow(
     order_id: str,
@@ -331,6 +348,7 @@ def update_order_workflow(
     amount:float | None = None,
     notes: str | None = None,
     LoadingNotes: str | None = None,
+    workday_id: str| None = None
     
 
 
@@ -373,6 +391,15 @@ def update_order_workflow(
         fields["הערות ליקוט"] = notes
     if LoadingNotes:
         fields["הערות העמסה"] = LoadingNotes
+    if workday_id:
+        if not workday_id.startswith("rec"):
+            raise HTTPException(
+                status_code=400,
+                detail="מזהה יום עבודה אינו תקין",
+            )
+        fields["יום עבודה"]=[workday_id]
+
+        
 
     if not fields:
         raise HTTPException(
@@ -459,6 +486,25 @@ def upload_file_to_airtable(
             f"שגיאה בהעלאת הקובץ:\n"
             f"{response.status_code}\n"
             f"{response.text}"
+        )
+
+    return response.json()
+def get_order_by_record_id(record_id: str):
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{AIRTABLE_ORDERS_TABLE}/{record_id}"
+    )
+
+    response = requests.get(
+        url,
+        headers=airtable_headers(),
+        timeout=30,
+    )
+
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
         )
 
     return response.json()

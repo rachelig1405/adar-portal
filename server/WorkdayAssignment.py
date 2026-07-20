@@ -41,7 +41,7 @@ def workday_assignment(max_date:date,order_id:str):
         print("רשומות של כל הימים המתאימים",records)
         #מעבר על כל יום מתאים
         for record in records:
-            orders=record["fields"].get("הזמנות", [])
+            orders=record["fields"].get("הזמנות")
             print("הזמנות ליום עבודה",orders)
             #מעבר על כל הזמנה והזמנה לבדוק אם אפשר להזיז אותה
             for order in orders:

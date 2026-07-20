@@ -13,7 +13,7 @@ load_dotenv(dotenv_path=env_path)
 
 from Models import OrderCreate
 from Models import PickingStart
-from Models import CustomerCreate, PickingEnd
+from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
@@ -25,7 +25,7 @@ from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
 from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order
-
+from WorkdayAssignment import workday_assignment
 
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
@@ -193,3 +193,23 @@ async def importOrdersFromExcel(
     file: UploadFile = File(...)
 ):
     return await import_orders_excel(file)
+@app.post("/api/workday-assignment")
+def assign_order_to_workday(
+    request: WorkdayAssignmentRequest
+):
+    try:
+        result = workday_assignment(
+            max_date=request.max_date,
+            order_id=request.order_id,
+        )
+
+        return result
+
+    except HTTPException:
+        raise
+
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error),
+        )

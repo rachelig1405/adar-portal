@@ -28,6 +28,6 @@ class PickingEnd(BaseModel):
     amount:float |None=None
     notes: str |None=None
     warehouse_notes: str | None = ""
-    class WorkdayAssignmentRequest(BaseModel):
-        max_date: date
-        order_id: str
+class WorkdayAssignmentRequest(BaseModel):
+    max_date: date
+    order_id: str

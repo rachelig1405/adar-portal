@@ -30,6 +30,7 @@ def workday_assignment(max_date:date,order_id:str):
             }
     #במידה ולא נמצא יום פנוי
     else:
+        print("else נכנסתי ל")
         #חיפוש יום עבודה בתצוגה המציגה את כל הימים
         orders=None
         order=None
@@ -37,12 +38,15 @@ def workday_assignment(max_date:date,order_id:str):
         f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
         f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
         f')',view="Grid view")
+        print("רשומות של כל הימים המתאימים",records)
         #מעבר על כל יום מתאים
         for record in records:
             orders=record["fields"].get("הזמנות", [])
+            print("הזמנות ליום עבודה",orders)
             #מעבר על כל הזמנה והזמנה לבדוק אם אפשר להזיז אותה
             for order in orders:
                 order1=get_order_by_record_id(order)
+                print(order1)
                 max_order_day=order1["fields"].get("יום עבודה בפועל")
                 #בדיקה אם יש להזמנות האחרות יום פנוי
                 records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
@@ -51,6 +55,7 @@ def workday_assignment(max_date:date,order_id:str):
                     f')',view="ימים בשיבוץ")
                 #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
                 if records_of_worksday:
+                    print("if שני")
                     update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
                     #עדכון ההזמנה החדשה
                     result=update_order_workflow(order_id=order_id,workday_id=record["id"])

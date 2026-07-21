@@ -37,7 +37,7 @@ def create_workdays_until(target_date: date):
     records = get_all_airtable_records(
         table_name=AIRTABLE_WORKDAY_TABLE,
         fields=["יום עבודה"],
-        view="כל ימי העבודה",
+        view="Grid view",
     )
 
     if not records:
@@ -169,8 +169,9 @@ def workday_assignment(max_date:date,order_id:str):
                 last_record["fields"]["יום עבודה"]
                 )
 
-            if last_workday < max_date:
-                create_workdays_until(target_date=max_date)
+                if last_workday < max_date:
+                    create_workdays_until(target_date=max_date)
+                    continue
         
             print("רשומות של כל הימים המתאימים",records)
             

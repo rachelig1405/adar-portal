@@ -132,14 +132,17 @@ export default function NewOrder({ onClose }) {
 
 {form.customer_search && !form.customer_id && (
   <div className="search-results">
-    {customers
-      .filter((c) =>
-        `${c.number} ${c.name} ${c.display}`
-          .toLowerCase()
-          .includes(form.customer_search.toLowerCase())
-      )
-      .slice(0, 15)
-      .map((c) => (
+   {customers
+    .filter((c) =>
+      `${c.number || ""} ${c.name || ""} ${c.display || ""}`
+        .toLowerCase()
+        .includes(
+          String(form.customer_search || "")
+            .trim()
+            .toLowerCase()
+        )
+    )
+  .map((c) => (
         <button
           type="button"
           key={c.id}

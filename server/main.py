@@ -119,6 +119,7 @@ def end_picking(data: PickingEnd):
         amount=data.amount,
         notes=data.notes,
         invoice=data.invoice
+         break_minutes=data.break_minutes
     )
 
     return {
@@ -133,7 +134,7 @@ def check_order(data: PickingEnd):
         notes=data.notes,
         amount=data.amount,
         invoice=data.invoice,
-        break_minutes=data.break_minutes
+       
         
     )
 

@@ -265,24 +265,28 @@ export default function NewOrder({ onClose }) {
           setNewCustomer({ ...newCustomer, city: e.target.value })
         }
       />
-       <label>סיגמנט</label>
-       <input
-       type="checkbox"
+       <label className="checkbox-row">
+          <input
+            type="checkbox"
         
-        value={newCustomer.sigment}
-        onChange={(e) =>
-          setNewCustomer({ ...newCustomer, sigment: e.target.value })
-        }
-      />
-      <label>מיקאסה</label>
-       <input
-       type="checkbox"
-        placeholder="מיקאסה"
-        value={newCustomer.mikasa}
-        onChange={(e) =>
+            value={newCustomer.sigment}
+            onChange={(e) =>
+            setNewCustomer({ ...newCustomer, sigment: e.target.value })
+            }
+          />
+        סיגמנט
+        </label>
+      <label className="checkbox-row">
+        <input
+          type="checkbox"
+          placeholder="מיקאסה"
+          value={newCustomer.mikasa}
+          onChange={(e) =>
           setNewCustomer({ ...newCustomer, mikasa: e.target.value })
         }
-      />
+        />
+       מיקאסה
+      </label>
       מ
      
 

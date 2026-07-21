@@ -274,7 +274,7 @@ export default function NewOrder({ onClose }) {
             setNewCustomer({ ...newCustomer, sigment: e.target.value })
             }
           />
-        סיגמנט
+              סיגמנט
         </label>
       <label className="checkbox-row">
         <input
@@ -285,9 +285,9 @@ export default function NewOrder({ onClose }) {
           setNewCustomer({ ...newCustomer, mikasa: e.target.value })
         }
         />
-       מיקאסה
+            מיקאסה
       </label>
-      מ
+      
      
 
     

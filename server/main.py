@@ -117,7 +117,8 @@ def end_picking(data: PickingEnd):
         status="מלוקט",
         end_time=True,
         amount=data.amount,
-        notes=data.notes
+        notes=data.notes,
+        invoice=data.invoice
     )
 
     return {

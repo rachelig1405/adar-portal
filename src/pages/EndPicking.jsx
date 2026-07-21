@@ -5,6 +5,7 @@ export default function EndPicking({ onClose }) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
+   const [invoice, setNotes] = useState("");
 
   const [orderSearch, setOrderSearch] = useState("");
  
@@ -191,7 +192,8 @@ export default function EndPicking({ onClose }) {
           body: JSON.stringify({
             order_id: selectedOrder.id,
             amount: amount==""?null: Number(amount),
-            notes: notes==""?null :notes
+            notes: notes==""?null :notes,
+            invoice:invoice==""?null :invoice
           }),
         }
       );
@@ -252,7 +254,7 @@ export default function EndPicking({ onClose }) {
 
             <input
               type="text"
-              placeholder="הקלידי מספר הזמנה או שם לקוח..."
+              placeholder="הקלד מספר הזמנה או שם לקוח..."
               value={orderSearch}
               disabled={loading}
               autoComplete="off"
@@ -329,6 +331,14 @@ export default function EndPicking({ onClose }) {
                
                 
                 value={notes}
+                onChange={(event) => setNotes(event.target.value)}
+            />
+             <label>מספר חשבונית</label>
+            <input
+                type="text"
+               
+                
+                value={invoice}
                 onChange={(event) => setNotes(event.target.value)}
             />
           

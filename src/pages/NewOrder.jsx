@@ -265,7 +265,7 @@ export default function NewOrder({ onClose }) {
           setNewCustomer({ ...newCustomer, city: e.target.value })
         }
       />
-
+       <label>סיגמנט</label>
        <input
        type="checkbox"
         
@@ -274,7 +274,7 @@ export default function NewOrder({ onClose }) {
           setNewCustomer({ ...newCustomer, sigment: e.target.value })
         }
       />
-      
+      <label>מיקאסה</label>
        <input
        type="checkbox"
         placeholder="מיקאסה"

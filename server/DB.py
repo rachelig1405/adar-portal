@@ -36,25 +36,41 @@ def get_table_records(table_name: str, name_field: str):
     ]
 #החזרת טבלה לקוחות
 def get_customers():
-    url = f"https://api.airtable.com/v0/{AIRTABLE_BASE_ID}/{AIRTABLE_CUSTOMERS_TABLE}"
-    response = requests.get(url, headers=airtable_headers())
 
-    if response.status_code != 200:
-        raise HTTPException(status_code=response.status_code, detail=response.text)
+    records = get_all_airtable_records(
+        table_name=AIRTABLE_CUSTOMERS_TABLE,
+        fields=[
+            "מספר לקוח",
+            "שם לקוח",
+        ],
+    )
 
     customers = []
 
-    for record in response.json().get("records", []):
+    for record in records:
         fields = record.get("fields", {})
 
         customer_number = fields.get("מספר לקוח", "")
         customer_name = fields.get("שם לקוח", "")
 
+        # אם השדה הוא Lookup ומתקבלת רשימה
+        if isinstance(customer_number, list):
+            customer_number = ", ".join(
+                str(value) for value in customer_number
+            )
+
+        if isinstance(customer_name, list):
+            customer_name = ", ".join(
+                str(value) for value in customer_name
+            )
+
         customers.append({
             "id": record["id"],
-            "number": customer_number,
-            "name": customer_name,
-            "display": f"{customer_number} - {customer_name}"
+            "number": str(customer_number),
+            "name": str(customer_name),
+            "display": (
+                f"{customer_number} - {customer_name}"
+            ),
         })
 
     return customers

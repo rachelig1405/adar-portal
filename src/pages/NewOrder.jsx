@@ -28,6 +28,8 @@ export default function NewOrder({ onClose }) {
   phone: "",
   address: "",
   notes: "",
+  sigment: false,
+  mikasa: false,
  });
 
   useEffect(() => {
@@ -133,15 +135,15 @@ export default function NewOrder({ onClose }) {
 {form.customer_search && !form.customer_id && (
   <div className="search-results">
    {customers
-    .filter((c) =>
-      `${c.number || ""} ${c.name || ""} ${c.display || ""}`
-        .toLowerCase()
-        .includes(
-          String(form.customer_search || "")
-            .trim()
-            .toLowerCase()
-        )
-    )
+  .filter((c) =>
+    `${c.number || ""} ${c.name || ""} ${c.display || ""}`
+      .toLowerCase()
+      .includes(
+        String(form.customer_search || "")
+          .trim()
+          .toLowerCase()
+      )
+  )
   .map((c) => (
         <button
           type="button"
@@ -270,22 +272,26 @@ export default function NewOrder({ onClose }) {
       />
        <label className="checkbox-row">
           <input
-            type="checkbox"
-        
-            value={newCustomer.sigment}
-            onChange={(e) =>
-            setNewCustomer({ ...newCustomer, sigment: e.target.value })
-            }
-          />
+              type="checkbox"
+              checked={Boolean(newCustomer.sigment)}
+              onChange={(e) =>
+                setNewCustomer({
+                  ...newCustomer,
+                  sigment: e.target.checked,
+                })
+                }
+            />
               סיגמנט
         </label>
       <label className="checkbox-row">
         <input
-          type="checkbox"
-          placeholder="מיקאסה"
-          value={newCustomer.mikasa}
-          onChange={(e) =>
-          setNewCustomer({ ...newCustomer, mikasa: e.target.value })
+        type="checkbox"
+        checked={Boolean(newCustomer.mikasa)}
+        onChange={(e) =>
+          setNewCustomer({
+            ...newCustomer,
+            mikasa: e.target.checked,
+          })
         }
         />
             מיקאסה

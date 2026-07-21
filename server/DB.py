@@ -281,14 +281,14 @@ def get_orders_filter_by_status(    status: str ):
 
         
         if picking_lines:
-             display += f"\n - שורות ליקוט: {picking_lines}"
+             display += f"\nשורות ליקוט: {picking_lines}"
         if segment:
-             display += f"\n - לקוח סיגמנט "
+             display += f"\nלקוח סיגמנט "
         
         if notes:
-             display += f"\n - {notes} "
+             display += f"\n הערות: {notes} "
         if amount:
-            display += f"\n - {amount} משטחים"
+            display += f"\n{amount} משטחים"
             
 
 

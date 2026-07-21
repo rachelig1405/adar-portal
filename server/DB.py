@@ -385,7 +385,8 @@ def update_order_workflow(
     notes: str | None = None,
     LoadingNotes: str | None = None,
     workday_id: str| None = None,
-    invoice:str| None = None
+    invoice:str| None = None,
+    break_minutes:int| None = None
 
 
 ):
@@ -429,6 +430,8 @@ def update_order_workflow(
         fields["הערות העמסה"] = LoadingNotes
     if invoice:
         fields["חשבונית"] = invoice
+    if break_minutes:
+        fields["הפסקה"] = break_minutes
     if workday_id:
         if not workday_id.startswith("rec"):
             raise HTTPException(

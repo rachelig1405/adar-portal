@@ -29,6 +29,7 @@ class PickingEnd(BaseModel):
     notes: str |None=None
     warehouse_notes: str | None = ""
     invoice:str|None=""
+    break_minutes: int | None = None
 class WorkdayAssignmentRequest(BaseModel):
     max_date: date
     order_id: str

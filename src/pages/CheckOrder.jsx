@@ -6,6 +6,7 @@ export default function CheckOrder({ onClose }) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
+    const [invoice, setInvoince] = useState("");
 
   const [orderSearch, setOrderSearch] = useState("");
  
@@ -193,7 +194,8 @@ export default function CheckOrder({ onClose }) {
           body: JSON.stringify({
             order_id: selectedOrder.id,
             amount: amount==""?null: Number(amount),
-            notes: notes==""?null :notes
+            notes: notes==""?null :notes,
+            invoice:invoice==""?null :invoice
           }),
         }
       );
@@ -332,6 +334,14 @@ export default function CheckOrder({ onClose }) {
                 
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
+            />
+              <label>מספר חשבונית</label>
+            <input
+                type="text"
+               
+                
+                value={invoice}
+                onChange={(event) => setInvoince(event.target.value)}
             />
           
 

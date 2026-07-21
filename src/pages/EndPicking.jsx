@@ -5,7 +5,8 @@ export default function EndPicking({ onClose }) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
-   const [invoice, setInvoince] = useState("");
+  const [breakMinutes, setBreakMinutes] = useState("");
+   
 
   const [orderSearch, setOrderSearch] = useState("");
  
@@ -193,7 +194,11 @@ export default function EndPicking({ onClose }) {
             order_id: selectedOrder.id,
             amount: amount==""?null: Number(amount),
             notes: notes==""?null :notes,
-            invoice:invoice==""?null :invoice
+            break_minutes:
+              breakMinutes === ""
+                ? null
+                : Number(breakMinutes),
+                    
           }),
         }
       );
@@ -333,15 +338,18 @@ export default function EndPicking({ onClose }) {
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
             />
-             <label>מספר חשבונית</label>
-            <input
-                type="text"
-               
-                
-                value={invoice}
-                onChange={(event) => setInvoince(event.target.value)}
-            />
-          
+           
+          <label>האם הייתה הפסקה?</label>
+
+          <select
+            value={breakMinutes}
+            onChange={(event) => setBreakMinutes(event.target.value)}
+          >
+            <option value="">לא הייתה הפסקה</option>
+            <option value="10">10 דקות</option>
+            <option value="15">רבע שעה</option>
+            <option value="30">חצי שעה</option>
+          </select>
 
 
           <button

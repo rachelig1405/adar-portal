@@ -132,6 +132,8 @@ def check_order(data: PickingEnd):
         status="בבדיקה",
         notes=data.notes,
         amount=data.amount,
+        invoice=data.invoice,
+        break_minutes=data.break_minutes
         
     )
 

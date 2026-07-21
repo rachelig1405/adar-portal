@@ -47,7 +47,7 @@ def create_workdays_until(target_date: date):
         )
 
     last_workday_value = (
-        records[0]
+        records[-1]
         .get("fields", {})
         .get("יום עבודה")
     )

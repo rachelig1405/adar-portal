@@ -5,7 +5,7 @@ export default function EndPicking({ onClose }) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
-   const [invoice, setNotes] = useState("");
+   const [invoice, setInvoince] = useState("");
 
   const [orderSearch, setOrderSearch] = useState("");
  
@@ -339,7 +339,7 @@ export default function EndPicking({ onClose }) {
                
                 
                 value={invoice}
-                onChange={(event) => setNotes(event.target.value)}
+                onChange={(event) => setInvoince(event.target.value)}
             />
           
 

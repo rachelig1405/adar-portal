@@ -140,7 +140,7 @@ export default function Portal({ user, onLogout }) {
               <h2>פעולות מהירות</h2>
 
               <p>
-                בחרי פעולה לפתיחה בתוך הפורטל
+                בחר פעולה לפתיחה בתוך הפורטל
               </p>
             </div>
           </div>

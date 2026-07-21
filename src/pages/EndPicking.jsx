@@ -233,7 +233,7 @@ export default function EndPicking({ onClose }) {
         <div className="form-header">
           <div>
             <div className="frame-kicker">ADAR Portal</div>
-            <strong>תחילת ליקוט</strong>
+            <strong>סיום ליקוט</strong>
           </div>
 
           <button type="button" onClick={onClose}>

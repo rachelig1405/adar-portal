@@ -320,7 +320,7 @@ export default function NewPicking({ onClose }) {
               <div className="selected-record">
                 <div>
                   <span>הזמנה שנבחרה</span>
-                  <strong>{selectedOrder.display}</strong>
+                  <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
                 </div>
 
                 <button
@@ -341,7 +341,7 @@ export default function NewPicking({ onClose }) {
 
             <input
               type="text"
-              placeholder="הקלידי שם עובד..."
+              placeholder="הקלד שם עובד..."
               value={employeeSearch}
               disabled={loading}
               autoComplete="off"

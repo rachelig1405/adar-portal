@@ -279,11 +279,16 @@ def get_orders_filter_by_status(    status: str ):
         if customer_name:
             display += f" - {customer_name}"
 
-        if amount:
-            display += f" - {amount} משטחים"
+        
         if notes:
              display += f" - {notes} "
-             
+        if picking_lines:
+             display += f" - שורות ליקוט: {picking_lines}"
+        if segment:
+             display += f" - לקוח סיגמנט"
+        if amount:
+            display += f" - {amount} משטחים"
+
 
         orders.append({
             "id": record["id"],

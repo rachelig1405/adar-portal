@@ -274,7 +274,7 @@ export default function NewPicking({ onClose }) {
 
             <input
               type="text"
-              placeholder="הקלידי מספר הזמנה או שם לקוח..."
+              placeholder="הקלד מספר הזמנה או שם לקוח..."
               value={orderSearch}
               disabled={loading}
               autoComplete="off"
@@ -316,24 +316,52 @@ export default function NewPicking({ onClose }) {
               </div>
             )}
 
-            {selectedOrder && (
-              <div className="selected-record">
-                <div>
-                  <span>הזמנה שנבחרה</span>
-                  <strong>{selectedOrder.display}</strong>
-                </div>
+        {selectedOrder && (
+        <>
+        <div className="selected-record">
+          <div>
+          <span>הזמנה שנבחרה</span>
+          <strong>{selectedOrder.display}</strong>
+      </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedOrder(null);
-                    setOrderSearch("");
-                  }}
-                >
-                  שינוי
-                </button>
-              </div>
-            )}
+      <button
+        type="button"
+        onClick={() => {
+          setSelectedOrder(null);
+          setOrderSearch("");
+        }}
+      >
+        שינוי
+      </button>
+    </div>
+
+    <div className="order-extra-details">
+
+      <div className="order-detail-row">
+        <span>שורות ליקוט</span>
+        <strong>{selectedOrder.picking_lines ?? 0}</strong>
+      </div>
+
+      <div className="order-detail-row">
+        <span>סיגמנט</span>
+        <strong>{selectedOrder.segment || "לא צוין"}</strong>
+      </div>
+
+      <div className="order-detail-row">
+        <span>כמות משטחים</span>
+        <strong>{selectedOrder.amount || 0}</strong>
+      </div>
+
+      <div className="order-detail-row warehouse-notes-row">
+        <span>הערות למחסן</span>
+        <div>
+          {selectedOrder.notes || "אין הערות למחסן"}
+        </div>
+      </div>
+
+    </div>
+  </>
+)}
           </div>
 
           <div className="picker-section">

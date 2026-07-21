@@ -259,11 +259,19 @@ def get_orders_filter_by_status(    status: str ):
         customer_name = fields.get("שם לקוח", "")
         amount= fields.get("כמות משטחים", "")
         notes=fields.get("הערות למחסן", "")
+        picking_lines = fields.get("שורות ליקוט", 0)
+        segment = fields.get("סיגמנט", False)
+
+
 
         # אם שם הלקוח הוא Lookup, לפעמים מתקבל מערך
         if isinstance(customer_name, list):
             customer_name = ", ".join(
                 str(value) for value in customer_name
+            )
+        if isinstance(segment, list):
+            segment = ", ".join(
+                str(value) for value in segment
             )
 
         display = order_number
@@ -275,6 +283,7 @@ def get_orders_filter_by_status(    status: str ):
             display += f" - {amount} משטחים"
         if notes:
              display += f" - {notes} "
+             
 
         orders.append({
             "id": record["id"],
@@ -283,7 +292,11 @@ def get_orders_filter_by_status(    status: str ):
             "display": display,
             "quantity": fields.get("כמות", 0),
             "notes": notes,
-            "amount": amount
+            "amount": amount,
+
+            "picking_lines": picking_lines,
+            "segment": segment,
+            
         })
 
     return orders

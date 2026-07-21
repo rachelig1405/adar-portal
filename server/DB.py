@@ -260,7 +260,7 @@ def get_orders_filter_by_status(    status: str ):
         amount= fields.get("כמות משטחים", "")
         notes=fields.get("הערות למחסן", "")
         picking_lines = fields.get("שורות ליקוט", 0)
-        segment = fields.get("סיגמנט", False)
+        segment = fields.get("סיגמנט", "")
 
 
 

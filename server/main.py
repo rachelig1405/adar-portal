@@ -118,7 +118,7 @@ def end_picking(data: PickingEnd):
         end_time=True,
         amount=data.amount,
         notes=data.notes,
-        invoice=data.invoice
+        invoice=data.invoice,
          break_minutes=data.break_minutes
     )
 

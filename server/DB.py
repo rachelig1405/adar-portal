@@ -508,3 +508,35 @@ def get_order_by_record_id(record_id: str):
         )
 
     return response.json()
+#יצירת רשומה בטבלה ימי עבודה
+def create_workday_record(workday_date: date):
+    table_name = quote(
+        AIRTABLE_WORKDAY_TABLE,
+        safe="",
+    )
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{table_name}"
+    )
+
+    payload = {
+        "fields": {
+            "יום עבודה": workday_date.isoformat(),
+        }
+    }
+
+    response = requests.post(
+        url,
+        headers=airtable_headers(),
+        json=payload,
+        timeout=30,
+    )
+
+    if response.status_code not in (200, 201):
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
+        )
+
+    return response.json()

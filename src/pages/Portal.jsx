@@ -12,6 +12,7 @@ import CheckOrder from "./CheckOrder";
 import LoadingOrders from "./LoadOrder";
 import EndPicking from "./EndPicking";
 import ImportOrdersExcel from "./importOrdersExcel.";
+import CreateProductPdfs from "./CreateStickers";
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -20,6 +21,9 @@ const INTERNAL_COMPONENTS = {
   check: CheckOrder,
   loading:LoadingOrders,
   importOrdersExcel:ImportOrdersExcel,
+  stickers: CreateProductPdfs,
+
+
 };
 
 
@@ -60,33 +64,40 @@ export default function Portal({ user, onLogout }) {
     setActiveAction(null);
   }
 
-
-  function handleAction(item) {
-    const isInternalPage = Boolean(
-      INTERNAL_COMPONENTS[item.key]
-    );
-
-    if (isInternalPage) {
-      setActiveAction(item.key);
-      return;
-    }
-
-    if (item.openInFrame) {
-      setActiveAction(item.key);
-      return;
-    }
-
-    if (item.url) {
-      window.open(
-        item.url,
-        "_blank",
-        "noopener,noreferrer"
-      );
-      return;
-    }
-
-    alert("עדיין לא הוגדר קישור לפעולה הזאת");
+function handleAction(item) {
+  if (
+    item.key === "createProductPdfs" &&
+    user.role !== "admin"
+  ) {
+    alert("הפעולה מותרת למנהל המערכת בלבד");
+    return;
   }
+
+  const isInternalPage = Boolean(
+    INTERNAL_COMPONENTS[item.key]
+  );
+
+  if (isInternalPage) {
+    setActiveAction(item.key);
+    return;
+  }
+
+  if (item.openInFrame) {
+    setActiveAction(item.key);
+    return;
+  }
+
+  if (item.url) {
+    window.open(
+      item.url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+    return;
+  }
+
+  alert("עדיין לא הוגדר קישור לפעולה הזאת");
+}
 
 
   return (

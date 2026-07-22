@@ -153,7 +153,8 @@ def workday_assignment(max_date:date,order_id:str):
                 return {
                     "success": True,
                     "record": result,
-                    "message": "ההזמנה שובצה בהצלחה"
+                    "message": "ההזמנה שובצה בהצלחה",
+                    "workday id":workday
                 }
         #במידה ולא נמצא יום פנוי
         else:

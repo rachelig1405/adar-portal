@@ -8,3 +8,12 @@ python-calamine
 holidays
 python-barcode
 Pillow
+fastapi
+uvicorn
+python-multipart
+pandas
+openpyxl
+jinja2
+playwright
+Pillow
+python-barcode

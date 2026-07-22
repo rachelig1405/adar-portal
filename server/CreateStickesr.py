@@ -4,7 +4,7 @@ import barcode
 from barcode.writer import ImageWriter
 from pathlib import Path
 
-from tkinter.ttk import Progressbar
+
 import subprocess
 import tempfile
 import shutil

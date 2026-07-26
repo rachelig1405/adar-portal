@@ -389,9 +389,34 @@ def barcode_url(barcode_value: str) -> str:
 
     # אם הברקוד כבר נוצר בעבר, אין צורך לייצר שוב
     if not svg_path.exists():
-        command = [    get_zint_executable()
-            
-        ]
+        zint_exe = get_zint_executable()
+        command = [
+    str(zint_exe),
+
+    # EAN-13 / EANX
+    "--barcode=EANX",
+
+    # הברקוד המלא
+    f"--data={digits}",
+
+    # קובץ SVG
+    f"--output={svg_path}",
+
+    # גובה הפסים
+    "--height=39",
+
+    # הורדת פסי השמירה
+    "--guarddescent=5",
+
+    # רווח בין הפסים למספרים
+    "--textgap=1",
+
+    # אזורים לבנים תקניים
+    "--quietzones",
+
+    # הטמעת הפונט בתוך SVG
+    "--embedfont",
+]
 
         result = subprocess.run(
             command,

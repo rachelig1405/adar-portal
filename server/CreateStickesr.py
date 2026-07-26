@@ -1,6 +1,5 @@
 import base64
 import re
-import barcode
 from barcode.writer import ImageWriter
 from pathlib import Path
 import platform
@@ -17,7 +16,7 @@ from playwright.sync_api import sync_playwright
 from openpyxl import load_workbook
 from io import BytesIO
 
-from barcode import EAN13
+
 from barcode.writer import SVGWriter
 
 
@@ -72,6 +71,15 @@ OLD_PRODUCTS_ROOTS = [
     OLD_PRODUCTS_ROOT_2,
     OLD_PRODUCTS_ROOT_3,
 ]
+def get_zint_executable() -> str:
+    if platform.system() == "Windows":
+        return str(
+            Path(__file__).parent
+            / "zint-2.16.0"
+            / "zint.exe"
+        )
+
+    return "zint"
 def validate_product_row(row, excel_row_number: int) -> list[str]:
     """
     בודקת שורת מוצר אחת ומחזירה רשימת שגיאות.
@@ -381,7 +389,7 @@ def barcode_url(barcode_value: str) -> str:
 
     # אם הברקוד כבר נוצר בעבר, אין צורך לייצר שוב
     if not svg_path.exists():
-        command = [    str(ZINT_PATH)
+        command = [    get_zint_executable()
             
         ]
 

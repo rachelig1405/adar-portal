@@ -256,12 +256,18 @@ def get_employees():
 
     return employees
 #החזת טבלת הזמנות לפי סטטוס מסוים
-def get_orders_filter_by_status(    status: str ):
-
-    records = get_all_airtable_records(
+def get_orders_filter_by_status(    status: str ,loading:bool|None=None):
+    if loading:
+         records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula=f'{{סטטוס}}="{status}"'
+          filter_formula=f'{{סטטוס}}="{status}" and {{בצפי}}=1'
     )
+    else:
+
+        records = get_all_airtable_records(
+            AIRTABLE_ORDERS_TABLE,
+            filter_formula=f'{{סטטוס}}="{status}"'
+        )
 
     orders = []
 

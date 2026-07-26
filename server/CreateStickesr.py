@@ -3,6 +3,9 @@ import re
 import barcode
 from barcode.writer import ImageWriter
 from pathlib import Path
+import platform
+import shutil
+from pathlib import Path
 
 
 import subprocess
@@ -345,7 +348,17 @@ def local_file_to_data_uri(path_value: str) -> str:
 def get_logo_data_uri():
     logo_path = Path(__file__).parent / "לוגו.jpeg"
     return local_file_to_data_uri(str(logo_path))
+BASE_DIR = Path(__file__).parent
 
+if platform.system() == "Windows":
+    ZINT_PATH = BASE_DIR / "zint-2.16.0" / "zint.exe"
+else:
+    ZINT_PATH = shutil.which("zint")
+
+if ZINT_PATH is None:
+    raise FileNotFoundError(
+        "לא נמצא Zint במערכת"
+    )
 def barcode_url(barcode_value: str) -> str:
     """
     יוצר ברקוד EAN-13 באמצעות Zint,
@@ -359,13 +372,7 @@ def barcode_url(barcode_value: str) -> str:
             f"ברקוד EAN-13 חייב להכיל בדיוק 13 ספרות. התקבל: {digits}"
         )
 
-    # מיקום zint.exe בתוך תיקיית הפרויקט
-    zint_exe = Path(__file__).parent / "zint-2.16.0" / "zint.exe" 
 
-    if not zint_exe.exists():
-        raise FileNotFoundError(
-            f"לא נמצא Zint בנתיב: {zint_exe}"
-        )
 
     barcode_folder = Path(__file__).parent / "_barcodes"
     barcode_folder.mkdir(parents=True, exist_ok=True)
@@ -374,32 +381,8 @@ def barcode_url(barcode_value: str) -> str:
 
     # אם הברקוד כבר נוצר בעבר, אין צורך לייצר שוב
     if not svg_path.exists():
-        command = [
-            str(zint_exe),
-
-            # EAN-13 / EANX
-            "--barcode=EANX",
-
-            # הברקוד המלא
-            f"--data={digits}",
-
-            # קובץ SVG
-            f"--output={svg_path}",
-
-            # גובה הפסים
-            "--height=39",
-
-            # הורדת פסי השמירה מתחת לפסים הרגילים
-            "--guarddescent=5",
-
-            # רווח בין הפסים למספרים
-            "--textgap=1",
-
-            # אזורים לבנים תקניים בצדדים
-            "--quietzones",
-
-            # הטמעת הפונט בתוך SVG
-            "--embedfont",
+        command = [    str(ZINT_PATH)
+            
         ]
 
         result = subprocess.run(

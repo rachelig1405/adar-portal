@@ -16,7 +16,7 @@ export default function LoadingOrders({ onClose }) {
 
       try {
         const response = await fetch(
-          `${API_URL}/api/orders/filter_by_status?status=בבדיקה`
+          `${API_URL}/api/orders/ready_to_loading?status=בבדיקה`
         );
 
         const data = await response.json();

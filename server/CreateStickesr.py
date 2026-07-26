@@ -1,6 +1,6 @@
 import base64
 import re
-from barcode.writer import ImageWriter
+
 from pathlib import Path
 import platform
 import shutil

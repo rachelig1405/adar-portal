@@ -12,3 +12,4 @@ openpyxl
 jinja2
 playwright
 barcode
+setuptools

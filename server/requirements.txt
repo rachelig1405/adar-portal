@@ -6,11 +6,9 @@ python-multipart
 pydantic
 python-calamine
 holidays
-python-barcode
 Pillow
 pandas
 openpyxl
 jinja2
 playwright
-
 

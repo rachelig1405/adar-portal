@@ -16,4 +16,8 @@ openpyxl
 jinja2
 playwright
 Pillow
+<<<<<<< HEAD
 python-barcode
+=======
+python-barcode
+>>>>>>> b089d56 (stickes)

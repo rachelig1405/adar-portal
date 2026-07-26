@@ -66,7 +66,7 @@ export default function Portal({ user, onLogout }) {
 
 function handleAction(item) {
   if (
-    item.key === "createProductPdfs" &&
+    item.key === "stickers" &&
     user.role !== "admin"
   ) {
     alert("הפעולה מותרת למנהל המערכת בלבד");

@@ -443,25 +443,25 @@ def barcode_url(barcode_value: str) -> str:
     return f"data:image/svg+xml;base64,{encoded}"
 
 
-def html_to_pdf(html: str, output_pdf: Path):
+async def html_to_pdf(html: str, output_pdf: Path):
     output_pdf.parent.mkdir(parents=True, exist_ok=True)
 
-    with async_playwright() as p:
+    async with async_playwright() as p:
         browser = p.chromium.launch()
 
         page = browser.new_page(
             device_scale_factor=1
         )
 
-        page.emulate_media(media="print")
+        await  page.emulate_media(media="print")
 
-        page.set_content(
+        await page.set_content(
             html,
             wait_until="networkidle"
         )
 
         # ממתינים לטעינת פונטים ותמונות
-        page.evaluate("""
+        await page.evaluate("""
         async () => {
             if (document.fonts && document.fonts.ready) {
                 await document.fonts.ready;
@@ -484,7 +484,7 @@ def html_to_pdf(html: str, output_pdf: Path):
         """)
 
         # הקטנת טקסט אוטומטית עד שהוא נכנס לרוחב המוגדר
-        page.evaluate("""
+        await page.evaluate("""
         () => {
             const MM_TO_PX = 96 / 25.4;
             const elements =
@@ -525,16 +525,16 @@ def html_to_pdf(html: str, output_pdf: Path):
         }
         """)
 
-        page.pdf(
+        await page.pdf(
             path=str(output_pdf),
             print_background=True,
             prefer_css_page_size=True,
             scale=1,
         )
 
-        browser.close()
+        await browser.close()
 
-        browser.close()
+        await browser.close()
 def extract_excel_images_by_sku(excel_path: Path, output_folder: Path):
     wb = load_workbook(excel_path)
     ws = wb.active

@@ -12,7 +12,7 @@ import tempfile
 import shutil
 import pandas as pd
 from jinja2 import Template
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 from openpyxl import load_workbook
 from io import BytesIO
 
@@ -446,7 +446,7 @@ def barcode_url(barcode_value: str) -> str:
 def html_to_pdf(html: str, output_pdf: Path):
     output_pdf.parent.mkdir(parents=True, exist_ok=True)
 
-    with sync_playwright() as p:
+    with async_playwright() as p:
         browser = p.chromium.launch()
 
         page = browser.new_page(

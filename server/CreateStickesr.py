@@ -17,7 +17,7 @@ from openpyxl import load_workbook
 from io import BytesIO
 
 
-from barcode.writer import SVGWriter
+
 
 
 # =========================

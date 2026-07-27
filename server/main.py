@@ -480,8 +480,9 @@ def login(data: LoginRequest):
     return {
         "success": True,
         "user": {
-            "username": fields.get("Username", ""),
-            "name": fields.get("Full Name", ""),
-            "role": fields.get("Role", ""),
+            "username": fields.get("שם משתמש", ""),
+            "name": fields.get("שם", ""),
+            "role": fields.get("תפקיד", ""),
+            "id": user_record["id"]
         },
     }

@@ -464,6 +464,7 @@ def login(data: LoginRequest):
     saved_password = str(
         fields.get("סיסמא", "")
     ).strip()
+    print(saved_password)
 
     if saved_password != password:
         raise HTTPException(

@@ -12,7 +12,6 @@ const warehouse = [
 const office = [
   { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },
   { key:"newOrder", title:"קליטת הזמנה", subtitle:"יצירת הזמנה חדשה", icon:"🧾", color:"blue", url:LINKS.newOrder },
-  { key:"customers", title:"לקוחות", subtitle:"ממשק לקוחות", icon:"👥", color:"pink", url:LINKS.customers },
   { key:"orders", title:"הזמנות", subtitle:"כל ההזמנות במערכת", icon:"📋", color:"yellow", url:LINKS.allOrders },
   { key:"dashboard", title:"דשבורד משרד", subtitle:"תצוגת ניהול משרד", icon:"📊", color:"purple", url:LINKS.officeDashboard },
   {
@@ -26,7 +25,6 @@ const office = [
 const admin=[
     { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },
   { key:"newOrder", title:"קליטת הזמנה", subtitle:"יצירת הזמנה חדשה", icon:"🧾", color:"blue", url:LINKS.newOrder },
-  { key:"customers", title:"לקוחות", subtitle:"ממשק לקוחות", icon:"👥", color:"pink", url:LINKS.customers },
   { key:"orders", title:"הזמנות", subtitle:"כל ההזמנות במערכת", icon:"📋", color:"yellow", url:LINKS.allOrders },
   { key:"dashboard", title:"דשבורד משרד", subtitle:"תצוגת ניהול משרד", icon:"📊", color:"purple", url:LINKS.officeDashboard },
   {

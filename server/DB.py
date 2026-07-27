@@ -639,5 +639,6 @@ def get_airtable_user(username: str):
 
     if not records:
         return None
+    print("1")
 
     return records[0]

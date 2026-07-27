@@ -462,7 +462,7 @@ def login(data: LoginRequest):
     fields = user_record.get("fields", {})
 
     saved_password = str(
-        fields.get("Password", "")
+        fields.get("סיסמא", "")
     ).strip()
 
     if saved_password != password:

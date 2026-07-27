@@ -472,7 +472,7 @@ def login(data: LoginRequest):
             detail="שם המשתמש או הסיסמה שגויים",
         )
 
-    if not fields.get("Active", False):
+    if not fields.get("פעיל", False):
         raise HTTPException(
             status_code=403,
             detail="המשתמש אינו פעיל",

@@ -33,3 +33,6 @@ class PickingEnd(BaseModel):
 class WorkdayAssignmentRequest(BaseModel):
     max_date: date
     order_id: str
+class LoginRequest(BaseModel):
+    username: str
+    password: str

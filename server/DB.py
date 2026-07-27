@@ -12,6 +12,10 @@ AIRTABLE_CUSTOMERS_TABLE = os.getenv("AIRTABLE_CUSTOMERS_TABLE")
 AIRTABLE_AGENTS_TABLE = os.getenv("AIRTABLE_AGENTS_TABLE")
 AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
 AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
+AIRTABLE_USERS_TABLE = os.getenv(
+    "AIRTABLE_USERS_TABLE"
+   
+)
 from Models import CustomerCreate,OrderCreate
 def airtable_headers():
     return {
@@ -587,3 +591,55 @@ def create_workday_record(workday_date: date):
         )
 
     return response.json()
+#חיפוש שם משתמש בטבלת משתמשים
+def get_airtable_user(username: str):
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        raise RuntimeError(
+            "חסרים משתני AIRTABLE_TOKEN או AIRTABLE_BASE_ID"
+        )
+
+    table_name = quote(
+        AIRTABLE_WORKERS_TABLE,
+        safe="",
+    )
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{table_name}"
+    )
+
+    safe_username = (
+        username
+        .replace("\\", "\\\\")
+        .replace("'", "\\'")
+    )
+
+    formula = (
+        f"LOWER({{Username}})"
+        f"=LOWER('{safe_username}')"
+    )
+
+    response = requests.get(
+        url,
+        headers={
+            "Authorization": f"Bearer {AIRTABLE_TOKEN}",
+        },
+        params={
+            "filterByFormula": formula,
+            "maxRecords": 1,
+        },
+        timeout=20,
+    )
+
+    if not response.ok:
+        print("Airtable error:", response.text)
+        raise RuntimeError(
+            "שגיאה בקריאת המשתמשים מ-Airtable"
+        )
+
+    records = response.json().get("records", [])
+
+    if not records:
+        return None
+
+    return records[0]

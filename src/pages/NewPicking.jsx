@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { API_URL } from "../config";
 
-export default function NewPicking({ onClose }) {
+export default function NewPicking({ onClose,user }) {
   const [orders, setOrders] = useState([]);
   const [employees, setEmployees] = useState([]);
 
@@ -213,7 +213,7 @@ export default function NewPicking({ onClose }) {
           },
           body: JSON.stringify({
             order_id: selectedOrder.id,
-            employee_id: selectedEmployee.id,
+            employee_id: user.id,
           }),
         }
       );
@@ -339,19 +339,7 @@ export default function NewPicking({ onClose }) {
           <div className="picker-section">
             <label>עובד</label>
 
-            <input
-              type="text"
-              placeholder="הקלד שם עובד..."
-              value={employeeSearch}
-              disabled={loading}
-              autoComplete="off"
-              onKeyDown={handleEmployeeKeyDown}
-              onChange={(event) => {
-                setEmployeeSearch(event.target.value);
-                setSelectedEmployee(null);
-                setEmployeeActiveIndex(-1);
-              }}
-            />
+       
 
             {!selectedEmployee && !loading && (
               <div className="picker-results employee-results">
@@ -381,24 +369,7 @@ export default function NewPicking({ onClose }) {
               </div>
             )}
 
-            {selectedEmployee && (
-              <div className="selected-record">
-                <div>
-                  <span>עובד שנבחר</span>
-                  <strong>{selectedEmployee.name}</strong>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedEmployee(null);
-                    setEmployeeSearch("");
-                  }}
-                >
-                  שינוי
-                </button>
-              </div>
-            )}
+      
           </div>
 
           <button

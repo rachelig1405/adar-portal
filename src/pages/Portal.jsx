@@ -171,6 +171,7 @@ function handleAction(item) {
       {ActiveInternalComponent && (
         <ActiveInternalComponent
           onClose={closeActiveAction}
+          user={user}
         />
       )}
 

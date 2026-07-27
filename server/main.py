@@ -17,18 +17,21 @@ load_dotenv(dotenv_path=env_path)
 from CreateStickesr import process_excel
 from Models import OrderCreate
 from Models import PickingStart
-from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest
+from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 AIRTABLE_CUSTOMERS_TABLE = os.getenv("AIRTABLE_CUSTOMERS_TABLE")
 AIRTABLE_AGENTS_TABLE = os.getenv("AIRTABLE_AGENTS_TABLE")
 AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
+AIRTABLE_USERS_TABLE = os.getenv(
+    "AIRTABLE_USERS_TABLE"
+)
 from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user
 from WorkdayAssignment import workday_assignment
 
 FRONTEND_URL = os.getenv(
@@ -428,3 +431,57 @@ async def create_product_pdfs(
             status_code=500,
             detail=f"שגיאה ביצירת הקבצים: {error}",
         ) from error
+@app.post("/api/login")
+def login(data: LoginRequest):
+    username = data.username.strip()
+    password = data.password.strip()
+
+    if not username or not password:
+        raise HTTPException(
+            status_code=400,
+            detail="יש להזין שם משתמש וסיסמה",
+        )
+
+    try:
+        user_record = get_airtable_user(username)
+
+    except Exception as error:
+        print("Login error:", error)
+
+        raise HTTPException(
+            status_code=500,
+            detail="שגיאה בחיבור לשרת",
+        )
+
+    if not user_record:
+        raise HTTPException(
+            status_code=401,
+            detail="שם המשתמש או הסיסמה שגויים",
+        )
+
+    fields = user_record.get("fields", {})
+
+    saved_password = str(
+        fields.get("Password", "")
+    ).strip()
+
+    if saved_password != password:
+        raise HTTPException(
+            status_code=401,
+            detail="שם המשתמש או הסיסמה שגויים",
+        )
+
+    if not fields.get("Active", False):
+        raise HTTPException(
+            status_code=403,
+            detail="המשתמש אינו פעיל",
+        )
+
+    return {
+        "success": True,
+        "user": {
+            "username": fields.get("Username", ""),
+            "name": fields.get("Full Name", ""),
+            "role": fields.get("Role", ""),
+        },
+    }

@@ -344,7 +344,7 @@ async def create_product_pdfs(
         # הרצת הפונקציה הקיימת
         # ============================
 
-        result = process_excel(
+        result = await process_excel(
             excel_path=str(excel_path),
             output_root=str(output_dir),
             certificate_folder=str(certificates_dir),

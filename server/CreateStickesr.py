@@ -1,23 +1,16 @@
+
+
 import base64
-import re
-
-from pathlib import Path
 import platform
+import re
 import shutil
+import subprocess
 from pathlib import Path
 
-
-import subprocess
-import tempfile
-import shutil
 import pandas as pd
 from jinja2 import Template
-from playwright.async_api import async_playwright
 from openpyxl import load_workbook
-from io import BytesIO
-
-
-
+from playwright.async_api import async_playwright
 
 
 # =========================
@@ -356,23 +349,11 @@ def local_file_to_data_uri(path_value: str) -> str:
 def get_logo_data_uri():
     logo_path = Path(__file__).parent / "לוגו.jpeg"
     return local_file_to_data_uri(str(logo_path))
-BASE_DIR = Path(__file__).parent
-
-if platform.system() == "Windows":
-    ZINT_PATH = BASE_DIR / "zint-2.16.0" / "zint.exe"
-else:
-    ZINT_PATH = shutil.which("zint")
-
-if ZINT_PATH is None:
-    raise FileNotFoundError(
-        "לא נמצא Zint במערכת"
-    )
 def barcode_url(barcode_value: str) -> str:
     """
-    יוצר ברקוד EAN-13 באמצעות Zint,
-    מחזיר אותו כ-Data URI מסוג SVG לשתילה בתוך HTML.
+    יוצר ברקוד EAN-13 באמצעות Zint ומחזיר Data URI מסוג SVG.
+    עובד עם zint.exe ב-Windows ועם zint ב-Linux/Render.
     """
-
     digits = clean_digits(barcode_value)
 
     if len(digits) != 13:
@@ -380,146 +361,91 @@ def barcode_url(barcode_value: str) -> str:
             f"ברקוד EAN-13 חייב להכיל בדיוק 13 ספרות. התקבל: {digits}"
         )
 
-
-
     barcode_folder = Path(__file__).parent / "_barcodes"
     barcode_folder.mkdir(parents=True, exist_ok=True)
+    svg_path = barcode_folder / f"{digits}_h39_g5_t1.svg"
 
-    svg_path = barcode_folder / f"{digits}_h45_g5_t1.svg"
-
-    # אם הברקוד כבר נוצר בעבר, אין צורך לייצר שוב
     if not svg_path.exists():
         zint_exe = get_zint_executable()
         command = [
-    str(zint_exe),
+            str(zint_exe),
+            "--barcode=EANX",
+            f"--data={digits}",
+            f"--output={svg_path}",
+            "--height=39",
+            "--guarddescent=5",
+            "--textgap=1",
+            "--quietzones",
+            "--embedfont",
+        ]
 
-    # EAN-13 / EANX
-    "--barcode=EANX",
-
-    # הברקוד המלא
-    f"--data={digits}",
-
-    # קובץ SVG
-    f"--output={svg_path}",
-
-    # גובה הפסים
-    "--height=39",
-
-    # הורדת פסי השמירה
-    "--guarddescent=5",
-
-    # רווח בין הפסים למספרים
-    "--textgap=1",
-
-    # אזורים לבנים תקניים
-    "--quietzones",
-
-    # הטמעת הפונט בתוך SVG
-    "--embedfont",
-]
-
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-        )
+        try:
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                check=False,
+            )
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(
+                f"לא נמצא Zint להפעלה: {zint_exe}"
+            ) from exc
 
         if result.returncode != 0:
             raise RuntimeError(
                 "Zint נכשל ביצירת הברקוד:\n"
-                + result.stderr
+                f"פקודה: {' '.join(command)}\n"
+                f"STDOUT: {result.stdout}\n"
+                f"STDERR: {result.stderr}"
             )
 
         if not svg_path.exists():
-            raise RuntimeError(
-                f"Zint לא יצר את הקובץ: {svg_path}"
-            )
+            raise RuntimeError(f"Zint לא יצר את הקובץ: {svg_path}")
 
-    svg_data = svg_path.read_bytes()
-    encoded = base64.b64encode(svg_data).decode("ascii")
-
+    encoded = base64.b64encode(svg_path.read_bytes()).decode("ascii")
     return f"data:image/svg+xml;base64,{encoded}"
 
 
-async def html_to_pdf(html: str, output_pdf: Path):
+async def html_to_pdf(html: str, output_pdf: Path, browser) -> None:
+    """מייצר PDF מעמוד HTML באמצעות דפדפן Playwright קיים."""
     output_pdf.parent.mkdir(parents=True, exist_ok=True)
+    page = await browser.new_page(device_scale_factor=1)
 
-    async with async_playwright() as p:
-        browser = p.chromium.launch()
+    try:
+        await page.emulate_media(media="print")
+        await page.set_content(html, wait_until="load")
 
-        page = browser.new_page(
-            device_scale_factor=1
-        )
-
-        await  page.emulate_media(media="print")
-
-        await page.set_content(
-            html,
-            wait_until="networkidle"
-        )
-
-        # ממתינים לטעינת פונטים ותמונות
         await page.evaluate("""
         async () => {
             if (document.fonts && document.fonts.ready) {
                 await document.fonts.ready;
             }
-
             const images = Array.from(document.images);
-
-            await Promise.all(
-                images.map(async (img) => {
-                    if (img.complete) return;
-
-                    try {
-                        await img.decode();
-                    } catch (error) {
-                        // ממשיכים גם אם תמונה מסוימת לא נטענה
-                    }
-                })
-            );
+            await Promise.all(images.map(async (img) => {
+                if (img.complete) return;
+                try { await img.decode(); } catch (error) {}
+            }));
         }
         """)
 
-        # הקטנת טקסט אוטומטית עד שהוא נכנס לרוחב המוגדר
         await page.evaluate("""
         () => {
             const MM_TO_PX = 96 / 25.4;
-            const elements =
-                document.querySelectorAll(".auto-fit-text");
-
+            const elements = document.querySelectorAll(".auto-fit-text");
             elements.forEach((element) => {
-                const computed =
-                    window.getComputedStyle(element);
-
-                let fontSizePx =
-                    parseFloat(computed.fontSize);
-
-                const minimumMm =
-                    parseFloat(
-                        element.dataset.minFontMm || "1"
-                    );
-
-                const minimumPx =
-                    minimumMm * MM_TO_PX;
-
-                // מקטינים כל פעם בצעד קטן לקבלת התאמה מדויקת
+                const computed = window.getComputedStyle(element);
+                let fontSizePx = parseFloat(computed.fontSize);
+                const minimumMm = parseFloat(element.dataset.minFontMm || "1");
+                const minimumPx = minimumMm * MM_TO_PX;
                 const stepPx = 0.15;
-
                 while (
-                    element.scrollWidth >
-                        element.clientWidth + 0.25 &&
+                    element.scrollWidth > element.clientWidth + 0.25 &&
                     fontSizePx > minimumPx
                 ) {
-                    fontSizePx = Math.max(
-                        minimumPx,
-                        fontSizePx - stepPx
-                    );
-
-                    element.style.fontSize =
-                        fontSizePx + "px";
+                    fontSizePx = Math.max(minimumPx, fontSizePx - stepPx);
+                    element.style.fontSize = fontSizePx + "px";
                 }
             });
         }
@@ -531,10 +457,10 @@ async def html_to_pdf(html: str, output_pdf: Path):
             prefer_css_page_size=True,
             scale=1,
         )
+    finally:
+        await page.close()
 
-        await browser.close()
 
-        await browser.close()
 def extract_excel_images_by_sku(excel_path: Path, output_folder: Path):
     wb = load_workbook(excel_path)
     ws = wb.active
@@ -1068,7 +994,7 @@ li::before {
       <li>אין להשליך בטריות לאש, מפני סכנת פיצוץ.</li>
       <li>אין לחשוף את הסוללות למגע עם מים ורטיבות.</li>
       {% if  battery%}
-          <li> 🔋 המשחק מופעל ע"י סוללות{battery}}</li>
+          <li> 🔋 המשחק מופעל ע"י סוללות {{ battery }}</li>
   
       {% endif %}
     </ul>
@@ -1100,7 +1026,7 @@ WARNING_EXTRA_HTML = {
 }
 
 
-def render_templates(row, product_dir: Path, photo_data: str = ""):
+async def render_templates(row, product_dir: Path, browser, photo_data: str = ""):
     sku = val(row, COL_SKU)
     item_no = val(row, COL_ITEM_NO)
     pcs = val(row, COL_PCS)
@@ -1163,12 +1089,24 @@ def render_templates(row, product_dir: Path, photo_data: str = ""):
     
    
 
-    html_to_pdf(Template(CARTON_HTML).render(**context), product_dir / f"{safe_name(sku)}_MR.pdf")
-    html_to_pdf(Template(BARCODES_84_HTML).render(**context), product_dir / f"{safe_name(sku)}_HTS.pdf")
-    html_to_pdf(Template(WARNING_HTML).render(**context), product_dir / f"{safe_name(sku)}_ST.pdf")
+    await html_to_pdf(
+        Template(CARTON_HTML).render(**context),
+        product_dir / f"{safe_name(sku)}_MR.pdf",
+        browser,
+    )
+    await html_to_pdf(
+        Template(BARCODES_84_HTML).render(**context),
+        product_dir / f"{safe_name(sku)}_HTS.pdf",
+        browser,
+    )
+    await html_to_pdf(
+        Template(WARNING_HTML).render(**context),
+        product_dir / f"{safe_name(sku)}_ST.pdf",
+        browser,
+    )
 
 
-def process_excel(
+async def process_excel(
     excel_path: str,
     output_root: str,
     certificate_folder: str = "",
@@ -1275,93 +1213,88 @@ def process_excel(
     )
 
     total = len(valid_row_indexes)
+    created_products = 0
 
     # ======================================
-    # יצירת PDF רק לשורות התקינות
+    # יצירת PDF רק לשורות התקינות.
+    # Chromium נפתח פעם אחת לכל הריצה כדי לחסוך זמן וזיכרון.
     # ======================================
-
-    for progress_index, dataframe_index in enumerate(
-        valid_row_indexes,
-        start=1
-    ):
-        row = df.loc[dataframe_index]
-
-        sku = val(row, COL_SKU)
-        item_no = val(row, COL_ITEM_NO)
-
-        clean_sku = safe_name(sku)
-
-        folder_name = (
-            clean_sku
-            or safe_name(item_no)
-            or f"row_{dataframe_index + 2}"
+    async with async_playwright() as p:
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
 
-        product_dir = output_root / folder_name
-        product_dir.mkdir(parents=True, exist_ok=True)
+        try:
+            for progress_index, dataframe_index in enumerate(
+                valid_row_indexes,
+                start=1,
+            ):
+                row = df.loc[dataframe_index]
+                sku = val(row, COL_SKU)
+                item_no = val(row, COL_ITEM_NO)
+                clean_sku = safe_name(sku)
 
-        # חיפוש והעתקת התיקייה הישנה של המק"ט.
-        old_folder_copied, old_folder_result = copy_old_sku_folder(
-            sku=sku,
-            product_dir=product_dir,
-        )
-
-        if not old_folder_copied:
-            old_folder_errors.append(
-                f"מק״ט {sku}: {old_folder_result}"
-            )
-
-        # חיפוש התמונה שחולצה לפי המק"ט
-        photo_path = image_map.get(clean_sku)
-
-        photo_data = (
-            local_file_to_data_uri(str(photo_path))
-            if photo_path
-            else ""
-        )
-
-        render_templates(
-            row,
-            product_dir,
-            photo_data=photo_data
-        )
-
-        certificate_number = val(
-            row,
-            COL_CERTIFICATE,
-        )
-
-        if certificate_folder_path is not None:
-            copied, certificate_result = copy_certificate_pdf(
-                certificate_folder=certificate_folder_path,
-                certificate_number=certificate_number,
-                product_dir=product_dir,
-                sku=sku,
-            )
-            if str(sku).strip() in {
-                 "11798",
-                 "17698",
-                    "7928",
-}:
-                 print("=" * 60)
-                 print("מק״ט:", repr(sku))
-                 print("מספר תעודה שנקרא:", repr(certificate_number))
-                 print("כל הערכים בשורה:")
-
-                 for column_name, cell_value in row.items():
-                    print(
-                        repr(column_name),
-                        "=>",
-                        repr(cell_value)
-                    )
-
-            if not copied:
-                certificate_errors.append(
-                    f"מק״ט {sku}: {certificate_result}"
+                folder_name = (
+                    clean_sku
+                    or safe_name(item_no)
+                    or f"row_{dataframe_index + 2}"
                 )
 
-        if progress_callback:
-            progress_callback(progress_index, total)
+                product_dir = output_root / folder_name
+                product_dir.mkdir(parents=True, exist_ok=True)
+
+                # אי-מציאת תיקייה ישנה אינה עוצרת את יצירת ה-PDF.
+                old_folder_copied, old_folder_result = copy_old_sku_folder(
+                    sku=sku,
+                    product_dir=product_dir,
+                )
+                if not old_folder_copied:
+                    old_folder_errors.append(
+                        f"מק״ט {sku}: {old_folder_result}"
+                    )
+
+                photo_path = image_map.get(clean_sku)
+                photo_data = (
+                    local_file_to_data_uri(str(photo_path))
+                    if photo_path
+                    else ""
+                )
+
+                await render_templates(
+                    row,
+                    product_dir,
+                    browser,
+                    photo_data=photo_data,
+                )
+                created_products += 1
+
+                certificate_number = val(row, COL_CERTIFICATE)
+                if certificate_folder_path is not None:
+                    copied, certificate_result = copy_certificate_pdf(
+                        certificate_folder=certificate_folder_path,
+                        certificate_number=certificate_number,
+                        product_dir=product_dir,
+                        sku=sku,
+                    )
+
+                    if str(sku).strip() in {"11798", "17698", "7928"}:
+                        print("=" * 60)
+                        print("מק״ט:", repr(sku))
+                        print("מספר תעודה שנקרא:", repr(certificate_number))
+                        print("כל הערכים בשורה:")
+                        for column_name, cell_value in row.items():
+                            print(repr(column_name), "=>", repr(cell_value))
+
+                    if not copied:
+                        certificate_errors.append(
+                            f"מק״ט {sku}: {certificate_result}"
+                        )
+
+                if progress_callback:
+                    progress_callback(progress_index, total)
+        finally:
+            await browser.close()
 
     certificate_report_path = None
 
@@ -1402,7 +1335,7 @@ def process_excel(
         )
 
     return {
-        "created_products": total,
+        "created_products": created_products,
         "invalid_rows": len(df) - total,
         "error_count": len(all_errors),
         "report_path": report_path,
@@ -1411,5 +1344,3 @@ def process_excel(
         "old_folder_error_count": len(old_folder_errors),
         "old_folder_report_path": old_folder_report_path,
     }
-
-

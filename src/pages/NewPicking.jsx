@@ -335,8 +335,8 @@ export default function NewPicking({ onClose,user }) {
             disabled={
               loading ||
               saving ||
-              !selectedOrder ||
-              !selectedEmployee
+              !selectedOrder 
+              
             }
           >
             {saving ? "שומר..." : "התחל ליקוט"}

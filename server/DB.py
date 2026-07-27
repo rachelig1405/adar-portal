@@ -615,7 +615,7 @@ def get_airtable_user(username: str):
     )
 
     formula = (
-        f"LOWER({{Username}})"
+        f"LOWER({{שם משתמש}})"
         f"=LOWER('{safe_username}')"
     )
 

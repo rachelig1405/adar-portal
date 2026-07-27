@@ -614,10 +614,8 @@ def get_airtable_user(username: str):
         .replace("'", "\\'")
     )
 
-    formula = (
-        f"LOWER({{שם משתמש}})"
-        f"=LOWER('{safe_username}')"
-    )
+    formula = f"{{שם משתמש}}='{safe_username}'"
+    print(formula)
 
     response = requests.get(
         url,

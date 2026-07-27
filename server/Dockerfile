@@ -5,6 +5,11 @@ WORKDIR /app
 # התקנת Zint וכלי מערכת בסיסיים
 RUN apt-get update && apt-get install -y \
     zint \
+    fontconfig \
+    fonts-noto-core \
+    fonts-dejavu-core \
+    fonts-liberation2 \
+    && fc-cache -f -v \
     && rm -rf /var/lib/apt/lists/*
 
 # התקנת ספריות Python

@@ -41,13 +41,7 @@ export default function NewPicking({ onClose,user }) {
           );
         }
 
-        if (!employeesResponse.ok) {
-          throw new Error(
-            typeof employeesData.detail === "string"
-              ? employeesData.detail
-              : "שגיאה בטעינת העובדים"
-          );
-        }
+    
 
         setOrders(Array.isArray(ordersData) ? ordersData : []);
         setEmployees(Array.isArray(employeesData) ? employeesData : []);
@@ -195,10 +189,7 @@ export default function NewPicking({ onClose,user }) {
       return;
     }
 
-    if (!selectedEmployee?.id) {
-      setError("חובה לבחור עובד");
-      return;
-    }
+ 
 
     setSaving(true);
     setError("");
@@ -336,41 +327,7 @@ export default function NewPicking({ onClose,user }) {
             )}
           </div>
 
-          <div className="picker-section">
-            <label>עובד</label>
-
-       
-
-            {!selectedEmployee && !loading && (
-              <div className="picker-results employee-results">
-                {filteredEmployees.length > 0 ? (
-                  filteredEmployees.map((employee, index) => (
-                    <button
-                      type="button"
-                      key={employee.id}
-                      className={`picker-row ${
-                        employeeActiveIndex === index ? "active" : ""
-                      }`}
-                      onMouseEnter={() =>
-                        setEmployeeActiveIndex(index)
-                      }
-                      onClick={() => chooseEmployee(employee)}
-                    >
-                      <div className="picker-main">
-                        {employee.name}
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="empty-search">
-                    לא נמצאו עובדים
-                  </div>
-                )}
-              </div>
-            )}
-
-      
-          </div>
+    
 
           <button
             className="save-button"

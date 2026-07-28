@@ -8,7 +8,17 @@ AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 def clean_zpl_value(value) -> str:
     return str(value or "").replace("^", "").replace("~", "").strip()
 
+def clean_airtable_value(value):
+    if isinstance(value, list):
+        if not value:
+            return ""
 
+        return str(value[0])
+
+    if value is None:
+        return ""
+
+    return str(value)
 def create_order_label_zpl(order: dict) -> str:
     fields = order.get("fields", {})
 
@@ -30,6 +40,11 @@ def create_order_label_zpl(order: dict) -> str:
     customer_number= clean_zpl_value(
             fields.get("מספר לקוח")
         )
+    order_number = clean_airtable_value(order_number)
+    customer_number = clean_airtable_value(customer_number)
+    customer_name = clean_airtable_value(customer_name)
+    address = clean_airtable_value(address)
+    city = clean_airtable_value(city)
 
 
     return f"""
@@ -40,30 +55,30 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^PQ4
 
-^FO250,20
-^A0N,34,34
+^FO740,50
+^A0R,45,45
 ^FD{order_number}^FS
 
-^FO70,100
-^BY4,3,120
-^BCN,120,N,N,N
+^FO650,50
+^BY3,2,120
+^BCR,120,N,N,N
 ^FD{order_number}^FS
 
-^FO40,270
-^A0N,40,40
-^FD{customer_number}^FS
+^FO480,50
+^A0R,40,40
+^FDמספר לקוח: {customer_number}^FS
 
-^FO40,340
-^A0N,34,34
-^FD{customer_name}^FS
+^FO410,50
+^A0R,34,34
+^FDשם לקוח: {customer_name}^FS
 
-^FO40,400
-^A0N,34,34
-^FD{address}^FS
+^FO340,50
+^A0R,34,34
+^FDכתובת: {address}^FS
 
-^FO40,460
-^A0N,34,34
-^FD{city}^FS
+^FO270,50
+^A0R,34,34
+^FDעיר: {city}^FS
 
 ^XZ
 """

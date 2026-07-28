@@ -264,7 +264,7 @@ def get_orders_filter_by_status(    status: str ,loading:bool|None=None):
     if loading:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula=f'{{סטטוס}}="{status}" and {{בצפי}}=1'
+          filter_formula=f'AND({{סטטוס}}="{status}", {{בצפי}}=1)'
     )
     else:
 

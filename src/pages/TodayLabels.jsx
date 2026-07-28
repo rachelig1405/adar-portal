@@ -115,6 +115,7 @@ function TodayLabelsPrint({ onClose }) {
         )}
 
     </div>
+    
 
 </div>
   );

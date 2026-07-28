@@ -85,15 +85,34 @@ function TodayLabelsPrint({ onClose }) {
 
         <div className="label-buttons">
 
-            <button className="print-button">
-                🖨️ הדפס
+            <button
+                className="print-button"
+                onClick={printLabels}
+                disabled={loading}
+            >
+             {loading ? "שולח למדפסת..." : "🖨️ הדפס"}
             </button>
 
-            <button className="back-button">
+            <button
+                className="back-button"
+                onClick={onClose}
+            >
                 חזרה
             </button>
 
         </div>
+        {message && (
+            <div
+                className={
+                    message.includes("שגיאת") ||
+                    message.includes("לא נמצאה")
+                        ? "print-error"
+                        : "print-success"
+                }
+            >
+                {message}
+            </div>
+        )}
 
     </div>
 

@@ -66,11 +66,15 @@ def create_order_label_zpl(order: dict) -> str:
     customer_number= clean_zpl_value(
             fields.get("מספר לקוח")
         )
+    customer_phone= clean_zpl_value(
+                fields.get("טלפון")
+            )
     order_number = clean_airtable_value(order_number)
     customer_number = clean_airtable_value(customer_number)
     customer_name = clean_airtable_value(customer_name)
     address = clean_airtable_value(address)
     city = clean_airtable_value(city)
+    customer_phone=clean_airtable_value(customer_phone)
 
 
     return f"""
@@ -79,9 +83,9 @@ def create_order_label_zpl(order: dict) -> str:
 ^PW800
 ^LL560
 
-^PQ1
+^PQ4
 
-^FO560,120
+^FO570,130
 ^A0R,34,34
 
 ^FD{order_number}^FS
@@ -94,10 +98,10 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^FO480,50
 
-^A0R,40,40
+^A0R,34,34
 ^FDמספר לקוח: {customer_number}^FS
 
-^FO410,700
+^FO410,50
 
 ^A0R,34,34
 ^FDשם לקוח: {customer_name}^FS
@@ -111,6 +115,11 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^A0R,34,34
 ^FDעיר: {city}^FS
+^FO200,50
+
+^A0R,34,34
+^FDטלפון: {customer_phone}^FS
+
 
 ^XZ
 """
@@ -133,3 +142,4 @@ def create_today_orders_zpl() -> str:
     ]
 
     return "\n".join(labels)
+

@@ -19,7 +19,7 @@ def clean_text(text):
     return str(text)
 
 
-def right_align_x(text, right_x=700, char_width=18):
+def right_align_x(text, right_x=850, char_width=18):
     """
     מחזיר ערך X כך שהטקסט יסתיים באותו קו ימין.
 
@@ -28,7 +28,7 @@ def right_align_x(text, right_x=700, char_width=18):
     char_width - רוחב משוער של כל תו בפונט
     """
 
-    text = clean_text(text)
+
 
     return right_x - (len(text) * char_width)
 
@@ -123,7 +123,7 @@ def create_order_label_zpl(order: dict) -> str:
 ^A0R,34,34
 ^FDמספר לקוח: {customer_number}^FS
 
-^FO410,right_align_x('שם לקוח: ' + customer_name)
+^FO410,{right_align_x('שם לקוח: ' + customer_name)}
 
 ^A0R,34,34
 ^FDשם לקוח: {customer_name}^FS

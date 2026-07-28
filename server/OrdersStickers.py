@@ -59,7 +59,7 @@ def create_order_label_zpl(order: dict) -> str:
 """
 def create_today_orders_zpl() -> str:
     records = get_all_airtable_records(table_name=AIRTABLE_ORDERS_TABLE,filter_formula=  "IS_SAME("
-        "{יום עבדוה בפועל},"
+        "{יום עבודה בפועל},"
         "TODAY(),"
         "'day'"
         ")")

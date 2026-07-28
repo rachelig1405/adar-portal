@@ -105,7 +105,7 @@ def create_order_label_zpl(order: dict) -> str:
 ^PW800
 ^LL560
 
-^PQ1
+^PQ4
 
 ^FO570,130
 ^A0R,40,40
@@ -118,21 +118,22 @@ def create_order_label_zpl(order: dict) -> str:
 ^BCR,120,N,N,N
 ^FD{order_number}^FS
 
-^FO{right_align_x('מספר לקוח: ' + customer_number)},50
+^FO480,{right_align_x('מספר לקוח: ' + customer_number)}
+
 ^A0R,34,34
 ^FDמספר לקוח: {customer_number}^FS
 
-^FO{right_align_x('שם לקוח: ' + customer_name)},50
+^FO410,right_align_x('שם לקוח: ' + customer_name)
 
 ^A0R,34,34
 ^FDשם לקוח: {customer_name}^FS
 
-^FO{right_align_x('כתובת: ' + address)},50
+^FO340,{right_align_x('כתובת: ' + address)}
 
 ^A0R,34,34
 ^FDכתובת: {address}^FS
 
-^FO{right_align_x('עיר: ' + city)},50
+^FO270,{right_align_x('עיר: ' + city)}
 
 ^A0R,34,34
 ^FDעיר: {city}^FS

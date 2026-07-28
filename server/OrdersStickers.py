@@ -19,7 +19,7 @@ def clean_text(text):
     return str(text)
 
 
-def right_align_x(text, right_x=1200, char_width=18):
+def right_align_x(text, right_x=750, char_width=12):
     """
     מחזיר ערך X כך שהטקסט יסתיים באותו קו ימין.
 

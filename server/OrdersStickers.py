@@ -9,6 +9,28 @@ def clean_zpl_value(value) -> str:
     return str(value or "").replace("^", "").replace("~", "").strip()
 
 import ast
+def clean_text(text):
+    if text is None:
+        return ""
+
+    if isinstance(text, list):
+        text = text[0] if text else ""
+
+    return str(text)
+
+
+def right_align_x(text, right_x=700, char_width=18):
+    """
+    מחזיר ערך X כך שהטקסט יסתיים באותו קו ימין.
+
+    text       - הטקסט להדפסה
+    right_x    - קו הימין הרצוי
+    char_width - רוחב משוער של כל תו בפונט
+    """
+
+    text = clean_text(text)
+
+    return right_x - (len(text) * char_width)
 
 
 def clean_airtable_value(value):
@@ -83,10 +105,10 @@ def create_order_label_zpl(order: dict) -> str:
 ^PW800
 ^LL560
 
-^PQ4
+^PQ1
 
 ^FO570,130
-^A0R,34,34
+^A0R,40,40
 
 ^FD{order_number}^FS
 
@@ -96,29 +118,25 @@ def create_order_label_zpl(order: dict) -> str:
 ^BCR,120,N,N,N
 ^FD{order_number}^FS
 
-^FO480,50
-
+^FO{right_align_x('מספר לקוח: ' + customer_number)},50
 ^A0R,34,34
 ^FDמספר לקוח: {customer_number}^FS
 
-^FO410,50
+^FO{right_align_x('שם לקוח: ' + customer_name)},50
 
 ^A0R,34,34
 ^FDשם לקוח: {customer_name}^FS
 
-^FO340,50
+^FO{right_align_x('כתובת: ' + address)},50
 
 ^A0R,34,34
 ^FDכתובת: {address}^FS
 
-^FO270,50
+^FO{right_align_x('עיר: ' + city)},50
 
 ^A0R,34,34
 ^FDעיר: {city}^FS
-^FO200,50
 
-^A0R,34,34
-^FDטלפון: {customer_phone}^FS
 
 
 ^XZ

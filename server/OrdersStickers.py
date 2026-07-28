@@ -30,30 +30,32 @@ def create_order_label_zpl(order: dict) -> str:
 
     return f"""
 ^XA
+^CI28
 ^PW800
 ^LL560
-^CI28
 
-^FO40,30
-^A0N,45,45
-^FDOrder: {order_number}^FS
+^PQ4
 
-^FO40,100
-^BY3,2,100
-^BCN,100,Y,N,N
+^FO250,20
+^A0N,34,34
 ^FD{order_number}^FS
 
-^FO40,260
+^FO70,100
+^BY4,3,120
+^BCN,120,N,N,N
+^FD{order_number}^FS
+
+^FO40,270
+^A0N,40,40
+^FD{customer_name}^FS
+
+^FO40,340
 ^A0N,34,34
-^FDCustomer: {customer_name}^FS
+^FD{address}^FS
 
-^FO40,320
-^A0N,30,30
-^FDAddress: {address}^FS
-
-^FO40,380
-^A0N,30,30
-^FDCity: {city}^FS
+^FO40,400
+^A0N,34,34
+^FD{city}^FS
 
 ^XZ
 """

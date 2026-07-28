@@ -30,7 +30,7 @@ def right_align_x(text, right_x=750, char_width=12):
 
 
 
-    return right_x - (len(text) * char_width)
+    return max(10,right_x - (len(text) * char_width))
 
 
 def clean_airtable_value(value):

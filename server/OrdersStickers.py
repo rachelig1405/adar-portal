@@ -97,6 +97,17 @@ def create_order_label_zpl(order: dict) -> str:
     address = clean_airtable_value(address)
     city = clean_airtable_value(city)
     customer_phone=clean_airtable_value(customer_phone)
+    print(customer_number, len("מספר לקוח: " + customer_number),
+      right_align_x("מספר לקוח: " + customer_number))
+
+    print(customer_name, len("שם לקוח: " + customer_name),
+        right_align_x("שם לקוח: " + customer_name))
+
+    print(address, len("כתובת: " + address),
+        right_align_x("כתובת: " + address))
+
+    print(city, len("עיר: " + city),
+      right_align_x("עיר: " + city))
 
 
     return f"""

@@ -81,28 +81,34 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^PQ1
 
-^FO510,700
+^FO560,140
 ^A0R,45,45
+^FB220,1,0,R
 ^FD{order_number}^FS
 
-^FO650,700
+^FO650,50
+^FB220,1,0,R
 ^BY3,2,120
 ^BCR,120,N,N,N
 ^FD{order_number}^FS
 
-^FO480,700
+^FO480,50
+^FB220,1,0,R
 ^A0R,40,40
 ^FDמספר לקוח: {customer_number}^FS
 
 ^FO410,700
+^FB220,1,0,R
 ^A0R,34,34
 ^FDשם לקוח: {customer_name}^FS
 
-^FO340,700
+^FO340,50
+^FB220,1,0,R
 ^A0R,34,34
 ^FDכתובת: {address}^FS
 
-^FO270,700
+^FO270,50
+^FB220,1,0,R
 ^A0R,34,34
 ^FDעיר: {city}^FS
 

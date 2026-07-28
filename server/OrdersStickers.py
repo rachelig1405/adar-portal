@@ -27,6 +27,10 @@ def create_order_label_zpl(order: dict) -> str:
     city = clean_zpl_value(
         fields.get("עיר")
     )
+    customer_number= clean_zpl_value(
+            fields.get("מספר לקוח")
+        )
+
 
     return f"""
 ^XA
@@ -47,13 +51,17 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^FO40,270
 ^A0N,40,40
-^FD{customer_name}^FS
+^FD{customer_number}^FS
 
 ^FO40,340
 ^A0N,34,34
-^FD{address}^FS
+^FD{customer_name}^FS
 
 ^FO40,400
+^A0N,34,34
+^FD{address}^FS
+
+^FO40,460
 ^A0N,34,34
 ^FD{city}^FS
 

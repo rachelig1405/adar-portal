@@ -8,15 +8,41 @@ AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
 def clean_zpl_value(value) -> str:
     return str(value or "").replace("^", "").replace("~", "").strip()
 
+import ast
+
+
 def clean_airtable_value(value):
-    if isinstance(value, list):
+    if value is None:
+        return ""
+
+    # רשימה אמיתית שמגיעה מ-Airtable Lookup
+    if isinstance(value, (list, tuple)):
         if not value:
             return ""
 
-        return str(value[0])
+        return clean_airtable_value(value[0])
 
-    if value is None:
-        return ""
+    text = str(value).strip()
+
+    # מחרוזת שנראית כמו רשימה: "['6161']"
+    if text.startswith("[") and text.endswith("]"):
+        try:
+            parsed_value = ast.literal_eval(text)
+
+            if isinstance(parsed_value, (list, tuple)):
+                if not parsed_value:
+                    return ""
+
+                return clean_airtable_value(parsed_value[0])
+        except (ValueError, SyntaxError):
+            pass
+
+    # הסרת סוגריים וגרשיים במקרה שלא הצלחנו לפענח
+    text = text.strip("[]")
+    text = text.strip()
+    text = text.strip("'\"")
+
+    return text.strip()
 
     return str(value)
 def create_order_label_zpl(order: dict) -> str:
@@ -53,32 +79,36 @@ def create_order_label_zpl(order: dict) -> str:
 ^PW800
 ^LL560
 
-^PQ4
+^PQ1
 
-^FO740,50
-^A0R,45,45
+^FO120,20
+^BY4,3,120
+^BCN,120,N,N,N
 ^FD{order_number}^FS
 
-^FO650,50
-^BY3,2,120
-^BCR,120,N,N,N
+^FO260,170
+^A0N,40,40
 ^FD{order_number}^FS
 
-^FO480,50
-^A0R,40,40
-^FDמספר לקוח: {customer_number}^FS
+^FO760,260
+^A0R,36,36
+^FB300,1,0,R
+^FD{customer_number}^FS
 
-^FO410,50
-^A0R,34,34
-^FDשם לקוח: {customer_name}^FS
+^FO760,320
+^A0R,36,36
+^FB300,1,0,R
+^FD{customer_name}^FS
 
-^FO340,50
-^A0R,34,34
-^FDכתובת: {address}^FS
+^FO760,380
+^A0R,32,32
+^FB400,1,0,R
+^FD{address}^FS
 
-^FO270,50
-^A0R,34,34
-^FDעיר: {city}^FS
+^FO760,440
+^A0R,32,32
+^FB300,1,0,R
+^FD{city}^FS
 
 ^XZ
 """

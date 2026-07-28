@@ -33,7 +33,8 @@ from DB import get_table_records
 from DB import get_employees
 from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user
 from WorkdayAssignment import workday_assignment
-
+from fastapi.responses import PlainTextResponse
+from OrdersStickers import create_today_orders_zpl
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
     "http://localhost:5173",
@@ -487,3 +488,10 @@ def login(data: LoginRequest):
             "id": user_record["id"]
         },
     }
+#הדפסת מדבקות להזמנות להיום
+@app.get(
+    "/api/labels/today",
+    response_class=PlainTextResponse,
+)
+def print_today_labels():
+    return create_today_orders_zpl()

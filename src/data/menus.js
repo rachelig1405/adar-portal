@@ -6,6 +6,7 @@ const warehouse = [
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
   { key:"orders", title:"כל ההזמנות", subtitle:"תצוגת הזמנות מהמערכת", icon:"📦", color:"yellow", url:LINKS.allOrders },
   { key:"dashboard", title:"דשבורד מחסן", subtitle:"נתוני מחסן וסטטוסים", icon:"📊", color:"purple", url:LINKS.warehouseDashboard},
+  {key:"OrderStickers",title: "הדפסת מדבקות",subtitle:"",icon: "📰",color:"blue"}
  
 
 ];

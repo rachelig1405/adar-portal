@@ -13,7 +13,7 @@ import LoadingOrders from "./LoadOrder";
 import EndPicking from "./EndPicking";
 import ImportOrdersExcel from "./importOrdersExcel.";
 import CreateProductPdfs from "./CreateStickers";
-
+import TodayLabelsPrint from "./TodayLabels";
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
   startPicking: NewPicking,
@@ -22,6 +22,7 @@ const INTERNAL_COMPONENTS = {
   loading:LoadingOrders,
   importOrdersExcel:ImportOrdersExcel,
   stickers: CreateProductPdfs,
+  OrderStickers: TodayLabelsPrint
 
 
 };
@@ -53,6 +54,11 @@ export default function Portal({ user, onLogout }) {
 
     return menu.find((item) => item.key === activeAction) || null;
   }, [activeAction, menu]);
+  const normalizedRole = String(user?.role || "")
+  .trim()
+  .toLowerCase();
+
+  const isWarehouse = normalizedRole === "warehouse";
 
   const ActiveInternalComponent =
     activeAction && INTERNAL_COMPONENTS[activeAction]
@@ -164,6 +170,8 @@ function handleAction(item) {
                 onClick={() => handleAction(item)}
               />
             ))}
+          
+
           </div>
         </section>
       </main>

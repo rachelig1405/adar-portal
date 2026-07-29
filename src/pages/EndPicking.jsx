@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { API_URL } from "../config";
-export default function EndPicking({ onClose },{user}) {
+export default function EndPicking({ onClose,user}) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");

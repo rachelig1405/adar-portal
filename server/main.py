@@ -17,6 +17,7 @@ load_dotenv(dotenv_path=env_path)
 from CreateStickesr import process_excel
 from Models import OrderCreate
 from Models import PickingStart
+from typing import Optional
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
@@ -92,8 +93,8 @@ def GetEmployes():
 
 
 @app.get("/api/orders/filter_by_status")
-def Get_orders_filter_by_status(status: str = Query(..., description="סטטוס ההזמנות"), action: int = Query(..., description="פעולה"),
-    user_id: str = Query(..., description="מזהה המשתמש")):
+def Get_orders_filter_by_status(status: str = Query(..., description="סטטוס ההזמנות"), action: Optional[int] = Query(None, description="פעולה"),
+    user_id: Optional[str] = Query(None, description="מזהה המשתמש"),):
     return get_orders_filter_by_status(status=status,action=action,user_id=user_id)
    
 

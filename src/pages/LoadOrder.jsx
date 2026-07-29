@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { API_URL } from "../config";
-export default function LoadingOrders({ onClose }) {
+export default function LoadingOrders({ onClose,user}) {
   const [orders, setOrders] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState({});
 

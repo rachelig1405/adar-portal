@@ -276,7 +276,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                                 f"{{סטטוס}}='{status}',"
                                 f"{{עובדים}}='{user_id}'"
                                 f")"
-                                )
+                                ))
 
         else:
 

@@ -26,7 +26,7 @@ export default function NewPicking({ onClose,user }) {
 
       try {
         const [ordersResponse, employeesResponse] = await Promise.all([
-          fetch(`${API_URL}/api/orders/filter_by_status?status=לפני יצור`),
+          fetch(`${API_URL}/api/orders/filter_by_status?status=לפני יצור&action=0&user_id={user.id}`),
           fetch(`${API_URL}/api/employees`),
         ]);
 

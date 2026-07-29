@@ -183,26 +183,27 @@ def workday_assignment(max_date:date,order_id:str):
                 #מעבר על כל הזמנה והזמנה לבדוק אם אפשר להזיז אותה
                 for order in orders:
                     order1=get_order_by_record_id(order)
-                    print(order1)
-                    max_order_day = order1["fields"].get("תאריך ליקוט מקסימילי")
+                    if order1["fields"].get("סטטוס")=="לפני יצור":
+                        print(order1)
+                        max_order_day = order1["fields"].get("תאריך ליקוט מקסימילי")
 
-                    
-                    #בדיקה אם יש להזמנות האחרות יום פנוי
-                    records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
-                        f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
-                        f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
-                        f')',view="ימים בשיבוץ")
-                    
-                    #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
-                    if records_of_worksday:
-                        print("if שני")
-                        update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
-                        #עדכון ההזמנה החדשה
-                        result=update_order_workflow(order_id=order_id,workday_id=record["id"])
-                        return {
-                            "success": True,
-                            "record": result,
-                        }
+                        
+                        #בדיקה אם יש להזמנות האחרות יום פנוי
+                        records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
+                            f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
+                            f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
+                            f')',view="ימים בשיבוץ")
+                        
+                        #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
+                        if records_of_worksday:
+                            print("if שני")
+                            update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
+                            #עדכון ההזמנה החדשה
+                            result=update_order_workflow(order_id=order_id,workday_id=record["id"])
+                            return {
+                                "success": True,
+                                "record": result,
+                            }
                 
         print("send message to agents")
         return {"success": False,"message": "לא נמצא יום עבודה פנוי"}

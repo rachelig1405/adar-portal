@@ -267,23 +267,21 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
           filter_formula=f'AND({{סטטוס}}="{status}", {{בצפי}}=1)'
     )
     else :
+        records = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=f'{{סטטוס}}="{status}"')
         if action==2:
+                   if user_id:
+                        records = [
+                        record
+                        for record in records
+                        if user_id in (
+                            record.get("fields", {}).get("עובדים") or []
+                        )
+                    ]
                  
-                 records = get_all_airtable_records(
-                    AIRTABLE_ORDERS_TABLE,
-                      filter_formula = (
-                                f"AND("
-                                f"{{סטטוס}}='{status}',"
-                                f"{{עובדים}}='{user_id}'"
-                                f")"
-                                ))
 
-        else:
-
-            records = get_all_airtable_records(
-                AIRTABLE_ORDERS_TABLE,
-                filter_formula=f'{{סטטוס}}="{status}"'
-            )
+     
 
     orders = []
 

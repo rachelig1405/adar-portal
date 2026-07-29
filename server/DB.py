@@ -271,7 +271,12 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                  
                  records = get_all_airtable_records(
                     AIRTABLE_ORDERS_TABLE,
-                      filter_formula=f'AND({{סטטוס}}="{status}", {{עובדים}}={user_id})')
+                      filter_formula = (
+                                f"AND("
+                                f"{{סטטוס}}='{status}',"
+                                f"{{עובדים}}='{user_id}'"
+                                f")"
+                                )
 
         else:
 

@@ -5,7 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const LOCAL_PRINT_URL = import.meta.env.VITE_LOCAL_PRINT_URL || "http://127.0.0.1:5001";
 const PRINT_KEY = import.meta.env.VITE_LOCAL_PRINT_KEY || "adar-print-2026";
 
-function TodayLabelsPrint({ onClose }) {
+export default function TodayLabelsPrint({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -43,19 +43,88 @@ function TodayLabelsPrint({ onClose }) {
     finally { setLoading(false); }
   };
 
-  return <div className="label-print-page" dir="rtl"><div className="label-print-card">
-    <h1 className="label-print-title">🖨️ הדפסת מדבקות</h1>
-    <p className="label-print-subtitle">הדפסת מדבקה אחת לכל הזמנה של יום העבודה הנוכחי.</p>
-    <div className="label-info-box">
-      <div className="label-info-row"><span className="label-info-title">סוג מדבקה</span><span>הזמנות יום עבודה</span></div>
-      <div className="label-info-row"><span className="label-info-title">תוכן המדבקה</span><span>מספר הזמנה, ברקוד, לקוח, כתובת ועיר</span></div>
+return (
+  <div className="modal-backdrop" dir="rtl">
+    <div className="form-window label-print-window">
+      <div className="form-header">
+        <div>
+          <div className="frame-kicker">ADAR Portal</div>
+          <strong>הדפסת מדבקות</strong>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+          disabled={loading}
+        >
+          חזרה
+        </button>
+      </div>
+
+      <div className="label-print-card">
+        <h1 className="label-print-title">
+          🖨️ הדפסת מדבקות
+        </h1>
+
+        <p className="label-print-subtitle">
+          הדפסת מדבקה אחת לכל הזמנה של יום העבודה הנוכחי.
+        </p>
+
+        <div className="label-info-box">
+          <div className="label-info-row">
+            <span className="label-info-title">סוג מדבקה</span>
+            <span>הזמנות יום עבודה</span>
+          </div>
+
+          <div className="label-info-row">
+            <span className="label-info-title">תוכן המדבקה</span>
+            <span>
+              מספר הזמנה, ברקוד, לקוח, כתובת ועיר
+            </span>
+          </div>
+        </div>
+
+        <div className="label-buttons">
+          <button
+            type="button"
+            className="print-button"
+            onClick={printLabels}
+            disabled={loading}
+          >
+            {loading ? "מבצע פעולה..." : "🖨️ הדפס"}
+          </button>
+
+          <button
+            type="button"
+            className="check-button"
+            onClick={checkPrintServer}
+            disabled={loading}
+          >
+            בדיקת שרת הדפסה
+          </button>
+
+          <button
+            type="button"
+            className="back-button"
+            onClick={onClose}
+            disabled={loading}
+          >
+            חזרה
+          </button>
+        </div>
+
+        {message && (
+          <div
+            className={
+              isError ? "print-error" : "print-success"
+            }
+          >
+            {message}
+          </div>
+        )}
+      </div>
     </div>
-    <div className="label-buttons">
-      <button type="button" className="print-button" onClick={printLabels} disabled={loading}>{loading ? "מבצע פעולה..." : "🖨️ הדפס"}</button>
-      <button type="button" className="check-button" onClick={checkPrintServer} disabled={loading}>בדיקת שרת הדפסה</button>
-      <button type="button" className="back-button" onClick={onClose} disabled={loading}>חזרה</button>
-    </div>
-    {message && <div className={isError ? "print-error" : "print-success"}>{message}</div>}
-  </div></div>;
+  </div>
+);
 }
 export default TodayLabelsPrint;

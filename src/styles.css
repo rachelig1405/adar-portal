@@ -684,3 +684,65 @@
     font-weight: bold;
 }
 .label-print-page{width:100%;min-height:100%;display:flex;justify-content:center;align-items:flex-start;padding:30px;box-sizing:border-box}.label-print-card{width:760px;max-width:100%;background:#fff;border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.12);padding:30px;box-sizing:border-box}.label-print-title{margin:0 0 10px;font-size:28px;color:#1f2937}.label-print-subtitle{margin:0 0 28px;color:#6b7280;line-height:1.6}.label-info-box{margin-bottom:26px;padding:18px;background:#f7f8fa;border:1px solid #d9dde4;border-radius:9px}.label-info-row{display:flex;justify-content:space-between;gap:24px;margin-bottom:12px;font-size:16px}.label-info-row:last-child{margin-bottom:0}.label-info-title{flex-shrink:0;font-weight:700;color:#374151}.label-buttons{display:flex;flex-wrap:wrap;gap:12px}.print-button,.check-button,.back-button{min-height:50px;border:0;border-radius:8px;padding:0 22px;font-size:16px;font-weight:700;cursor:pointer}.print-button{flex:1;min-width:200px;background:#1976d2;color:#fff}.check-button{background:#e8eef7;color:#253858}.back-button{background:#ececec;color:#333}.print-button:disabled,.check-button:disabled,.back-button:disabled{opacity:.6;cursor:not-allowed}.print-success,.print-error{margin-top:22px;padding:15px;border-radius:8px;line-height:1.5}.print-success{background:#e8f8ec;border:1px solid #6ac26a;color:#1d6b1d}.print-error{background:#fdeaea;border:1px solid #e53935;color:#b71c1c}@media(max-width:600px){.label-print-page{padding:14px}.label-print-card{padding:20px}.label-info-row{flex-direction:column;gap:4px}.label-buttons{flex-direction:column}.print-button,.check-button,.back-button{width:100%}}
+.label-print-window {
+  width: min(720px, calc(100vw - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.label-print-card {
+  padding: 28px;
+  background: white;
+}
+
+.label-print-title {
+  margin: 0 0 10px;
+  font-size: 28px;
+  color: #26354a;
+}
+
+.label-print-subtitle {
+  margin: 0 0 24px;
+  color: #718096;
+  font-size: 17px;
+}
+
+.label-info-box {
+  border: 1px solid #d9e2ef;
+  border-radius: 12px;
+  background: #f7f9fc;
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.label-info-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 8px 0;
+}
+
+.label-info-title {
+  font-weight: 700;
+  color: #26354a;
+}
+
+.label-buttons {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr 1fr;
+  gap: 12px;
+}
+
+.label-buttons button {
+  min-height: 54px;
+  border: 0;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.label-buttons button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

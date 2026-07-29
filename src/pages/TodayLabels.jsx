@@ -67,7 +67,7 @@ return (
         </h1>
 
         <p className="label-print-subtitle">
-          הדפסת מדבקה אחת לכל הזמנה של יום העבודה הנוכחי.
+          הדפסת מדבקות להזמנות של יום העבודה הנוכחי.
         </p>
 
         <div className="label-info-box">

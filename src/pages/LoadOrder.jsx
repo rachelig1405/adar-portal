@@ -8,7 +8,11 @@ export default function LoadingOrders({ onClose }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
+    const params = new URLSearchParams({
+  status: "בבדיקה",
+  action: 1,
+  user_id: user.id,
+});
   useEffect(() => {
     async function loadOrders() {
       setLoading(true);
@@ -16,7 +20,7 @@ export default function LoadingOrders({ onClose }) {
 
       try {
         const response = await fetch(
-          `${API_URL}/api/orders/ready_to_loading?status=בבדיקה`
+          `${API_URL}/api/orders/filter_by_status?${params}`
         );
 
         const data = await response.json();

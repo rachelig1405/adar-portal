@@ -92,11 +92,10 @@ def GetEmployes():
 
 
 @app.get("/api/orders/filter_by_status")
-def Get_orders_filter_by_status(status: str = Query(..., description="סטטוס ההזמנות")):
-    return get_orders_filter_by_status(status=status)
-@app.get("/api/orders/ready_to_loading")
-def ReadyToLoading(status: str = Query(..., description="סטטוס ההזמנות")):
-       return get_orders_filter_by_status(status=status,loading=True)    
+def Get_orders_filter_by_status(status: str = Query(..., description="סטטוס ההזמנות"), action: int = Query(..., description="פעולה"),
+    user_id: str = Query(..., description="מזהה המשתמש")):
+    return get_orders_filter_by_status(status=status,action=action,user_id=user_id)
+   
 
 
 from datetime import datetime, timezone

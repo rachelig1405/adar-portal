@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { API_URL } from "../config";
-export default function EndPicking({ onClose }) {
+export default function EndPicking({ onClose },{user}) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
@@ -21,6 +21,11 @@ export default function EndPicking({ onClose }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const params = new URLSearchParams({
+  status: "בליקוט",
+  action: 2,
+  user_id: user.id,
+});
 
   useEffect(() => {
     async function loadData() {
@@ -29,7 +34,7 @@ export default function EndPicking({ onClose }) {
 
       try {
         const [ordersResponse] = await Promise.all([
-          fetch(`${API_URL}/api/orders/filter_by_status?status=בליקוט`),
+          fetch(`${API_URL}/api/orders/filter_by_status?${params}`),
          
         ]);
 

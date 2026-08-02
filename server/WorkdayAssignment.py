@@ -206,7 +206,7 @@ def workday_assignment(max_date:date,order_id:str):
                                     f'),'
                                     f'{{סטטוס}}="בשיבוץ"'
                                     f')'
-                                f')',view="ימים בשיבוץ")
+                               ,view="ימים בשיבוץ")
                         
                         #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
                         if records_of_worksday:

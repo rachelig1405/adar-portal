@@ -293,7 +293,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         )
 
         customer_name = fields.get("שם לקוח", "")
-        amount= fields.get("כמות משטחים", "")
+        amount= fields.get("כמות משטחים", 0)
         notes=fields.get("הערות למחסן", "")
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)

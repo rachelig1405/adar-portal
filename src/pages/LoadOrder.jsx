@@ -322,9 +322,9 @@ async function submit(event) {
                           {order.customer_name ||
                             "ללא שם לקוח"}
                         </span>
-                        <strong style={{ whiteSpace: "pre-line" }}>
-                            משטחים {order.amount}
-                        </strong>
+                        <span style={{ whiteSpace: "pre-line" }}>
+                             {order.amount} משטחים
+                        </span>
                       </label>
   
                       {selected && (

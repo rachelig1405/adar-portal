@@ -318,7 +318,13 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         
         if picking_lines:
              display += f"\nשורות ליקוט: {picking_lines}"
-        if segment is True:
+        if isinstance(segment, list):
+            segment = segment[0] if segment else False
+        is_segment = (
+        segment is True
+        or str(segment).strip().lower() == "true"
+        )
+        if is_segment:
              display += f"\nלקוח סיגמנט "
         
         if notes:

@@ -137,10 +137,15 @@ AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
 def workday_assignment(max_date:date,order_id:str):
     while(1):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
-        records_view_shibuts=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
-        f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
-        f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
-        f')',view="ימים בשיבוץ")
+        records_view_shibuts=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula = (
+    f'AND('
+    f'OR('
+    f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
+    f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
+    f'),'
+    f'{{סטטוס}}="בשיבוץ"'
+    f')'
+),view="ימים בשיבוץ")
         #רשומות של כל הימים כולל המלאים מהיום ועד ליום העבודה המקסימלי
         records=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
             f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'

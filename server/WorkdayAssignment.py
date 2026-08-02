@@ -212,12 +212,14 @@ def workday_assignment(max_date:date,order_id:str):
                         if records_of_worksday:
                             print("if שני",flush=True)
                             update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
+                            #אם היום התפנה בעקבות הזזת ההזמנה
+                            if record["fields"].get("סהכ שורות ליקוט")-order1["fields"].get("שורות ליקוט")<=record["fields"].get("שורות ליקוט ליום"):
                             #עדכון ההזמנה החדשה
-                            result=update_order_workflow(order_id=order_id,workday_id=record["id"])
-                            return {
-                                "success": True,
-                                "record": result,
-                            }
+                                result=update_order_workflow(order_id=order_id,workday_id=record["id"])
+                                return {
+                                    "success": True,
+                                    "record": result,
+                                }
                 
         print("send message to agents")
         return {"success": False,"message": "לא נמצא יום עבודה פנוי"}

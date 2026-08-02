@@ -5,7 +5,7 @@ const warehouse = [
   {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"green", url:LINKS.check},
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
   { key:"orders", title:"כל ההזמנות", subtitle:"תצוגת הזמנות מהמערכת", icon:"📦", color:"yellow", url:LINKS.allOrders },
-  { key:"dashboard", title:"דשבורד מחסן", subtitle:"נתוני מחסן וסטטוסים", icon:"📊", color:"purple", url:LINKS.warehouseDashboard},
+  
   {key:"OrderStickers",title: "הדפסת מדבקות",subtitle:"",icon: "📰",color:"blue"}
  
 
@@ -27,7 +27,6 @@ const admin=[
     { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },
   { key:"newOrder", title:"קליטת הזמנה", subtitle:"יצירת הזמנה חדשה", icon:"🧾", color:"blue", url:LINKS.newOrder },
   { key:"orders", title:"הזמנות", subtitle:"כל ההזמנות במערכת", icon:"📋", color:"yellow", url:LINKS.allOrders },
-  { key:"dashboard", title:"דשבורד משרד", subtitle:"תצוגת ניהול משרד", icon:"📊", color:"purple", url:LINKS.officeDashboard },
   {
     key: "importOrdersExcel",
     title: "קליטת הזמנות מאקסל",

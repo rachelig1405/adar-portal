@@ -20,7 +20,7 @@ const office = [
     title: "קליטת הזמנות מאקסל",
     subtitle: "העלאת קובץ הזמנות",
     icon: "📊",
-   color: "green",
+   color: "pink",
   }
 ];
 const admin=[

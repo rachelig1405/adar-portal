@@ -310,7 +310,8 @@ export default function EndPicking({ onClose,user}) {
               <div className="selected-record">
                 <div>
                   <span>הזמנה שנבחרה</span>
-                  <strong>{selectedOrder.display}</strong>
+                   <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
+                   
                 </div>
 
                 <button

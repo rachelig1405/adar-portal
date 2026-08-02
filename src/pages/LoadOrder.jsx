@@ -322,6 +322,9 @@ async function submit(event) {
                           {order.customer_name ||
                             "ללא שם לקוח"}
                         </span>
+                        <strong style={{ whiteSpace: "pre-line" }}>
+                            משטחים {order.display}
+                        </strong>
                       </label>
 
                       {selected && (
@@ -331,7 +334,7 @@ async function submit(event) {
                           </label>
 
                           <textarea
-                            placeholder="הקלידי הערות להזמנה הזאת..."
+                            placeholder="הקלד הערות להזמנה הזאת..."
                             value={selected.notes}
                             onChange={(event) =>
                               updateOrderNotes(

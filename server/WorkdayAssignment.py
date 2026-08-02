@@ -47,7 +47,7 @@ def create_workdays_until(target_date: date):
             detail="לא נמצאה רשומה אחרונה בטבלת ימי העבודה",
         )
        """
-        last_workday = date.today() - timedelta(days=1)
+        last_workday_value = date.today() - timedelta(days=1)
 
     else:
 

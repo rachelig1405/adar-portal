@@ -323,7 +323,7 @@ async function submit(event) {
                             "ללא שם לקוח"}
                         </span>
                         <strong style={{ whiteSpace: "pre-line" }}>
-                            משטחים {order.display}
+                            משטחים {order.amount}
                         </strong>
                       </label>
   

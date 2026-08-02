@@ -326,7 +326,7 @@ async function submit(event) {
                             משטחים {order.display}
                         </strong>
                       </label>
-
+  
                       {selected && (
                         <div className="loading-order-details">
                           <label>

@@ -296,7 +296,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         amount= fields.get("כמות משטחים", "")
         notes=fields.get("הערות למחסן", "")
         picking_lines = fields.get("שורות ליקוט", 0)
-        segment = fields.get("סיגמנט", "")
+        segment = fields.get("סיגמנט", False)
 
 
 
@@ -318,7 +318,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         
         if picking_lines:
              display += f"\nשורות ליקוט: {picking_lines}"
-        if segment=="TRUE":
+        if segment is True:
              display += f"\nלקוח סיגמנט "
         
         if notes:

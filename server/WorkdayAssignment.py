@@ -199,10 +199,13 @@ def workday_assignment(max_date:date,order_id:str):
 
                         
                         #בדיקה אם יש להזמנות האחרות יום פנוי
-                        records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula= f'AND(' f'OR('
-                            f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
-                            f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
-                            f')' f'{{סטטוס}}="בשיבוץ"'
+                        records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=     f'AND('
+                                    f'OR('
+                                    f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
+                                    f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
+                                    f'),'
+                                    f'{{סטטוס}}="בשיבוץ"'
+                                    f')'
                                 f')',view="ימים בשיבוץ")
                         
                         #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה

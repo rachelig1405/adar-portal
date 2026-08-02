@@ -184,7 +184,7 @@ def workday_assignment(max_date:date,order_id:str):
                     create_workdays_until(target_date=max_date)
                     continue
         
-            print("רשומות של כל הימים המתאימים",records)
+            print("רשומות של כל הימים המתאימים",records,flush=True)
             
             #מעבר על כל יום מתאים
             for record in records:
@@ -194,7 +194,7 @@ def workday_assignment(max_date:date,order_id:str):
                 for order in orders:
                     order1=get_order_by_record_id(order)
                     if order1["fields"].get("סטטוס")=="לפני יצור":
-                        print(order1)
+                        print(order1,flush=True)
                         max_order_day = order1["fields"].get("תאריך ליקוט מקסימילי")
 
                         
@@ -207,7 +207,7 @@ def workday_assignment(max_date:date,order_id:str):
                         
                         #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
                         if records_of_worksday:
-                            print("if שני")
+                            print("if שני",flush=True)
                             update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
                             #עדכון ההזמנה החדשה
                             result=update_order_workflow(order_id=order_id,workday_id=record["id"])

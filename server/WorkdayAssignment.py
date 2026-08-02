@@ -41,16 +41,21 @@ def create_workdays_until(target_date: date):
     )
 
     if not records:
+        """
         raise HTTPException(
             status_code=400,
             detail="לא נמצאה רשומה אחרונה בטבלת ימי העבודה",
         )
+       """
+        last_workday_value=date.today()
+        create_workday_record(last_workday_value)
+    else:
 
-    last_workday_value = (
-        records[-1]
-        .get("fields", {})
-        .get("יום עבודה")
-    )
+        last_workday_value = (
+            records[-1]
+            .get("fields", {})
+            .get("יום עבודה")
+        )
 
     if not last_workday_value:
         raise HTTPException(

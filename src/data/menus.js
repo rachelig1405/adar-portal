@@ -32,7 +32,7 @@ const admin=[
     title: "קליטת הזמנות מאקסל",
     subtitle: "העלאת קובץ הזמנות",
     icon: "📊",
-   color: "green",
+   color: "pink",
   },
    { key:"startPicking", title:"תחילת ליקוט", subtitle:"פתיחת תהליך ליקוט להזמנה", icon:"🟢", color:"green", url:LINKS.startPicking },
   { key:"endPicking", title:"סיום ליקוט", subtitle:"עדכון סיום ליקוט", icon:"✅", color:"blue", url:LINKS.endPicking },

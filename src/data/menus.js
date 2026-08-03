@@ -6,7 +6,13 @@ const warehouse = [
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
   { key:"orders", title:"כל ההזמנות", subtitle:"תצוגת הזמנות מהמערכת", icon:"📦", color:"yellow", url:LINKS.allOrders },
   
-  {key:"OrderStickers",title: "הדפסת מדבקות",subtitle:"",icon: "📰",color:"blue"}
+  {key:"OrderStickers",title: "הדפסת מדבקות",subtitle:"",icon: "📰",color:"blue"},
+  {
+  key: "generalChat",
+  title: "צ׳אט עובדים",
+  subtitle: "התכתבות כללית בין עובדי החברה",
+  icon: "💬",
+}
  
 
 ];
@@ -21,7 +27,13 @@ const office = [
     subtitle: "העלאת קובץ הזמנות",
     icon: "📊",
    color: "pink",
-  }
+  },
+  {
+  key: "generalChat",
+  title: "צ׳אט עובדים",
+  subtitle: "התכתבות כללית בין עובדי החברה",
+  icon: "💬",
+}
 ];
 const admin=[
     { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },
@@ -38,7 +50,13 @@ const admin=[
   { key:"endPicking", title:"סיום ליקוט", subtitle:"עדכון סיום ליקוט", icon:"✅", color:"blue", url:LINKS.endPicking },
   {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"green", url:LINKS.check},
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
-  {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"yellow"}
+  {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"yellow"},
+  {
+  key: "generalChat",
+  title: "צ׳אט עובדים",
+  subtitle: "התכתבות כללית בין עובדי החברה",
+  icon: "💬",
+}
 ];
 export function getMenu(role) {
   if (role === "warehouse") return warehouse;

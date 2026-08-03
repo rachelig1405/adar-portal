@@ -14,6 +14,7 @@ import EndPicking from "./EndPicking";
 import ImportOrdersExcel from "./importOrdersExcel.";
 import CreateProductPdfs from "./CreateStickers";
 import TodayLabelsPrint from "./TodayLabels";
+import GeneralChat from "./GeneralChat";
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
   startPicking: NewPicking,
@@ -22,7 +23,8 @@ const INTERNAL_COMPONENTS = {
   loading:LoadingOrders,
   importOrdersExcel:ImportOrdersExcel,
   stickers: CreateProductPdfs,
-  OrderStickers: TodayLabelsPrint
+  OrderStickers: TodayLabelsPrint,
+  generalChat: GeneralChat,
 
 
 };

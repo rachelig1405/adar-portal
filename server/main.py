@@ -18,7 +18,7 @@ from CreateStickesr import process_excel
 from Models import OrderCreate
 from Models import PickingStart
 from typing import Optional
-from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest
+from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
@@ -32,7 +32,7 @@ from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl
@@ -495,3 +495,24 @@ def login(data: LoginRequest):
 )
 def print_today_labels():
     return create_today_orders_zpl()
+@app.get("/api/chat/messages")
+def api_get_chat_messages(
+    limit: int = Query(100, ge=1, le=200),
+):
+    return get_chat_messages(limit=limit)
+
+
+@app.post("/api/chat/messages")
+def api_create_chat_message(
+    data: ChatMessageCreate,
+):
+    created_record = create_chat_message(
+        user_id=data.user_id,
+        message=data.message,
+    )
+
+    return {
+        "success": True,
+        "id": created_record["id"],
+        "message": "ההודעה נשלחה בהצלחה",
+    }

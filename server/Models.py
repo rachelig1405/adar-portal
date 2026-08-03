@@ -36,3 +36,9 @@ class WorkdayAssignmentRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+from pydantic import BaseModel, Field
+
+
+class ChatMessageCreate(BaseModel):
+    user_id: str = Field(..., min_length=1)
+    message: str = Field(..., min_length=1, max_length=2000)

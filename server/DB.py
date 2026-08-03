@@ -16,6 +16,7 @@ AIRTABLE_USERS_TABLE = os.getenv(
     "AIRTABLE_USERS_TABLE"
    
 )
+AIRTABLE_CHAT_TABLE=os.getenv("AIRTABLE_CHAT_TABLE")
 from Models import CustomerCreate,OrderCreate
 def airtable_headers():
     return {
@@ -658,3 +659,106 @@ def get_airtable_user(username: str):
     print("1")
 
     return records[0]
+#פונקציה ליצירת הודעה
+from urllib.parse import quote
+
+
+
+def create_chat_message(user_id: str, message: str):
+    message = str(message).strip()
+
+    if not message:
+        raise HTTPException(
+            status_code=400,
+            detail="לא ניתן לשלוח הודעה ריקה",
+        )
+
+    table_name = quote(
+        AIRTABLE_CHAT_TABLE,
+        safe="",
+    )
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{table_name}"
+    )
+
+    payload = {
+        "fields": {
+            "הודעה": message,
+            "שולח": [user_id],
+        }
+    }
+
+    response = requests.post(
+        url,
+        headers=airtable_headers(),
+        json=payload,
+        timeout=30,
+    )
+
+    if response.status_code not in (200, 201):
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
+        )
+
+    return response.json()
+#פונקתיה קבלת הודעה
+def get_chat_messages(limit: int = 100):
+    records = get_all_airtable_records(
+        table_name=AIRTABLE_CHAT_TABLE,
+        fields=[
+            "הודעה",
+            "שולח",
+            "שם שולח",
+            "תאריך יצירה",
+        ],
+        view="Grid view",
+    )
+
+    messages = []
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        sender_name = fields.get("שם שולח", "")
+
+        if isinstance(sender_name, list):
+            sender_name = (
+                str(sender_name[0])
+                if sender_name
+                else ""
+            )
+
+        sender_ids = fields.get("שולח", [])
+
+        if not isinstance(sender_ids, list):
+            sender_ids = []
+
+        messages.append({
+            "id": record["id"],
+            "message": str(
+                fields.get("הודעה", "")
+            ),
+            "sender_id": (
+                sender_ids[0]
+                if sender_ids
+                else None
+            ),
+            "sender_name": (
+                str(sender_name)
+                if sender_name
+                else "עובד"
+            ),
+            "created_at": fields.get(
+                "תאריך יצירה",
+                record.get("createdTime", ""),
+            ),
+        })
+
+    messages.sort(
+        key=lambda item: item.get("created_at", "")
+    )
+
+    return messages[-limit:]

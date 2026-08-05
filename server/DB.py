@@ -788,3 +788,67 @@ def get_chat_messages(limit: int = 100):
     )
 
     return messages[-limit:]
+#בדיקה האם קיימת כבר הזמנה בליקוט לעובד
+def employee_has_active_picking(
+    employee_id: str,
+    exclude_order_id: str | None = None,
+) -> dict | None:
+    records = get_all_airtable_records(
+        table_name=AIRTABLE_ORDERS_TABLE,
+        filter_formula='{סטטוס}="בליקוט"',
+    )
+
+    for record in records:
+        if exclude_order_id and record.get("id") == exclude_order_id:
+            continue
+
+        fields = record.get("fields", {})
+        workers = fields.get("עובדים") or []
+
+        if not isinstance(workers, list):
+            workers = [workers]
+
+        if employee_id in workers:
+            return {
+                "id": record.get("id"),
+                "order_number": str(
+                    fields.get("מספר הזמנה", "")
+                ),
+                "customer_name": fields.get(
+                    "שם לקוח",
+                    "",
+                ),
+            }
+
+    return None
+from fastapi import HTTPException
+
+
+def start_picking_order(
+    order_id: str,
+    employee_id: str,
+):
+    active_order = employee_has_active_picking(
+        employee_id=employee_id,
+        exclude_order_id=order_id,
+    )
+
+    if active_order:
+        order_number = (
+            active_order.get("order_number")
+            or "ללא מספר"
+        )
+
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "יש לך כבר הזמנה באמצע ליקוט: "
+                f"{order_number}"
+            ),
+        )
+
+    # מכאן ממשיכים לקוד הקיים שלך
+    # שמעדכן את ההזמנה לסטטוס בליקוט
+    # ומקשר אליה את העובד
+
+ 

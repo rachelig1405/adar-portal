@@ -25,11 +25,14 @@ export default function NewPicking({ onClose,user }) {
       setError("");
 
       try {
-        const [ordersResponse, employeesResponse] = await Promise.all([
-          fetch(`${API_URL}/api/orders/filter_by_status?status=לפני יצור&action=0&user_id={user.id}`),
-          fetch(`${API_URL}/api/employees`),
-        ]);
+        const [ordersResponse, employeesResponse, activePickingResponse] =
+          await Promise.all([
+            fetch(`${API_URL}/api/orders/filter_by_status?status=לפני יצור&action=0&user_id=${user.id}`),
+            fetch(`${API_URL}/api/employees`),
+            fetch(`${API_URL}/api/orders/filter_by_status?status=בליקוט&action=2&user_id=${user.id}`),
+          ]);
 
+       
         const ordersData = await ordersResponse.json();
         const employeesData = await employeesResponse.json();
 
@@ -51,6 +54,15 @@ export default function NewPicking({ onClose,user }) {
       } finally {
         setLoading(false);
       }
+      if (
+        activePickingResponse.ok &&
+        Array.isArray(activePickingData) &&
+        activePickingData.length > 0
+      ) {
+        alert(
+          `יש לך כבר הזמנה בליקוט:\n\n${activePickingData[0].display}`
+        );
+}
     }
 
     loadData();

@@ -298,6 +298,12 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         notes=fields.get("הערות למחסן", "")
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)
+        order_date=fields.get("תאריך אספקה", "")
+        eli_line=fields.get("קו אלי", "")
+        going_out_with_us=fields.get("יוצא איתנו", False)
+
+        
+
 
 
 
@@ -332,6 +338,13 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
              display += f"\n הערות: {notes} "
         if amount:
             display += f"\n{amount} משטחים"
+        if order_date:
+            display += f"\nתאריך אספקה: {order_date}"
+        if eli_line:
+            display += f"\nקו אלי {eli_line}"
+        if going_out_with_us:
+            display += f"\nיוצא איתנו"
+        
             
 
 

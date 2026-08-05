@@ -35,6 +35,8 @@ export default function NewPicking({ onClose,user }) {
        
         const ordersData = await ordersResponse.json();
         const employeesData = await employeesResponse.json();
+        const activePickingData =
+          await activePickingResponse.json();
 
         if (!ordersResponse.ok) {
           throw new Error(
@@ -48,13 +50,7 @@ export default function NewPicking({ onClose,user }) {
 
         setOrders(Array.isArray(ordersData) ? ordersData : []);
         setEmployees(Array.isArray(employeesData) ? employeesData : []);
-      } catch (loadError) {
-        console.error(loadError);
-        setError(loadError.message || "שגיאה בטעינת הנתונים");
-      } finally {
-        setLoading(false);
-      }
-      if (
+             if (
         activePickingResponse.ok &&
         Array.isArray(activePickingData) &&
         activePickingData.length > 0
@@ -62,7 +58,14 @@ export default function NewPicking({ onClose,user }) {
         alert(
           `יש לך כבר הזמנה בליקוט:\n\n${activePickingData[0].display}`
         );
-}
+      }
+ 
+      } catch (loadError) {
+        console.error(loadError);
+        setError(loadError.message || "שגיאה בטעינת הנתונים");
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadData();

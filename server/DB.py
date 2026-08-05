@@ -184,6 +184,8 @@ def get_all_airtable_records(
     filter_formula: str | None = None,
     fields: list[str] | None = None,
     view: str | None = None,
+    sort: list[tuple[str, str]] | None = None,
+
 ):
     url = (
         f"https://api.airtable.com/v0/"
@@ -209,6 +211,10 @@ def get_all_airtable_records(
             params["offset"] = offset
         if view:
             params["view"] = view
+        if sort:
+            for i, (field, direction) in enumerate(sort):
+                params[f"sort[{i}][field]"] = field
+                params[f"sort[{i}][direction]"] = direction
 
         response = requests.get(
             url,
@@ -265,12 +271,19 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
     if action==1:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula=f'AND({{סטטוס}}="{status}", {{בצפי}}=1)'
+          filter_formula=f'AND({{סטטוס}}="{status}", {{בצפי}}=1)',
+          sort= [
+        ("יום עבודה", "asc"),
+        ("תאריך אספקה", "asc"),
+        ],
     )
     else :
         records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-        filter_formula=f'{{סטטוס}}="{status}"')
+        filter_formula=f'{{סטטוס}}="{status}"',   sort= [
+                ("יום עבודה בפועל", "asc"),
+                ("תאריך אספקה", "asc"),
+                ],)
         if action==2:
                    if user_id:
                         records = [

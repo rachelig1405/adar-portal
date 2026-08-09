@@ -12,6 +12,7 @@ const warehouse = [
   title: "צ׳אט עובדים",
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
+  color:"yellow"
 }
  
 
@@ -33,6 +34,7 @@ const office = [
   title: "צ׳אט עובדים",
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
+  color:"yellow"
 }
 ];
 const admin=[
@@ -56,6 +58,7 @@ const admin=[
   title: "צ׳אט עובדים",
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
+  color:"yellow"
 }
 ];
 export function getMenu(role) {

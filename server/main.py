@@ -32,7 +32,7 @@ from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl
@@ -40,7 +40,7 @@ FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
     "http://localhost:5173",
 )
-
+from requests import Response
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -516,3 +516,23 @@ def api_create_chat_message(
         "id": created_record["id"],
         "message": "ההודעה נשלחה בהצלחה",
     }
+#הדפסת מדבקות לפי מספר הזמנה
+@app.get("/api/labels/order/{order_number}")
+def get_order_label(order_number: str):
+    records = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=f'{{מספר הזמנה}}="{order_number}"'
+    )
+
+    if not records:
+        raise HTTPException(
+            status_code=404,
+            detail="הזמנה לא נמצאה",
+        )
+
+    order = records[0]
+
+    return Response(
+        content=create_today_orders_zpl(order),
+        media_type="text/plain",
+    )

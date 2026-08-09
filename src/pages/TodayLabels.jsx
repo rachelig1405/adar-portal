@@ -9,6 +9,7 @@ export default function TodayLabelsPrint({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [orderNumber, setOrderNumber] = useState("");
 
   const printLabels = async () => {
     setLoading(true); setMessage(""); setIsError(false);
@@ -31,6 +32,75 @@ export default function TodayLabelsPrint({ onClose }) {
       setMessage(error instanceof TypeError ? "לא ניתן להתחבר לשרת ההדפסה המקומי. ודא ש-run_server.bat פועל." : error.message);
     } finally { setLoading(false); }
   };
+  const printOrderLabels = async () => {
+  const cleanOrderNumber = orderNumber.trim();
+
+  if (!cleanOrderNumber) {
+    setIsError(true);
+    setMessage("יש להזין מספר הזמנה");
+    return;
+  }
+
+  setLoading(true);
+  setMessage("");
+  setIsError(false);
+
+  try {
+    const zplResponse = await fetch(
+      `${API_URL}/api/labels/order/${encodeURIComponent(cleanOrderNumber)}`
+    );
+
+    if (!zplResponse.ok) {
+      throw new Error(
+        `שגיאה בקבלת המדבקה: ${await zplResponse.text()}`
+      );
+    }
+
+    const zpl = await zplResponse.text();
+
+    if (!zpl.trim()) {
+      throw new Error("השרת החזיר מדבקה ריקה");
+    }
+
+    const printResponse = await fetch(
+      `${LOCAL_PRINT_URL}/api/print`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Print-Key": PRINT_KEY,
+        },
+        body: JSON.stringify({
+          zpl,
+          job_name: `מדבקות הזמנה ${cleanOrderNumber}`,
+        }),
+      }
+    );
+
+    const result = await printResponse.json();
+
+    if (!printResponse.ok) {
+      throw new Error(
+        result.detail || "שגיאה בשרת ההדפסה המקומי"
+      );
+    }
+
+    setMessage(
+      `נשלחו ${result.labels} מדבקות להזמנה ${cleanOrderNumber}`
+    );
+  } catch (error) {
+    console.error(error);
+    setIsError(true);
+
+    setMessage(
+      error instanceof TypeError
+        ? "לא ניתן להתחבר לשרת ההדפסה המקומי"
+        : error.message
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
   const checkPrintServer = async () => {
     setLoading(true); setMessage(""); setIsError(false);
@@ -83,6 +153,31 @@ return (
             </span>
           </div>
         </div>
+        <div className="label-info-box">
+  <div className="label-info-row">
+    <span className="label-info-title">
+      הדפסה לפי מספר הזמנה
+    </span>
+  </div>
+
+  <input
+    type="text"
+    value={orderNumber}
+    placeholder="הקלד מספר הזמנה"
+    onChange={(event) =>
+      setOrderNumber(event.target.value)
+    }
+  />
+
+  <button
+    type="button"
+    className="print-button"
+    onClick={printOrderLabels}
+    disabled={loading || !orderNumber.trim()}
+  >
+    הדפס לפי מספר הזמנה
+  </button>
+</div>
 
         <div className="label-buttons">
           <button

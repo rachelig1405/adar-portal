@@ -53,7 +53,8 @@ export default function LoadingOrders({ onClose,user}) {
         order.order_number,
         order.customer_name,
         order.display,
-        order.amount
+        order.amount,
+        order.order_status
       ]
         .filter(Boolean)
         .join(" ")
@@ -62,6 +63,11 @@ export default function LoadingOrders({ onClose,user}) {
       return !query || searchableText.includes(query);
     });
   }, [orders, search]);
+  const totalAmount = useMemo(() => {
+  return filteredOrders.reduce((sum, order) => {
+    return sum + (Number(order.amount) || 0);
+  }, 0);
+}, [filteredOrders]);
 
   function toggleOrder(order) {
     setSelectedOrders((current) => {
@@ -325,7 +331,18 @@ async function submit(event) {
                         <span style={{ whiteSpace: "pre-line" }}>
                              {order.amount} משטחים
                         </span>
+                        <span
+                          style={{
+                            color: order.status !== "נבדק" ? "red" : "inherit",
+                            fontWeight: order.status !== "נבדק" ? "bold" : "normal",
+                          }}
+                        >
+                          {order.order_status}
+                        </span>
                       </label>
+                      <div className="loading-order-header">
+                         סה"כ משטחים: <strong>{totalAmount}</strong>
+                      </div>
   
                       {selected && (
                         <div className="loading-order-details">

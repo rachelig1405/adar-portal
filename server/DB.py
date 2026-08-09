@@ -271,7 +271,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
     if action==1:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula=f'AND({{סטטוס}}="{status}", {{בצפי}}=1)',
+          filter_formula=f'{{בצפי}}=1)',
           sort= [
         ("יום עבודה", "asc"),
         ("תאריך אספקה", "asc"),
@@ -314,8 +314,14 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         order_date=fields.get("תאריך אספקה", "")
         eli_line=fields.get("קו אלי", "")
         going_out_with_us=fields.get("יוצא איתנו", False)
+        order_status=fields.get("סטטוס", "")
 
-        
+        if(order_status)=="בבדיקה":
+            order_status="נבדק"
+
+        else:
+            order_status="לא נבדק"
+
 
 
 
@@ -372,7 +378,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
 
             "picking_lines": picking_lines,
             "segment": segment,
-            
+            "order_status": order_status
         })
 
     return orders

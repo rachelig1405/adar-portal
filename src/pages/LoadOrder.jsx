@@ -63,31 +63,47 @@ export default function LoadingOrders({ onClose,user}) {
       return !query || searchableText.includes(query);
     });
   }, [orders, search]);
-  const totalAmount = useMemo(() => {
-  return filteredOrders.reduce((sum, order) => {
-    return sum + (Number(order.amount) || 0);
-  }, 0);
-}, [filteredOrders]);
+const totalAmount = useMemo(() => {
+  return orders.reduce(
+    (sum, order) => sum + (Number(order.amount) || 0),
+    0
+  );
+}, [orders]);
 
-  function toggleOrder(order) {
+function toggleOrder(order) {
+  // אם ההזמנה כבר מסומנת - פשוט מבטלים בחירה
+  if (selectedOrders[order.id]) {
     setSelectedOrders((current) => {
       const next = { ...current };
-
-      if (next[order.id]) {
-        delete next[order.id];
-      } else {
-        next[order.id] = {
-          id: order.id,
-          order_number: order.order_number,
-          customer_name: order.customer_name,
-          notes: "",
-          file: null,
-        };
-      }
-
+      delete next[order.id];
       return next;
     });
+
+    return;
   }
+
+  // אם בוחרים הזמנה חדשה - מבקשים אישור
+  const confirmed = window.confirm(
+    `האם את בטוחה שהעמסת את ההזמנה?\n\n` +
+    `מספר הזמנה: ${order.order_number}\n` +
+    `לקוח: ${order.customer_name || "ללא שם לקוח"}`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setSelectedOrders((current) => ({
+    ...current,
+    [order.id]: {
+      id: order.id,
+      order_number: order.order_number,
+      customer_name: order.customer_name,
+      notes: "",
+      file: null,
+    },
+  }));
+}
 
   function updateOrderNotes(orderId, notes) {
     setSelectedOrders((current) => ({
@@ -300,6 +316,9 @@ async function submit(event) {
                 <div className="selected-count">
                   נבחרו <strong>{selectedCount}</strong> הזמנות
                 </div>
+                <div className="selected-count">
+                 סה"כ משטחים: <strong>{totalAmount}</strong>
+              </div>
               </div>
 
               <div className="loading-orders-list">
@@ -405,9 +424,7 @@ async function submit(event) {
                           )}
                         </div>
                       )}
-                      <div className="loading-order-header">
-                         סה"כ משטחים: <strong>{totalAmount}</strong>
-                      </div>
+                     
                     </div>
                   
                   

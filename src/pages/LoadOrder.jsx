@@ -340,9 +340,7 @@ async function submit(event) {
                           {order.order_status}
                         </span>
                       </label>
-                      <div className="loading-order-header">
-                         סה"כ משטחים: <strong>{totalAmount}</strong>
-                      </div>
+                      
   
                       {selected && (
                         <div className="loading-order-details">
@@ -407,7 +405,12 @@ async function submit(event) {
                           )}
                         </div>
                       )}
+                      <div className="loading-order-header">
+                         סה"כ משטחים: <strong>{totalAmount}</strong>
+                      </div>
                     </div>
+                  
+                  
                   );
                 })}
               </div>

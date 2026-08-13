@@ -270,7 +270,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
     if action==1:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula='{בצפי}=1',
+          filter_formula=f'AND({{בצפי}} = 1, {{סטטוס}} != "הועמס")=1',
           sort= [
         ("יום עבודה", "asc"),
         ("תאריך אספקה", "asc"),

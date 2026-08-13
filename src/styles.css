@@ -967,3 +967,203 @@
   font-weight: 700;
   cursor: pointer;
 }
+/* ============================= */
+/*       מסך העמסת הזמנות        */
+/* ============================= */
+
+.loading-orders-window {
+  width: min(900px, calc(100vw - 30px));
+  max-height: 94vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-orders-window .order-form {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+
+/* אזור הכפתורים העליון */
+.bulk-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+
+  margin: 14px 0;
+}
+
+.selected-count {
+  padding: 10px 16px;
+
+  background: #eef9ea;
+  color: #267326;
+
+  border-radius: 12px;
+
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+/* רשימת ההזמנות */
+.loading-orders-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  margin-top: 12px;
+
+  overflow-y: auto;
+}
+
+
+/* כרטיס הזמנה */
+.loading-order-card {
+  width: 100%;
+  height: auto !important;
+  min-height: 72px;
+
+  padding: 14px 16px;
+
+  background: #ffffff;
+
+  border: 1px solid #d8e4f3;
+  border-radius: 14px;
+
+  box-sizing: border-box;
+
+  overflow: visible !important;
+
+  transition: 0.2s ease;
+}
+
+
+/* הזמנה שנבחרה */
+.loading-order-card.selected {
+  background: #f0f8ff;
+  border: 2px solid #3b8fe8;
+}
+
+
+/* השורה הראשית של כל הזמנה */
+.loading-order-header {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    28px
+    110px
+    minmax(180px, 1fr)
+    110px
+    120px;
+
+  gap: 14px;
+
+  align-items: center;
+
+  direction: rtl;
+
+  cursor: pointer;
+
+  color: #26354a;
+
+  font-size: 16px;
+
+  min-height: 42px;
+}
+
+
+/* מספר הזמנה */
+.loading-order-header strong {
+  color: #26354a;
+  font-size: 16px;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+/* כל שאר הנתונים */
+.loading-order-header span {
+  display: block;
+
+  color: #526174;
+
+  font-size: 15px;
+
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  overflow: visible;
+}
+
+
+/* checkbox */
+.loading-order-header input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+
+  margin: 0;
+
+  cursor: pointer;
+}
+
+
+/* פרטים שנפתחים אחרי בחירת הזמנה */
+.loading-order-details {
+  margin-top: 15px;
+  padding-top: 15px;
+
+  border-top: 1px solid #e1e7ef;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+/* textarea */
+.loading-order-details textarea {
+  min-height: 75px;
+
+  padding: 12px;
+
+  border: 1px solid #d5dfec;
+  border-radius: 10px;
+
+  resize: vertical;
+
+  font-family: inherit;
+}
+
+
+/* קובץ */
+.loading-order-details input[type="file"] {
+  padding: 8px;
+}
+
+
+/* מובייל */
+@media (max-width: 750px) {
+
+  .loading-order-header {
+    grid-template-columns: 25px 1fr;
+    gap: 7px 12px;
+  }
+
+  .loading-order-header > *:not(input) {
+    grid-column: 2;
+  }
+
+  .loading-order-header input[type="checkbox"] {
+    grid-row: 1 / span 5;
+    align-self: start;
+  }
+}

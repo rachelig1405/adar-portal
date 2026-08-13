@@ -157,11 +157,10 @@ def create_order(order: OrderCreate):
     if order.picking_rows is not None:
         fields["שורות ליקוט"] = order.picking_rows
 
-    if order.goes_with_us is not None:
-        fields["יוצא איתנו"] = order.goes_with_us
+    if order.line is not None:
+        fields["קו הפצה"] = order.line
 
-    if order.line:
-        fields["קו אלי"] = order.line
+   
 
     if order.delivery_notes:
         fields["הערות אספקה"] = order.delivery_notes
@@ -312,8 +311,8 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)
         order_date=fields.get("תאריך אספקה", "")
-        eli_line=fields.get("קו אלי", "")
-        going_out_with_us=fields.get("יוצא איתנו", False)
+    
+        line=fields.get("קו הפצה", "")
         order_status=fields.get("סטטוס", "")
 
         if(order_status)=="בבדיקה":
@@ -359,10 +358,9 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
             display += f"\n{amount} משטחים"
         if order_date:
             display += f"\nתאריך אספקה: {order_date}"
-        if eli_line:
-            display += f"\nקו אלי {eli_line}"
-        if going_out_with_us:
-            display += f"\nיוצא איתנו"
+        if line:
+            display += f"\n{line}"
+   
         
             
 
@@ -375,6 +373,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
             "quantity": fields.get("כמות", 0),
             "notes": notes,
             "amount": amount,
+            "line":line,
 
             "picking_lines": picking_lines,
             "segment": segment,

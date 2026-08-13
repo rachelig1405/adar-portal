@@ -54,7 +54,8 @@ export default function LoadingOrders({ onClose,user}) {
         order.customer_name,
         order.display,
         order.amount,
-        order.order_status
+        order.order_status,
+        order.line
       ]
         .filter(Boolean)
         .join(" ")
@@ -349,6 +350,9 @@ async function submit(event) {
                         </span>
                         <span style={{ whiteSpace: "pre-line" }}>
                              {order.amount} משטחים
+                        </span>
+                         <span style={{ whiteSpace: "pre-line" }}>
+                             {order.line} 
                         </span>
                         <span
                           style={{

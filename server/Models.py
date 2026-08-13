@@ -19,7 +19,7 @@ class OrderCreate(BaseModel):
     agent_id: str | None = ""
     delivery_date: str | None = ""
     picking_rows: int | None = None
-    goes_with_us: bool | None = False
+
     line: str | None = ""
     delivery_notes: str | None = ""
     warehouse_notes:str | None = ""

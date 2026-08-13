@@ -13,8 +13,8 @@ export default function NewOrder({ onClose }) {
     agent_id: "",
     delivery_date: "",
     picking_rows: "",
-    goes_with_us: false,
-    line: "",
+    
+    line: "סוסנא",
     delivery_notes: "9:00-14:00",
     warehouse_notes: "",
     status: "לפני יצור",
@@ -190,25 +190,20 @@ export default function NewOrder({ onClose }) {
             ))}
           </select>
 
-          <label>קו אלי</label>
+          <label>קו הפצה</label>
           <select
             value={form.line}
             onChange={(e) => updateField("line", e.target.value)}
           >
             <option value="">בחר קו</option>
+            <option value="סוסנא">סוסנא</option>
+            <option value="משאית שלנו">משאית שלנו</option>
             <option value="ירושלים">ירושלים</option>
-            <option value="שכם">שכם</option>
+    
             <option value="ברטעה">ברטעה</option>
           </select>
 
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={form.goes_with_us}
-              onChange={(e) => updateField("goes_with_us", e.target.checked)}
-            />
-            יוצא איתנו
-          </label>
+      
 
           <label>הערות אספקה</label>
           <textarea

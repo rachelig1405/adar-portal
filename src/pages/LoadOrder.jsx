@@ -438,8 +438,8 @@ async function submit(event) {
                         </span>
                         <span
                           style={{
-                            color: order.status === "לא נבדק" ? "red" : "inherit",
-                            fontWeight: order.status === "לא נבדק" ? "bold" : "normal",whiteSpace: "pre-line"
+                            color: order.order_status === "לא נבדק" ? "red" : "inherit",
+                            fontWeight: order.order_status === "לא נבדק" ? "bold" : "normal",whiteSpace: "pre-line"
                           }}
                         >
                           {order.order_status}

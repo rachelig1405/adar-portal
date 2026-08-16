@@ -270,7 +270,19 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
     if action==1:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-          filter_formula=f'AND({{בצפי}} = 1, {{סטטוס}} != "הועמס")=1',
+          filter_formula=f'AND('
+        '{{סטטוס}} != "הועמס",'
+        'OR('
+            'AND('
+                '{{קו הפצה}} = "סוסנא",'
+                '{{בצפי}} = 1'
+            '),'
+            'AND('
+                '{{קו הפצה}} != "סוסנא",'
+                'IS_SAME({{תאריך אספקה}}, TODAY(), "day")'
+            ')'
+        ')'
+    ')',
           sort= [
         ("יום עבודה", "asc"),
         ("תאריך אספקה", "asc"),

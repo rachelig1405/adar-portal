@@ -79,6 +79,7 @@ export default function NewPicking({ onClose,user }) {
         order.order_number,
         order.customer_name,
         order.display,
+        order.notes
       ]
         .filter(Boolean)
         .join(" ")
@@ -327,6 +328,17 @@ export default function NewPicking({ onClose,user }) {
                 <div>
                   <span>הזמנה שנבחרה</span>
                   <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
+                              {selectedOrder.notes && (
+                    <div
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          marginTop: "6px",
+                        }}
+                      >
+                        הערות: {selectedOrder.notes}
+                      </div>
+                  )}
                 </div>
 
                 <button

@@ -14,6 +14,7 @@ import EndPicking from "./EndPicking";
 import ImportOrdersExcel from "./importOrdersExcel.";
 import CreateProductPdfs from "./CreateStickers";
 import TodayLabelsPrint from "./TodayLabels";
+import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -25,6 +26,7 @@ const INTERNAL_COMPONENTS = {
   stickers: CreateProductPdfs,
   OrderStickers: TodayLabelsPrint,
   generalChat: GeneralChat,
+  UpdateInvoice:UpdateInvoice
 
 
 };

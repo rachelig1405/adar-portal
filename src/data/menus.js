@@ -13,7 +13,12 @@ const warehouse = [
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
   color:"yellow"
-}
+},
+{key: "UpdateInvoice",
+  title: "עדכון חשבונית",
+  subtitle: "",
+  icon: "📄",
+  color:"pink"}
  
 
 ];
@@ -35,7 +40,12 @@ const office = [
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
   color:"yellow"
-}
+},
+{key: "UpdateInvoice",
+  title: "עדכון חשבונית",
+  subtitle: "",
+  icon: "📄",
+  color:"pink"}
 ];
 const admin=[
     { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },
@@ -59,7 +69,12 @@ const admin=[
   subtitle: "התכתבות כללית בין עובדי החברה",
   icon: "💬",
   color:"yellow"
-}
+},
+{key: "UpdateInvoice",
+  title: "עדכון חשבונית",
+  subtitle: "",
+  icon: "📄",
+  color:"pink"}
 ];
 export function getMenu(role) {
   if (role === "warehouse") return warehouse;

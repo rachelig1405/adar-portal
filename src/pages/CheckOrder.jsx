@@ -67,6 +67,7 @@ export default function CheckOrder({ onClose }) {
         order.customer_name,
         order.display,
         order.amount,
+        order.notes
       ]
         .filter(Boolean)
         .join(" ")
@@ -303,6 +304,17 @@ export default function CheckOrder({ onClose }) {
                 <div>
                   <span>הזמנה שנבחרה</span>
                   <strong>{selectedOrder.display}</strong>
+                       {selectedOrder.notes && (
+                    <div
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          marginTop: "6px",
+                        }}
+                      >
+                        הערות: {selectedOrder.notes}
+                      </div>
+                  )}
                 </div>
 
                 <button

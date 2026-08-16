@@ -328,7 +328,7 @@ export default function NewPicking({ onClose,user }) {
                 <div>
                   <span>הזמנה שנבחרה</span>
                   <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
-                              {selectedOrder.notes && (
+                    {selectedOrder.notes && (
                     <div
                         style={{
                           color: "red",

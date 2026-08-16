@@ -311,7 +311,17 @@ export default function EndPicking({ onClose,user}) {
                 <div>
                   <span>הזמנה שנבחרה</span>
                    <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
-                   
+                        {selectedOrder.notes && (
+                    <div
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          marginTop: "6px",
+                        }}
+                      >
+                        הערות: {selectedOrder.notes}
+                      </div>
+                  )}
                 </div>
 
                 <button

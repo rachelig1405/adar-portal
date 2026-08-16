@@ -352,8 +352,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         if is_segment:
              display += f"\nלקוח סיגמנט "
         
-        if notes:
-             display += f"\n הערות: {notes} "
+    
         if amount:
             display += f"\n{amount} משטחים"
         if order_date:

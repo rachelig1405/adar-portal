@@ -137,6 +137,7 @@ function toggleOrder(order) {
     }));
   }
 
+
   function updateOrderFile(orderId, file) {
     setSelectedOrders((current) => ({
       ...current,
@@ -147,25 +148,45 @@ function toggleOrder(order) {
     }));
   }
 
-  function selectAllVisible() {
-    setSelectedOrders((current) => {
-      const next = { ...current };
-
-      filteredOrders.forEach((order) => {
-        if (!next[order.id]) {
-          next[order.id] = {
-            id: order.id,
-            order_number: order.order_number,
-            customer_name: order.customer_name,
-            notes: "",
-            file: null,
-          };
-        }
-      });
-
-      return next;
-    });
+ function selectAllVisible() {
+  if (filteredOrders.length === 0) {
+    alert("אין הזמנות לבחירה בקו הזה");
+    return;
   }
+
+  const totalPallets = filteredOrders.reduce(
+    (sum, order) => sum + (Number(order.amount) || 0),
+    0
+  );
+
+  const confirmed = window.confirm(
+    `האם אתה בטוח שאתה רוצה לבחור את כל ההזמנות של קו ${selectedLine}?\n\n` +
+    `סה"כ הזמנות: ${filteredOrders.length}\n` +
+    `סה"כ משטחים: ${totalPallets}`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  setSelectedOrders((current) => {
+    const next = { ...current };
+
+    filteredOrders.forEach((order) => {
+      if (!next[order.id]) {
+        next[order.id] = {
+          id: order.id,
+          order_number: order.order_number,
+          customer_name: order.customer_name,
+          notes: "",
+          file: null,
+        };
+      }
+    });
+
+    return next;
+  });
+}
 
   function clearAllSelections() {
     setSelectedOrders({});

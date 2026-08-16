@@ -1169,3 +1169,48 @@
     align-self: start;
   }
 } 
+.distribution-tabs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  overflow-x: auto;
+
+  padding: 4px 2px 10px;
+
+  scrollbar-width: thin;
+}
+
+.distribution-tab {
+  flex: 0 0 auto;
+
+  border: 1px solid #d8e4f3;
+  background: #ffffff;
+
+  color: #526174;
+
+  border-radius: 12px;
+
+  padding: 9px 16px;
+
+  font-size: 15px;
+  font-weight: 800;
+
+  cursor: pointer;
+
+  transition: 0.18s;
+}
+
+.distribution-tab:hover {
+  background: #eef6ff;
+  color: #2f72c9;
+}
+
+.distribution-tab.active {
+  background: #2f72c9;
+  color: #ffffff;
+
+  border-color: #2f72c9;
+
+  box-shadow: 0 5px 15px rgba(47, 114, 201, 0.18);
+}

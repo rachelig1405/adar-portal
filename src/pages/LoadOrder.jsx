@@ -45,47 +45,52 @@ export default function LoadingOrders({ onClose,user}) {
 
     loadOrders();
   }, []);
+const filteredOrders = useMemo(() => {
+  const query = search.trim().toLowerCase();
 
-  const filteredOrders = useMemo(() => {
-    const query = search.trim().toLowerCase();
+  return orders.filter((order) => {
+    const sameLine =
+      String(order.line || "") === String(selectedLine || "");
 
-    return orders.filter((order) => {
-      const searchableText = [
-        order.order_number,
-        order.customer_name,
-        order.display,
-        order.amount,
-        order.order_status,
-        order.line
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
+    if (!sameLine) {
+      return false;
+    }
 
-      return !query || searchableText.includes(query);
-    });
-  }, [orders, search]);
-  const distributionLines = useMemo(() => {
+    const searchableText = [
+      order.order_number,
+      order.customer_name,
+      order.display,
+      order.amount,
+      order.order_status,
+      order.line,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+    return !query || searchableText.includes(query);
+  });
+}, [orders, search, selectedLine]);
+const distributionLines = useMemo(() => {
   return [
     ...new Set(
       orders
         .map((order) => order.line)
         .filter(Boolean)
     ),
-  ].sort();
+  ];
 }, [orders]);
+useEffect(() => {
+  if (!selectedLine && distributionLines.length > 0) {
+    setSelectedLine(distributionLines[0]);
+  }
+}, [distributionLines, selectedLine]);
 const totalAmount = useMemo(() => {
-  return orders
-    .filter((order) => {
-      if (!selectedLine) return true;
-
-      return String(order.line) === String(selectedLine);
-    })
-    .reduce(
-      (sum, order) => sum + (Number(order.amount) || 0),
-      0
-    );
-}, [orders, selectedLine]);
+  return filteredOrders.reduce(
+    (sum, order) => sum + (Number(order.amount) || 0),
+    0
+  );
+}, [filteredOrders]);
 
 function toggleOrder(order) {
   // אם ההזמנה כבר מסומנת - פשוט מבטלים בחירה
@@ -349,27 +354,28 @@ async function submit(event) {
               setSearch(event.target.value)
             }
           />
-          <div className="distribution-line-section">
-  <label>העמסה לפי קו הפצה</label>
+          <div className="distribution-tabs">
+  {distributionLines.map((line) => (
+    <button
+      key={line}
+      type="button"
+      className={`distribution-tab ${
+        selectedLine === line ? "active" : ""
+      }`}
+      onClick={() => {
+        setSelectedLine(line);
+        setSearch("");
 
-  <select
-    value={selectedLine}
-    onChange={(event) =>
-      selectDistributionLine(event.target.value)
-    }
-    disabled={loading}
-  >
-    <option value="">
-      בחר קו הפצה...
-    </option>
-
-    {distributionLines.map((line) => (
-      <option key={line} value={line}>
-        {line}
-      </option>
-    ))}
-  </select>
+        // חשוב:
+        // מעבר קו לא מסמן שום הזמנה
+        setSelectedOrders({});
+      }}
+    >
+      {line}
+    </button>
+  ))}
 </div>
+
 
           {!loading && (
             <>

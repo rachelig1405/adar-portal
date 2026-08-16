@@ -5,6 +5,7 @@ export default function LoadingOrders({ onClose,user}) {
   const [selectedOrders, setSelectedOrders] = useState({});
 
   const [search, setSearch] = useState("");
+  const [selectedLine, setSelectedLine] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -64,12 +65,27 @@ export default function LoadingOrders({ onClose,user}) {
       return !query || searchableText.includes(query);
     });
   }, [orders, search]);
-const totalAmount = useMemo(() => {
-  return orders.reduce(
-    (sum, order) => sum + (Number(order.amount) || 0),
-    0
-  );
+  const distributionLines = useMemo(() => {
+  return [
+    ...new Set(
+      orders
+        .map((order) => order.line)
+        .filter(Boolean)
+    ),
+  ].sort();
 }, [orders]);
+const totalAmount = useMemo(() => {
+  return orders
+    .filter((order) => {
+      if (!selectedLine) return true;
+
+      return String(order.line) === String(selectedLine);
+    })
+    .reduce(
+      (sum, order) => sum + (Number(order.amount) || 0),
+      0
+    );
+}, [orders, selectedLine]);
 
 function toggleOrder(order) {
   // אם ההזמנה כבר מסומנת - פשוט מבטלים בחירה
@@ -149,6 +165,45 @@ function toggleOrder(order) {
   function clearAllSelections() {
     setSelectedOrders({});
   }
+function selectDistributionLine(line) {
+  setSelectedLine(line);
+
+  if (!line) {
+    return;
+  }
+
+  const lineOrders = orders.filter(
+    (order) => String(order.line) === String(line)
+  );
+
+  if (lineOrders.length === 0) {
+    alert("לא נמצאו הזמנות בקו ההפצה הזה");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `האם להעמיס את כל ההזמנות של קו ${line}?\n\n` +
+    `סה"כ ${lineOrders.length} הזמנות`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const next = {};
+
+  lineOrders.forEach((order) => {
+    next[order.id] = {
+      id: order.id,
+      order_number: order.order_number,
+      customer_name: order.customer_name,
+      notes: "",
+      file: null,
+    };
+  });
+
+  setSelectedOrders(next);
+}
 
 async function submit(event) {
   event.preventDefault();
@@ -294,6 +349,27 @@ async function submit(event) {
               setSearch(event.target.value)
             }
           />
+          <div className="distribution-line-section">
+  <label>העמסה לפי קו הפצה</label>
+
+  <select
+    value={selectedLine}
+    onChange={(event) =>
+      selectDistributionLine(event.target.value)
+    }
+    disabled={loading}
+  >
+    <option value="">
+      בחר קו הפצה...
+    </option>
+
+    {distributionLines.map((line) => (
+      <option key={line} value={line}>
+        {line}
+      </option>
+    ))}
+  </select>
+</div>
 
           {!loading && (
             <>

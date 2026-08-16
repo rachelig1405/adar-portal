@@ -314,7 +314,16 @@ async function submit(event) {
   }
 }
 
-  const selectedCount = Object.keys(selectedOrders).length;
+const selectedCount = Object.keys(selectedOrders).length;
+
+const selectedTotalAmount = useMemo(() => {
+  return orders
+    .filter((order) => selectedOrders[order.id])
+    .reduce(
+      (sum, order) => sum + (Number(order.amount) || 0),
+      0
+    );
+}, [orders, selectedOrders]);
 
   return (
     <div className="modal-backdrop">
@@ -520,19 +529,19 @@ async function submit(event) {
             </>
           )}
 
-          <button
-            className="save-button"
-            type="submit"
-            disabled={
-              loading ||
-              saving ||
-              selectedCount === 0
-            }
-          >
-            {saving
-              ? "מעדכן הזמנות..."
-              : `העמס ${selectedCount} הזמנות`}
-          </button>
+       <button
+          className="save-button"
+          type="submit"
+          disabled={
+            loading ||
+            saving ||
+            selectedCount === 0
+          }
+        >
+          {saving
+            ? "מעדכן הזמנות..."
+            : `העמס ${selectedCount} הזמנות | סה"כ ${selectedTotalAmount} משטחים`}
+        </button>
         </form>
       </div>
     </div>

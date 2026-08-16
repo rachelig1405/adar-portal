@@ -158,7 +158,11 @@ def create_today_orders_zpl() -> str:
         "{יום עבודה בפועל},"
         "TODAY(),"
         "'day'"
-        ")")
+        ")",
+    sort= [
+               
+                ("תאריך אספקה", "asc"),("שורות ליקוט", "desc")
+                ],)
 
     if not records:
         raise HTTPException(

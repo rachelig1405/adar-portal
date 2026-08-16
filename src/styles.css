@@ -1013,14 +1013,12 @@
 .loading-orders-list {
   display: flex;
   flex-direction: column;
-
   gap: 12px;
-
   margin-top: 12px;
 
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
 }
-
 
 /* כרטיס הזמנה */
 .loading-order-card {

@@ -274,6 +274,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
           sort= [
         ("יום עבודה", "asc"),
         ("תאריך אספקה", "asc"),
+         ("לקוח","asc")
         ],
     )
     else :

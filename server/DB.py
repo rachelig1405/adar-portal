@@ -279,7 +279,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
     else :
         records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-        filter_formula=f'{{סטטוס}}="{status}"',   sort= [
+        filter_formula=f'{{סטטוס}}="{status}"',   sort= [("קו הפצה","asc")
                
                 ("תאריך אספקה", "asc"),("שורות ליקוט", "desc")
                 ],)

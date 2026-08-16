@@ -91,12 +91,18 @@ def create_order_label_zpl(order: dict) -> str:
     customer_phone= clean_zpl_value(
                 fields.get("טלפון")
             )
+    DeliveryDate= clean_zpl_value(
+                    fields.get("תאריך אספקה")
+                )
+    
+    
     order_number = clean_airtable_value(order_number)
     customer_number = clean_airtable_value(customer_number)
     customer_name = clean_airtable_value(customer_name)
     address = clean_airtable_value(address)
     city = clean_airtable_value(city)
     customer_phone=clean_airtable_value(customer_phone)
+    DeliveryDate=clean_airtable_value(DeliveryDate)
     print(customer_number, len("מספר לקוח: " + customer_number),
       right_align_x("מספר לקוח: " + customer_number))
 
@@ -148,6 +154,11 @@ def create_order_label_zpl(order: dict) -> str:
 
 ^A0R,34,34
 ^FDעיר: {city}^FS
+
+^FO200,{right_align_x('תאריך אספקה: ' + city)}
+
+^A0R,34,34
+^FDתאריך אספקה: {DeliveryDate}^FS
 
 
 

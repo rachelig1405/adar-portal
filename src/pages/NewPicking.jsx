@@ -314,8 +314,9 @@ export default function NewPicking({ onClose,user }) {
                       <div className="picker-secondary">
                         {order.customer_name || "ללא שם לקוח"}
                       </div>
-                      <div className="picker-secondary">תאריך אספקה: 
-                        {order.order_date || "ללא תאריך אספקה"}  
+                      <div className="picker-secondary">
+ 
+                        תאריך אספקה :  {order.order_date || "ללא תאריך אספקה"}  
                       </div>
                     </button>
                   ))

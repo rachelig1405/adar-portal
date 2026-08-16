@@ -71,6 +71,7 @@ export default function EndPicking({ onClose,user}) {
         order.order_number,
         order.customer_name,
         order.display,
+        order.notes
       ]
         .filter(Boolean)
         .join(" ")

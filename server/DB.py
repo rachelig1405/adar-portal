@@ -377,7 +377,9 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
 
             "picking_lines": picking_lines,
             "segment": segment,
-            "order_status": order_status
+            "order_status": order_status,
+            "order_date":order_date
+            
         })
 
     return orders

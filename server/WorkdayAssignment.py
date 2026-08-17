@@ -230,7 +230,7 @@ def workday_assignment(max_date:date,order_id:str):
                             order = int(order1["fields"].get("שורות ליקוט", 0))
                             limit = int(record["fields"].get("שורות ליקוט ליום", 0))
 
-                            if total - order <= limit:
+                            if total  <= limit:
                             #עדכון ההזמנה החדשה
                                 result=update_order_workflow(order_id=order_id,workday_id=record["id"])
                                 return {

@@ -43,13 +43,12 @@ useEffect(() => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error("שגיאה בטעינת תאריכים חסומים");
+        throw new Error("שגיאה בטעינת התאריכים החסומים");
       }
 
       const dates = (data.blocked_dates || []).map(
-        (dateString) => {
-          const [year, month, day] =
-            dateString.split("-").map(Number);
+        (value) => {
+          const [year, month, day] = value.split("-").map(Number);
 
           return new Date(
             year,
@@ -61,6 +60,7 @@ useEffect(() => {
 
       setBlockedDates(dates);
 
+      console.log("blockedDates:", dates);
     } catch (error) {
       console.error(error);
     }
@@ -201,38 +201,38 @@ useEffect(() => {
 
           <label>תאריך אספקה</label>
         <DatePicker
-            selected={
-              form.delivery_date
-                ? new Date(`${form.delivery_date}T00:00:00`)
-                : null
+          selected={
+            form.delivery_date
+              ? new Date(`${form.delivery_date}T00:00:00`)
+              : null
+          }
+
+          onChange={(date) => {
+            if (!date) {
+              updateField("delivery_date", "");
+              return;
             }
 
-            onChange={(date) => {
-              if (!date) {
-                updateField("delivery_date", "");
-                return;
-              }
+            const year = date.getFullYear();
+            const month = String(
+              date.getMonth() + 1
+            ).padStart(2, "0");
+            const day = String(
+              date.getDate()
+            ).padStart(2, "0");
 
-              const year = date.getFullYear();
-              const month = String(
-                date.getMonth() + 1
-              ).padStart(2, "0");
-              const day = String(
-                date.getDate()
-              ).padStart(2, "0");
+            updateField(
+              "delivery_date",
+              `${year}-${month}-${day}`
+            );
+          }}
 
-              updateField(
-                "delivery_date",
-                `${year}-${month}-${day}`
-              );
-            }}
+          minDate={new Date()}
+          excludeDates={blockedDates}
 
-            minDate={new Date()}
-            excludeDates={blockedDates}
-
-            dateFormat="dd/MM/yyyy"
-            placeholderText="בחר תאריך אספקה"
-          />
+          dateFormat="dd/MM/yyyy"
+          placeholderText="בחר תאריך אספקה"
+        />
         
     
 

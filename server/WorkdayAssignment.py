@@ -206,7 +206,7 @@ def workday_assignment(max_date:date,order_id:str):
                                     f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
                                     f'),'
                                     f'{{סטטוס}}="בשיבוץ"'
-                                    f')'
+                                    f')',view="ימים בשיבוץ"
                                )
                         print("records_of_worksday:", records_of_worksday, flush=True)
                         

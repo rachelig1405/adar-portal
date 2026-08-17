@@ -544,7 +544,7 @@ def get_blocked_workday_dates():
         table_name=AIRTABLE_WORKERS_TABLE,
         filter_formula='{מלא לגמרי}=1',
         fields=[
-            "תאריך ליקוט מינימלי",
+            "תאריך אספקה מינימלי",
             "מלא לגמרי",
         ],
     )
@@ -555,7 +555,7 @@ def get_blocked_workday_dates():
         fields = record.get("fields", {})
 
         blocked_date = fields.get(
-            "תאריך ליקוט מינימלי"
+            "תאריך אספקה מינימלי"
         )
 
         if blocked_date:

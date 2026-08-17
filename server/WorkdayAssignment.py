@@ -196,6 +196,7 @@ def workday_assignment(max_date:date,order_id:str):
                     if order1["fields"].get("סטטוס")=="לפני יצור":
                         print(order1,flush=True)
                         max_order_day = order1["fields"].get("תאריך ליקוט מקסימילי")
+                        print(max_order_day)
 
                         
                         #בדיקה אם יש להזמנות האחרות יום פנוי
@@ -207,6 +208,7 @@ def workday_assignment(max_date:date,order_id:str):
                                     f'{{סטטוס}}="בשיבוץ"'
                                     f')'
                                ,view="ימים בשיבוץ")
+                        print(records_of_worksday)
                         
                         #במידה ואפשר להזיז את ההזמנה - להזיז אותה ולבץ במקומה את ההזמנה ההחדשה
                         if records_of_worksday:

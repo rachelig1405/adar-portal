@@ -139,6 +139,10 @@ def workday_assignment(max_date:date,order_id:str):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
         records_view_shibuts=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula = (
     f'AND('
+     f'OR('
+    f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
+    f'IS_AFTER({{יום עבודה}}, TODAY())'
+    f'),'
     f'OR('
     f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
     f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
@@ -147,10 +151,13 @@ def workday_assignment(max_date:date,order_id:str):
     f')'
 ),view="ימים בשיבוץ")
         #רשומות של כל הימים כולל המלאים מהיום ועד ליום העבודה המקסימלי
-        records=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=  f'OR('
+        records=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=    f'AND('   f'OR('
+                f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
+                f'IS_AFTER({{יום עבודה}}, TODAY())'
+            f'),'f'OR('
             f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
             f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
-            f')',view="Grid view")
+            f')' f')',view="Grid view")
         workday=None
         if records_view_shibuts:
             workday=records_view_shibuts[0].get("id")
@@ -201,6 +208,10 @@ def workday_assignment(max_date:date,order_id:str):
                         
                         #בדיקה אם יש להזמנות האחרות יום פנוי
                         records_of_worksday=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=     f'AND('
+                                    f'OR('
+                                    f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
+                                    f'IS_AFTER({{יום עבודה}}, TODAY())'
+                                    f'),'                                 
                                     f'OR('
                                     f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
                                     f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'

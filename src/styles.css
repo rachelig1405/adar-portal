@@ -1212,3 +1212,17 @@
 
   box-shadow: 0 5px 15px rgba(47, 114, 201, 0.18);
 }
+.blocked-delivery-date {
+  color: #d40000 !important;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 0.55;
+}
+
+.react-datepicker__day--disabled {
+  color: #d40000 !important;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  cursor: not-allowed;
+  opacity: 0.45;
+}

@@ -536,3 +536,33 @@ def get_order_label(order_number: str):
         content=create_today_orders_zpl(order),
         media_type="text/plain",
     )
+#החזרת התאריכים החסומים
+@app.get("/api/workdays/blocked-dates")
+def get_blocked_workday_dates():
+
+    records = get_all_airtable_records(
+        table_name=AIRTABLE_WORKERS_TABLE,
+        filter_formula='{מלא לגמרי}=TRUE',
+        fields=[
+            "תאריך ליקוט מינימלי",
+            "מלא לגמרי",
+        ],
+    )
+
+    blocked_dates = []
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        blocked_date = fields.get(
+            "תאריך ליקוט מינימלי"
+        )
+
+        if blocked_date:
+            blocked_dates.append(
+                str(blocked_date)[:10]
+            )
+
+    return {
+        "blocked_dates": blocked_dates
+    }

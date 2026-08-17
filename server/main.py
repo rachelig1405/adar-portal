@@ -546,6 +546,7 @@ def get_blocked_workday_dates():
         fields=[
             "תאריך אספקה מינימלי",
             "מלא לגמרי",
+            
         ],
     )
 

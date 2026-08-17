@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { API_URL } from "../config";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function NewOrder({ onClose }) {
   const [customers, setCustomers] = useState([]);
@@ -31,7 +33,41 @@ export default function NewOrder({ onClose }) {
   sigment: false,
   mikasa: false,
  });
+useEffect(() => {
+  async function loadBlockedDates() {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/workdays/blocked-dates`
+      );
 
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error("שגיאה בטעינת תאריכים חסומים");
+      }
+
+      const dates = (data.blocked_dates || []).map(
+        (dateString) => {
+          const [year, month, day] =
+            dateString.split("-").map(Number);
+
+          return new Date(
+            year,
+            month - 1,
+            day
+          );
+        }
+      );
+
+      setBlockedDates(dates);
+
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  loadBlockedDates();
+}, []);
   useEffect(() => {
     async function loadData() {
       const customersRes = await fetch(`${API_URL}/api/customers`);
@@ -164,11 +200,33 @@ export default function NewOrder({ onClose }) {
        
 
           <label>תאריך אספקה</label>
-          <input
-            type="date"
-            value={form.delivery_date}
-            onChange={(e) => updateField("delivery_date", e.target.value)}
-          />
+         <DatePicker
+              selected={
+                form.delivery_date
+                  ? new Date(`${form.delivery_date}T00:00:00`)
+                  : null
+              }
+
+              onChange={(date) => {
+                if (!date) {
+                  updateField("delivery_date", "");
+                  return;
+                }
+
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const day = String(date.getDate()).padStart(2, "0");
+
+                updateField(
+                  "delivery_date",
+                  `${year}-${month}-${day}`
+                );
+              }}
+
+              minDate={new Date()}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="בחר תאריך אספקה"
+            />
 
           <label>שורות ליקוט</label>
           <input

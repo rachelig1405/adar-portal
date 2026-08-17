@@ -12,6 +12,7 @@
     "@vitejs/plugin-react": "latest",
     "axios": "^1.18.1",
     "react": "latest",
+    "react-datepicker": "^9.1.0",
     "react-dom": "latest",
     "vite": "latest"
   }

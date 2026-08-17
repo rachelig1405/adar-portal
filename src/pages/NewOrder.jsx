@@ -200,33 +200,41 @@ useEffect(() => {
        
 
           <label>תאריך אספקה</label>
-         <DatePicker
-              selected={
-                form.delivery_date
-                  ? new Date(`${form.delivery_date}T00:00:00`)
-                  : null
+        <DatePicker
+            selected={
+              form.delivery_date
+                ? new Date(`${form.delivery_date}T00:00:00`)
+                : null
+            }
+
+            onChange={(date) => {
+              if (!date) {
+                updateField("delivery_date", "");
+                return;
               }
 
-              onChange={(date) => {
-                if (!date) {
-                  updateField("delivery_date", "");
-                  return;
-                }
+              const year = date.getFullYear();
+              const month = String(
+                date.getMonth() + 1
+              ).padStart(2, "0");
+              const day = String(
+                date.getDate()
+              ).padStart(2, "0");
 
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const day = String(date.getDate()).padStart(2, "0");
+              updateField(
+                "delivery_date",
+                `${year}-${month}-${day}`
+              );
+            }}
 
-                updateField(
-                  "delivery_date",
-                  `${year}-${month}-${day}`
-                );
-              }}
+            minDate={new Date()}
+            excludeDates={blockedDates}
 
-              minDate={new Date()}
-              dateFormat="dd/MM/yyyy"
-              placeholderText="בחר תאריך אספקה"
-            />
+            dateFormat="dd/MM/yyyy"
+            placeholderText="בחר תאריך אספקה"
+          />
+        
+    
 
           <label>שורות ליקוט</label>
           <input

@@ -8,7 +8,7 @@ export default function NewOrder({ onClose }) {
   const [customers, setCustomers] = useState([]);
   const [agents, setAgents] = useState([]);
   const [saving, setSaving] = useState(false);
-
+  const [blockedDates, setBlockedDates] = useState([]);
   const [form, setForm] = useState({
     order_number: "",
     customer_id: "",

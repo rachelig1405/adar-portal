@@ -11,6 +11,7 @@ from fastapi.responses import FileResponse
 import shutil
 import tempfile
 import zipfile
+from fastapi import BackgroundTasks
 from pathlib import Path
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
@@ -228,14 +229,101 @@ def assign_order_to_workday(
             detail=str(error),
         )
 #יצירת סטיקרים
+import uuid
+from enum import Enum
+
+
+class JobStatus(str, Enum):
+    PENDING = "pending"
+    RUNNING = "running"
+    DONE = "done"
+    FAILED = "failed"
+
+
+# מאגר jobs בזיכרון. עובד היטב כל עוד יש worker בודד (ברירת המחדל ב-Render
+# לתוכניות רגילות). אם בעתיד יהיו כמה workers, יהיה צריך Redis/DB משותף.
+pdf_jobs: dict[str, dict] = {}
+
+
+def create_pdf_job() -> str:
+    job_id = str(uuid.uuid4())
+    pdf_jobs[job_id] = {
+        "status": JobStatus.PENDING,
+        "progress": 0,
+        "total": 0,
+        "zip_path": None,
+        "error": None,
+        "work_root": None,
+    }
+    return job_id
+async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, work_root: Path):
+    try:
+        pdf_jobs[job_id]["status"] = JobStatus.RUNNING
+        pdf_jobs[job_id]["work_root"] = str(work_root)
+
+        def progress_callback(progress_index: int, total: int):
+            pdf_jobs[job_id]["progress"] = progress_index
+            pdf_jobs[job_id]["total"] = total
+
+        result = await process_excel(
+            excel_path=str(excel_path),
+            output_root=str(output_dir),
+            progress_callback=progress_callback,
+        )
+
+        # שומרים גם סיכום של התהליך
+        summary_path = output_dir / "סיכום_תהליך.txt"
+
+        summary_lines = [
+            "סיכום יצירת תיקי מוצר",
+            "=" * 40,
+            "",
+            f"מוצרים שנוצרו: {result.get('created_products', 0)}",
+            f"שורות לא תקינות: {result.get('invalid_rows', 0)}",
+            f"שגיאות נתונים: {result.get('error_count', 0)}",
+            f"שגיאות תיקיות ישנות: {result.get('old_folder_error_count', 0)}",
+        ]
+
+        summary_path.write_text(
+            "\n".join(summary_lines),
+            encoding="utf-8-sig",
+        )
+
+        # ============================
+        # יצירת ZIP
+        # ============================
+
+        zip_path = work_root / "product_pdfs.zip"
+
+        with zipfile.ZipFile(
+            zip_path,
+            mode="w",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as zip_file:
+            for file_path in output_dir.rglob("*"):
+                if not file_path.is_file():
+                    continue
+
+                archive_name = file_path.relative_to(output_dir)
+
+                zip_file.write(
+                    filename=file_path,
+                    arcname=archive_name,
+                )
+
+        pdf_jobs[job_id]["zip_path"] = str(zip_path)
+        pdf_jobs[job_id]["status"] = JobStatus.DONE
+
+    except Exception as error:
+        pdf_jobs[job_id]["status"] = JobStatus.FAILED
+        pdf_jobs[job_id]["error"] = str(error)
+        shutil.rmtree(work_root, ignore_errors=True)
+#יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
 @app.post("/api/products/create-pdfs")
 async def create_product_pdfs(
+    background_tasks: BackgroundTasks,
     excel_file: UploadFile = File(...),
 ):
-    """
-    מקבל קובץ Excel, יוצר תיקיות מוצר ומחזיר ZIP להורדה.
-    """
-
     excel_name = excel_file.filename or ""
 
     if not excel_name.lower().endswith((".xlsx", ".xls")):
@@ -252,53 +340,66 @@ async def create_product_pdfs(
     excel_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    try:
-        safe_excel_name = Path(excel_name).name
-        excel_path = excel_dir / safe_excel_name
+    safe_excel_name = Path(excel_name).name
+    excel_path = excel_dir / safe_excel_name
 
-        with excel_path.open("wb") as destination:
-            while chunk := await excel_file.read(1024 * 1024):
-                destination.write(chunk)
+    with excel_path.open("wb") as destination:
+        while chunk := await excel_file.read(1024 * 1024):
+            destination.write(chunk)
 
-        result = await process_excel(
-            excel_path=str(excel_path),
-            output_root=str(output_dir),
-        )
+    job_id = create_pdf_job()
 
-        summary_path = output_dir / "סיכום_תהליך.txt"
-        summary_lines = [
-            "סיכום יצירת תיקי מוצר",
-            "=" * 40,
-            "",
-            f"מוצרים שנוצרו: {result.get('created_products', 0)}",
-            f"שורות לא תקינות: {result.get('invalid_rows', 0)}",
-            f"שגיאות נתונים: {result.get('error_count', 0)}",
-            f"שגיאות תיקיות ישנות: {result.get('old_folder_error_count', 0)}",
-        ]
-        summary_path.write_text("\n".join(summary_lines), encoding="utf-8-sig")
+    background_tasks.add_task(
+        run_create_pdfs_job,
+        job_id=job_id,
+        excel_path=excel_path,
+        output_dir=output_dir,
+        work_root=work_root,
+    )
 
-        zip_path = work_root / "product_pdfs.zip"
+    return {"job_id": job_id}
 
-        with zipfile.ZipFile(zip_path, mode="w", compression=zipfile.ZIP_DEFLATED) as zip_file:
-            for file_path in output_dir.rglob("*"):
-                if not file_path.is_file():
-                    continue
-                archive_name = file_path.relative_to(output_dir)
-                zip_file.write(filename=file_path, arcname=archive_name)
 
-        return FileResponse(
-            path=zip_path,
-            media_type="application/zip",
-            filename="product_pdfs.zip",
-            background=None,
-        )
+#בדיקת סטטוס יצירת הסטיקרים
+@app.get("/api/products/create-pdfs/status/{job_id}")
+def get_create_pdfs_status(job_id: str):
+    job = pdf_jobs.get(job_id)
 
-    except HTTPException:
-        raise
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job לא נמצא")
 
-    except Exception as error:
-        shutil.rmtree(work_root, ignore_errors=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"שגיאה ביצירת הקבצים: {error}",
-        ) from error
+    response = {
+        "status": job["status"],
+        "progress": job["progress"],
+        "total": job["total"],
+    }
+
+    if job["status"] == JobStatus.FAILED:
+        response["error"] = job["error"]
+
+    return response
+
+
+#הורדת קובץ ה-ZIP המוכן
+@app.get("/api/products/create-pdfs/download/{job_id}")
+def download_create_pdfs_zip(job_id: str):
+    job = pdf_jobs.get(job_id)
+
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job לא נמצא")
+
+    if job["status"] != JobStatus.DONE:
+        raise HTTPException(status_code=409, detail="הקובץ עדיין לא מוכן")
+
+    zip_path = job["zip_path"]
+
+    if not zip_path or not Path(zip_path).exists():
+        raise HTTPException(status_code=404, detail="קובץ ה-ZIP לא נמצא")
+
+    return FileResponse(
+        path=zip_path,
+        media_type="application/zip",
+        filename="product_pdfs.zip",
+    )
+
+    

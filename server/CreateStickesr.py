@@ -654,7 +654,7 @@ html,body{
 .pack-qty-row{
     position:absolute;
     right:8mm;
-    bottom:4mm;
+    bottom:6mm;
     width:84mm;
     font-size:12mm;
     font-weight:bold;

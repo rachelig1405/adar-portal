@@ -329,6 +329,8 @@ async def create_product_pdfs(
                     Path(uploaded_file.filename).name
                 ]
 
+            '''
+
             destination_path = (
                 certificates_dir.joinpath(*safe_parts)
             )
@@ -343,6 +345,7 @@ async def create_product_pdfs(
                     1024 * 1024
                 ):
                     destination.write(chunk)
+        '''
 
         # ============================
         # הרצת הפונקציה הקיימת
@@ -351,7 +354,7 @@ async def create_product_pdfs(
         result = await process_excel(
             excel_path=str(excel_path),
             output_root=str(output_dir),
-            certificate_folder=str(certificates_dir),
+            
         )
 
         # שומרים גם סיכום של התהליך
@@ -546,7 +549,7 @@ def get_blocked_workday_dates():
         fields=[
             "תאריך אספקה מינימלי",
             "מלא לגמרי",
-            
+
         ],
     )
 

@@ -1,24 +1,105 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
   "https://adar-portal.onrender.com";
 
+const POLL_INTERVAL_MS = 2500;
+
 export default function CreateProductPdfs() {
   const [excelFile, setExcelFile] = useState(null);
-  const [certificateFiles, setCertificateFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
 
-  const handleCertificateFolder = (event) => {
-    const files = Array.from(event.target.files || []);
+  const pollTimeoutRef = useRef(null);
 
-    const pdfFiles = files.filter((file) =>
-      file.name.toLowerCase().endsWith(".pdf")
+  const stopPolling = () => {
+    if (pollTimeoutRef.current) {
+      clearTimeout(pollTimeoutRef.current);
+      pollTimeoutRef.current = null;
+    }
+  };
+
+  const pollJobStatus = (jobId) => {
+    const poll = async () => {
+      try {
+        const response = await fetch(
+          `${API_URL}/api/products/create-pdfs/status/${jobId}`
+        );
+
+        if (!response.ok) {
+          throw new Error("שגיאה בבדיקת סטטוס התהליך.");
+        }
+
+        const data = await response.json();
+
+        if (data.total > 0) {
+          setProgress({ current: data.progress, total: data.total });
+          setMessage(
+            `מייצר קבצים... ${data.progress} מתוך ${data.total} מוצרים`
+          );
+        }
+
+        if (data.status === "done") {
+          setMessage("התהליך הסתיים, מוריד את הקובץ...");
+          await downloadZip(jobId);
+          setLoading(false);
+          return;
+        }
+
+        if (data.status === "failed") {
+          setError(data.error || "אירעה שגיאה ביצירת הקבצים.");
+          setMessage("");
+          setLoading(false);
+          return;
+        }
+
+        pollTimeoutRef.current = setTimeout(poll, POLL_INTERVAL_MS);
+      } catch (pollError) {
+        console.error(pollError);
+        setError(pollError.message || "אירעה שגיאה בבדיקת סטטוס התהליך.");
+        setMessage("");
+        setLoading(false);
+      }
+    };
+
+    poll();
+  };
+
+  const downloadZip = async (jobId) => {
+    const response = await fetch(
+      `${API_URL}/api/products/create-pdfs/download/${jobId}`
     );
 
-    setCertificateFiles(pdfFiles);
+    if (!response.ok) {
+      throw new Error("הקובץ עדיין לא מוכן להורדה.");
+    }
+
+    const blob = await response.blob();
+
+    const contentDisposition = response.headers.get("Content-Disposition");
+    let fileName = "product_pdfs.zip";
+
+    const match = contentDisposition?.match(/filename="?([^"]+)"?/);
+    if (match?.[1]) {
+      fileName = match[1];
+    }
+
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = downloadUrl;
+    link.download = fileName;
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    URL.revokeObjectURL(downloadUrl);
+
+    setMessage("התהליך הסתיים וקובץ ה-ZIP הורד.");
   };
 
   const handleSubmit = async (event) => {
@@ -26,35 +107,19 @@ export default function CreateProductPdfs() {
 
     setMessage("");
     setError("");
+    setProgress({ current: 0, total: 0 });
 
     if (!excelFile) {
       setError("צריך לבחור קובץ Excel.");
       return;
     }
 
-    if (certificateFiles.length === 0) {
-      setError("צריך לבחור תיקיית תעודות שמכילה קובצי PDF.");
-      return;
-    }
-
     const formData = new FormData();
-
     formData.append("excel_file", excelFile);
-
-    certificateFiles.forEach((file) => {
-      formData.append("certificate_files", file);
-
-      formData.append(
-        "certificate_paths",
-        file.webkitRelativePath || file.name
-      );
-    });
 
     try {
       setLoading(true);
-      setMessage(
-        `מעלה קובץ Excel ו-${certificateFiles.length} תעודות...`
-      );
+      setMessage("מעלה קובץ Excel...");
 
       const response = await fetch(
         `${API_URL}/api/products/create-pdfs`,
@@ -77,34 +142,10 @@ export default function CreateProductPdfs() {
         throw new Error(errorMessage);
       }
 
-      const blob = await response.blob();
+      const data = await response.json();
 
-      const contentDisposition =
-        response.headers.get("Content-Disposition");
-
-      let fileName = "product_pdfs.zip";
-
-      const match = contentDisposition?.match(
-        /filename="?([^"]+)"?/
-      );
-
-      if (match?.[1]) {
-        fileName = match[1];
-      }
-
-      const downloadUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = downloadUrl;
-      link.download = fileName;
-
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      URL.revokeObjectURL(downloadUrl);
-
-      setMessage("התהליך הסתיים וקובץ ה-ZIP הורד.");
+      setMessage("הקובץ הועלה, מתחילים ביצירת ה-PDF-ים...");
+      pollJobStatus(data.job_id);
     } catch (requestError) {
       console.error(requestError);
       setError(
@@ -112,10 +153,14 @@ export default function CreateProductPdfs() {
           "אירעה שגיאה ביצירת תיקי המוצרים."
       );
       setMessage("");
-    } finally {
       setLoading(false);
     }
   };
+
+  const progressPercent =
+    progress.total > 0
+      ? Math.round((progress.current / progress.total) * 100)
+      : 5;
 
   return (
     <div
@@ -161,42 +206,6 @@ export default function CreateProductPdfs() {
           )}
         </div>
 
-        <div style={{ marginBottom: "22px" }}>
-          <label
-            style={{
-              display: "block",
-              fontWeight: "bold",
-              marginBottom: "8px",
-            }}
-          >
-            תיקיית תעודות
-          </label>
-
-          <input
-            type="file"
-            accept=".pdf,application/pdf"
-            multiple
-            webkitdirectory=""
-            directory=""
-            disabled={loading}
-            onChange={handleCertificateFolder}
-          />
-
-          <div
-            style={{
-              marginTop: "8px",
-              color:
-                certificateFiles.length > 0
-                  ? "#087f23"
-                  : "#666666",
-            }}
-          >
-            {certificateFiles.length > 0
-              ? `נבחרו ${certificateFiles.length} קובצי PDF`
-              : "לא נבחרה תיקייה"}
-          </div>
-        </div>
-
         <button
           type="submit"
           disabled={loading}
@@ -229,10 +238,11 @@ export default function CreateProductPdfs() {
         >
           <div
             style={{
-              width: "60%",
+              width: `${progressPercent}%`,
               height: "100%",
               background: "#6f35d2",
               borderRadius: "20px",
+              transition: "width 0.4s ease",
             }}
           />
         </div>

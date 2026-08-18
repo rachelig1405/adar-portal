@@ -536,7 +536,7 @@ html,body{
 
 .product{
     position:absolute;
-    top:11mm;
+    top:calc(11mm - {{ carton_shift_mm }}mm);
     left:35mm;
     width:60mm;
     height:50mm;
@@ -545,7 +545,7 @@ html,body{
 
 .logo{
     position:absolute;
-    top:11mm;
+    top:calc(11mm - {{ carton_shift_mm }}mm);
     right:45mm;
     width:57mm;
     height:50mm;

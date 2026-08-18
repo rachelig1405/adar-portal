@@ -656,7 +656,7 @@ html,body{
     right:8mm;
     bottom:4mm;
     width:84mm;
-    font-size:8mm;
+    font-size:12mm;
     font-weight:bold;
     line-height:1;
     text-align:center;

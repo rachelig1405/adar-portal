@@ -231,189 +231,60 @@ def assign_order_to_workday(
 @app.post("/api/products/create-pdfs")
 async def create_product_pdfs(
     excel_file: UploadFile = File(...),
-    certificate_files: list[UploadFile] = File(...),
-    certificate_paths: list[str] = Form(...),
 ):
     """
-    מקבל:
-    - קובץ Excel
-    - תיקיית תעודות כקובצי PDF
-    - הנתיב היחסי של כל תעודה בתוך התיקייה
-
-    יוצר תיקיות מוצר ומחזיר ZIP להורדה.
+    מקבל קובץ Excel, יוצר תיקיות מוצר ומחזיר ZIP להורדה.
     """
 
     excel_name = excel_file.filename or ""
 
-    if not excel_name.lower().endswith(
-        (".xlsx", ".xls")
-    ):
+    if not excel_name.lower().endswith((".xlsx", ".xls")):
         raise HTTPException(
             status_code=400,
             detail="יש להעלות קובץ Excel מסוג XLSX או XLS.",
         )
 
-    if not certificate_files:
-        raise HTTPException(
-            status_code=400,
-            detail="לא התקבלו קובצי תעודות.",
-        )
-
-    if len(certificate_files) != len(certificate_paths):
-        raise HTTPException(
-            status_code=400,
-            detail="מספר הקבצים אינו תואם למספר הנתיבים.",
-        )
-
-    work_root = Path(
-        tempfile.mkdtemp(
-            prefix="portal_adar_products_"
-        )
-    )
+    work_root = Path(tempfile.mkdtemp(prefix="portal_adar_products_"))
 
     excel_dir = work_root / "excel"
-    certificates_dir = work_root / "certificates"
     output_dir = work_root / "output"
 
     excel_dir.mkdir(parents=True, exist_ok=True)
-    certificates_dir.mkdir(parents=True, exist_ok=True)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     try:
-        # ============================
-        # שמירת קובץ האקסל
-        # ============================
-
         safe_excel_name = Path(excel_name).name
         excel_path = excel_dir / safe_excel_name
 
         with excel_path.open("wb") as destination:
-            while chunk := await excel_file.read(
-                1024 * 1024
-            ):
+            while chunk := await excel_file.read(1024 * 1024):
                 destination.write(chunk)
-
-        # ============================
-        # שמירת תיקיית התעודות
-        # ============================
-
-        for uploaded_file, relative_path in zip(
-            certificate_files,
-            certificate_paths,
-        ):
-            if not uploaded_file.filename:
-                continue
-
-            if not uploaded_file.filename.lower().endswith(
-                ".pdf"
-            ):
-                continue
-
-            # מונע כתיבה מחוץ לתיקיית העבודה
-            relative_file_path = Path(
-                relative_path.replace("\\", "/")
-            )
-
-            safe_parts = [
-                part
-                for part in relative_file_path.parts
-                if part not in ("", ".", "..")
-            ]
-
-            # בדרך כלל החלק הראשון הוא שם התיקייה
-            if len(safe_parts) > 1:
-                safe_parts = safe_parts[1:]
-
-            if not safe_parts:
-                safe_parts = [
-                    Path(uploaded_file.filename).name
-                ]
-
-            '''
-
-            destination_path = (
-                certificates_dir.joinpath(*safe_parts)
-            )
-
-            destination_path.parent.mkdir(
-                parents=True,
-                exist_ok=True,
-            )
-
-            with destination_path.open("wb") as destination:
-                while chunk := await uploaded_file.read(
-                    1024 * 1024
-                ):
-                    destination.write(chunk)
-        '''
-
-        # ============================
-        # הרצת הפונקציה הקיימת
-        # ============================
 
         result = await process_excel(
             excel_path=str(excel_path),
             output_root=str(output_dir),
-            
         )
 
-        # שומרים גם סיכום של התהליך
         summary_path = output_dir / "סיכום_תהליך.txt"
-
         summary_lines = [
             "סיכום יצירת תיקי מוצר",
             "=" * 40,
             "",
-            (
-                f"מוצרים שנוצרו: "
-                f"{result.get('created_products', 0)}"
-            ),
-            (
-                f"שורות לא תקינות: "
-                f"{result.get('invalid_rows', 0)}"
-            ),
-            (
-                f"שגיאות נתונים: "
-                f"{result.get('error_count', 0)}"
-            ),
-            (
-                f"שגיאות תעודות: "
-                f"{result.get('certificate_error_count', 0)}"
-            ),
-            (
-                f"שגיאות תיקיות ישנות: "
-                f"{result.get('old_folder_error_count', 0)}"
-            ),
+            f"מוצרים שנוצרו: {result.get('created_products', 0)}",
+            f"שורות לא תקינות: {result.get('invalid_rows', 0)}",
+            f"שגיאות נתונים: {result.get('error_count', 0)}",
+            f"שגיאות תיקיות ישנות: {result.get('old_folder_error_count', 0)}",
         ]
-
-        summary_path.write_text(
-            "\n".join(summary_lines),
-            encoding="utf-8-sig",
-        )
-
-        # ============================
-        # יצירת ZIP
-        # ============================
+        summary_path.write_text("\n".join(summary_lines), encoding="utf-8-sig")
 
         zip_path = work_root / "product_pdfs.zip"
 
-        with zipfile.ZipFile(
-            zip_path,
-            mode="w",
-            compression=zipfile.ZIP_DEFLATED,
-        ) as zip_file:
+        with zipfile.ZipFile(zip_path, mode="w", compression=zipfile.ZIP_DEFLATED) as zip_file:
             for file_path in output_dir.rglob("*"):
                 if not file_path.is_file():
                     continue
-
-                archive_name = file_path.relative_to(
-                    output_dir
-                )
-
-                zip_file.write(
-                    filename=file_path,
-                    arcname=archive_name,
-                )
+                archive_name = file_path.relative_to(output_dir)
+                zip_file.write(filename=file_path, arcname=archive_name)
 
         return FileResponse(
             path=zip_path,
@@ -426,147 +297,8 @@ async def create_product_pdfs(
         raise
 
     except Exception as error:
-        shutil.rmtree(
-            work_root,
-            ignore_errors=True,
-        )
-
+        shutil.rmtree(work_root, ignore_errors=True)
         raise HTTPException(
             status_code=500,
             detail=f"שגיאה ביצירת הקבצים: {error}",
         ) from error
-@app.post("/api/login")
-def login(data: LoginRequest):
-    username = data.username.strip()
-    password = data.password.strip()
-
-    if not username or not password:
-        raise HTTPException(
-            status_code=400,
-            detail="יש להזין שם משתמש וסיסמה",
-        )
-
-    try:
-        user_record = get_airtable_user(username)
-
-    except Exception as error:
-        print("Login error:", error)
-
-        raise HTTPException(
-            status_code=500,
-            detail="שגיאה בחיבור לשרת",
-        )
-
-    if not user_record:
-        raise HTTPException(
-            status_code=401,
-            detail="שם המשתמש או הסיסמה שגויים",
-        )
-
-    fields = user_record.get("fields", {})
-
-    saved_password = str(
-        fields.get("סיסמא", "")
-    ).strip()
-    print(saved_password)
-
-    if saved_password != password:
-        raise HTTPException(
-            status_code=401,
-            detail="שם המשתמש או הסיסמה שגויים",
-        )
-
-    if not fields.get("פעיל", False):
-        raise HTTPException(
-            status_code=403,
-            detail="המשתמש אינו פעיל",
-        )
-
-    return {
-        "success": True,
-        "user": {
-            "username": fields.get("שם משתמש", ""),
-            "name": fields.get("שם", ""),
-            "role": fields.get("תפקיד", ""),
-            "id": user_record["id"]
-        },
-    }
-#הדפסת מדבקות להזמנות להיום
-@app.get(
-    "/api/labels/today",
-    response_class=PlainTextResponse,
-)
-def print_today_labels():
-    return create_today_orders_zpl()
-@app.get("/api/chat/messages")
-def api_get_chat_messages(
-    limit: int = Query(100, ge=1, le=200),
-):
-    return get_chat_messages(limit=limit)
-
-
-@app.post("/api/chat/messages")
-def api_create_chat_message(
-    data: ChatMessageCreate,
-):
-    created_record = create_chat_message(
-        user_id=data.user_id,
-        message=data.message,
-    )
-
-    return {
-        "success": True,
-        "id": created_record["id"],
-        "message": "ההודעה נשלחה בהצלחה",
-    }
-#הדפסת מדבקות לפי מספר הזמנה
-@app.get("/api/labels/order/{order_number}")
-def get_order_label(order_number: str):
-    records = get_all_airtable_records(
-        AIRTABLE_ORDERS_TABLE,
-        filter_formula=f'{{מספר הזמנה}}="{order_number}"'
-    )
-
-    if not records:
-        raise HTTPException(
-            status_code=404,
-            detail="הזמנה לא נמצאה",
-        )
-
-    order = records[0]
-
-    return Response(
-        content=create_today_orders_zpl(order),
-        media_type="text/plain",
-    )
-#החזרת התאריכים החסומים
-@app.get("/api/workdays/blocked-dates")
-def get_blocked_workday_dates():
-
-    records = get_all_airtable_records(
-        table_name=AIRTABLE_WORKERS_TABLE,
-        filter_formula='{מלא לגמרי}=1',
-        fields=[
-            "תאריך אספקה מינימלי",
-            "מלא לגמרי",
-
-        ],
-    )
-
-    blocked_dates = []
-
-    for record in records:
-        fields = record.get("fields", {})
-
-        blocked_date = fields.get(
-            "תאריך אספקה מינימלי"
-        )
-
-        if blocked_date:
-            blocked_dates.append(
-                str(blocked_date)[:10]
-            )
-
-    return {
-        "blocked_dates": blocked_dates
-    }

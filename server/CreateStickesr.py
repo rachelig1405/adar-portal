@@ -1128,6 +1128,27 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
     )
 
 
+import zipfile   # <-- להוסיף בראש הקובץ, ליד שאר ה-imports
+
+
+def zip_output_folder(output_root: Path, zip_name: str = "כל_המוצרים") -> Path:
+    """
+    דוחסת את כל תוכן תיקיית הפלט לקובץ ZIP אחד, ומחזירה את הנתיב אליו.
+    """
+    zip_path = output_root.parent / f"{zip_name}.zip"
+
+    if zip_path.exists():
+        zip_path.unlink()
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for file_path in output_root.rglob("*"):
+            if file_path.is_file():
+                arcname = file_path.relative_to(output_root)
+                zf.write(file_path, arcname)
+
+    return zip_path
+
+
 async def process_excel(
     excel_path: str,
     output_root: str,
@@ -1151,7 +1172,6 @@ async def process_excel(
     df = pd.read_excel(excel_path)
     df.columns = [str(column) for column in df.columns]
 
-    # בדיקה שהעמודות עצמן קיימות בקובץ
     required_columns = [
         COL_SKU,
         COL_ITEM_NO,
@@ -1188,7 +1208,6 @@ async def process_excel(
     valid_row_indexes = []
 
     for index, row in df.iterrows():
-        # שורה 1 באקסל היא כותרת, לכן הנתונים מתחילים משורה 2
         excel_row_number = index + 2
 
         row_errors = validate_product_row(
@@ -1201,7 +1220,6 @@ async def process_excel(
         else:
             valid_row_indexes.append(index)
 
-    # כתיבת דוח שגיאות
     report_path = None
 
     if all_errors:
@@ -1210,13 +1228,11 @@ async def process_excel(
             all_errors
         )
     else:
-        # אם נשאר דוח ישן מריצה קודמת – מוחקים אותו
         old_report = output_root / "שגיאות_נתונים.txt"
 
         if old_report.exists():
             old_report.unlink()
 
-    # אם אין אף שורה תקינה, אין טעם להמשיך
     if not valid_row_indexes:
         raise ValueError(
             "לא נמצאו מוצרים תקינים ליצירת PDF.\n"
@@ -1239,19 +1255,30 @@ async def process_excel(
 
     # ======================================
     # יצירת PDF רק לשורות התקינות.
-    # Chromium נפתח פעם אחת לכל הריצה כדי לחסוך זמן וזיכרון.
+    # הדפדפן מוחזר (נסגר ונפתח מחדש) כל BROWSER_RECYCLE_EVERY מוצרים
+    # כדי למנוע הצטברות זיכרון בריצות עם הרבה שורות.
     # ======================================
-    async with async_playwright() as p:
-        browser = await p.chromium.launch(
+    BROWSER_RECYCLE_EVERY = 150   # <-- חדש
+
+    async def launch_browser(p):   # <-- חדש
+        return await p.chromium.launch(
             headless=True,
             args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
+
+    async with async_playwright() as p:
+        browser = await launch_browser(p)   # <-- שונה
 
         try:
             for progress_index, dataframe_index in enumerate(
                 valid_row_indexes,
                 start=1,
             ):
+                # מיחזור דפדפן לפני שהזיכרון מצטבר מדי   # <-- חדש
+                if progress_index > 1 and (progress_index - 1) % BROWSER_RECYCLE_EVERY == 0:
+                    await browser.close()
+                    browser = await launch_browser(p)
+
                 row = df.loc[dataframe_index]
                 sku = val(row, COL_SKU)
                 item_no = val(row, COL_ITEM_NO)
@@ -1266,7 +1293,6 @@ async def process_excel(
                 product_dir = output_root / folder_name
                 product_dir.mkdir(parents=True, exist_ok=True)
 
-                # אי-מציאת תיקייה ישנה אינה עוצרת את יצירת ה-PDF.
                 old_folder_copied, old_folder_result = copy_old_sku_folder(
                     sku=sku,
                     product_dir=product_dir,
@@ -1356,6 +1382,9 @@ async def process_excel(
             encoding="utf-8-sig",
         )
 
+    # יצירת קובץ ZIP אחד עם כל תוצאות הריצה   # <-- חדש
+    zip_path = zip_output_folder(output_root)
+
     return {
         "created_products": created_products,
         "invalid_rows": len(df) - total,
@@ -1365,4 +1394,5 @@ async def process_excel(
         "certificate_report_path": certificate_report_path,
         "old_folder_error_count": len(old_folder_errors),
         "old_folder_report_path": old_folder_report_path,
+        "zip_path": zip_path,   # <-- חדש
     }

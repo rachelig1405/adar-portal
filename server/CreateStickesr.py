@@ -1148,7 +1148,6 @@ def zip_output_folder(output_root: Path, zip_name: str = "כל_המוצרים") 
 
     return zip_path
 
-
 async def process_excel(
     excel_path: str,
     output_root: str,
@@ -1159,13 +1158,6 @@ async def process_excel(
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
-    certificate_folder_path = (
-        Path(certificate_folder)
-        if certificate_folder
-        else None
-    )
-
-    certificate_errors = []
     old_folder_errors = []
 
     # קריאת טבלת האקסל
@@ -1258,23 +1250,23 @@ async def process_excel(
     # הדפדפן מוחזר (נסגר ונפתח מחדש) כל BROWSER_RECYCLE_EVERY מוצרים
     # כדי למנוע הצטברות זיכרון בריצות עם הרבה שורות.
     # ======================================
-    BROWSER_RECYCLE_EVERY = 150   # <-- חדש
+    BROWSER_RECYCLE_EVERY = 150
 
-    async def launch_browser(p):   # <-- חדש
+    async def launch_browser(p):
         return await p.chromium.launch(
             headless=True,
             args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
 
     async with async_playwright() as p:
-        browser = await launch_browser(p)   # <-- שונה
+        browser = await launch_browser(p)
 
         try:
             for progress_index, dataframe_index in enumerate(
                 valid_row_indexes,
                 start=1,
             ):
-                # מיחזור דפדפן לפני שהזיכרון מצטבר מדי   # <-- חדש
+                # מיחזור דפדפן לפני שהזיכרון מצטבר מדי
                 if progress_index > 1 and (progress_index - 1) % BROWSER_RECYCLE_EVERY == 0:
                     await browser.close()
                     browser = await launch_browser(p)
@@ -1316,60 +1308,11 @@ async def process_excel(
                     photo_data=photo_data,
                 )
                 created_products += 1
-                '''
-
-                certificate_number = val(row, COL_CERTIFICATE)
-                if certificate_folder_path is not None:
-                    copied, certificate_result = copy_certificate_pdf(
-                        certificate_folder=certificate_folder_path,
-                        certificate_number=certificate_number,
-                        product_dir=product_dir,
-                        sku=sku,
-                    )
-
-                    if str(sku).strip() in {"11798", "17698", "7928"}:
-                        print("=" * 60)
-                        print("מק״ט:", repr(sku))
-                        print("מספר תעודה שנקרא:", repr(certificate_number))
-                        print("כל הערכים בשורה:")
-                        for column_name, cell_value in row.items():
-                            print(repr(column_name), "=>", repr(cell_value))
-
-                    if not copied:
-                        certificate_errors.append(
-                            f"מק״ט {sku}: {certificate_result}"
-                        )
 
                 if progress_callback:
                     progress_callback(progress_index, total)
         finally:
             await browser.close()
-
-    certificate_report_path = None
-
-    if certificate_errors:
-        certificate_report_path = (
-            output_root / "שגיאות_תעודות.txt"
-        )
-
-        certificate_report_path.write_text(
-            "\n".join(
-                [
-                    "דוח שגיאות בהעתקת תעודות",
-                    "=" * 40,
-                    "",
-                    *certificate_errors,
-                ]
-            ),
-            encoding="utf-8-sig",
-        )
-        '''
-
-
-
-        finally:
-           await browser.close()
-                
 
     old_folder_report_path = None
 
@@ -1390,7 +1333,7 @@ async def process_excel(
             encoding="utf-8-sig",
         )
 
-    # יצירת קובץ ZIP אחד עם כל תוצאות הריצה   # <-- חדש
+    # יצירת קובץ ZIP אחד עם כל תוצאות הריצה
     zip_path = zip_output_folder(output_root)
 
     return {
@@ -1398,9 +1341,7 @@ async def process_excel(
         "invalid_rows": len(df) - total,
         "error_count": len(all_errors),
         "report_path": report_path,
-        "certificate_error_count": len(certificate_errors),
-   
         "old_folder_error_count": len(old_folder_errors),
         "old_folder_report_path": old_folder_report_path,
-        "zip_path": zip_path,   # <-- חדש
+        "zip_path": zip_path,
     }

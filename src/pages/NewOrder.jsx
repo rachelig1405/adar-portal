@@ -17,7 +17,7 @@ export default function NewOrder({ onClose }) {
     picking_rows: "",
     
     line: "סוסנא",
-    delivery_notes: "9:00-14:00",
+    delivery_notes: "",
     warehouse_notes: "",
     status: "לפני יצור",
     

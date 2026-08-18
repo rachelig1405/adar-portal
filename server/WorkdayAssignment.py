@@ -237,6 +237,7 @@ def workday_assignment(max_date:date,order_id:str):
                                     "success": True,
                                     "record": result,
                                 }
+                            
                 
         print("send message to agents")
         return {"success": False,"message": "לא נמצא יום עבודה פנוי"}

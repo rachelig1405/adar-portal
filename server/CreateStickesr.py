@@ -30,6 +30,7 @@ COL_X_STICKER="מידה X"
 COL_Y_STICKER="מידה Y"
 COL_BATTERY="בטריות"
 COL_CERTIFICATE="מספר תעודה"
+COL_PACK_QTY = "כמות במארז"   # כמות פריטים במארז - אופציונלי, לא חובה שיהיה ערך
 # העמודות שחייב להיות בהן ערך בכל שורת מוצר
 REQUIRED_VALUE_COLUMNS = {
     COL_SKU: "מק״ט",
@@ -553,10 +554,12 @@ html,body{
 
 /*************** DATA ***************/
 
+
+
 .item-row{
     position:absolute;
     left:18mm;
-    top:68mm;
+    top: calc(68mm - {{ carton_shift_mm }}mm);
     font-size:15mm;
 }
 
@@ -570,7 +573,7 @@ html,body{
 .pcs-row{
     position:absolute;
     left:18mm;
-     top:92mm;
+    top: calc(92mm - {{ carton_shift_mm }}mm);
     font-size:15mm;
 }
 
@@ -584,8 +587,7 @@ html,body{
 .cbm-row{
     position:absolute;
     left:18mm;
-    top:118mm;
-
+    top: calc(118mm - {{ carton_shift_mm }}mm);
     font-size:15mm;
 }
 
@@ -599,19 +601,14 @@ html,body{
 /*************** BARCODE ***************/
 .barcode-box{
     position:absolute;
-
     right:8mm;
-    bottom:14mm;
-
+    bottom: calc(14mm + {{ carton_shift_mm }}mm);
     width:84mm;
     height:54mm;
-
     border:0.6mm solid #000;
-
     box-sizing:border-box;
     text-align:center;
     direction:ltr;
-
     padding:2mm 3mm 2.5mm 3mm;
     overflow:hidden;
 }
@@ -640,7 +637,7 @@ html,body{
 .sku-row{
     position:absolute;
     left:18mm;
-    top:137mm;
+    top: calc(137mm - {{ carton_shift_mm }}mm);
     font-size:14mm;
     font-weight:400;
 }
@@ -651,6 +648,19 @@ html,body{
     text-align:center;
     border-bottom:0.6mm solid #000;
     margin-left:6mm;
+}
+
+/*************** PACK QTY (חדש) ***************/
+.pack-qty-row{
+    position:absolute;
+    right:8mm;
+    bottom:4mm;
+    width:84mm;
+    font-size:8mm;
+    font-weight:bold;
+    line-height:1;
+    text-align:center;
+    direction:rtl;
 }
 </style>
 </head>
@@ -695,8 +705,13 @@ html,body{
         מק"ט {{ sku }}
     </div>
 
-</div>
 
+</div>
+  {% if pack_qty %}
+  <div class="pack-qty-row">
+      {{ pack_qty }} במארז
+  </div>
+  {% endif %}
 
 
 </div>
@@ -1039,6 +1054,11 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
     x_html = sticker_dimension_mm(row, COL_X_STICKER, 80)
     Y_html = sticker_dimension_mm(row, COL_Y_STICKER, 40)
     barcode_digits = clean_digits(barcode_value)
+    pack_qty = val(row, COL_PACK_QTY)          # <-- חדש
+
+    # אם יש ערך בעמודת "כמות במארז" - מזיזים את כל הבלוק קצת למעלה
+    # כדי לפנות מקום לשורה החדשה מתחת לברקוד. אם ריק - בלי הזזה בכלל.
+    carton_shift_mm = 12 if pack_qty else 0  
 
     if len(barcode_digits) != 13:
         raise ValueError(
@@ -1085,6 +1105,8 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
         "barcode_width_mr": BARCODE_WIDTH_MR_MM,
         "barcode_width_hts": BARCODE_WIDTH_HTS_MM,
         "barcode_width_st": BARCODE_WIDTH_ST_MM,
+        "pack_qty": pack_qty,                  # <-- חדש
+        "carton_shift_mm": carton_shift_mm, 
     }
     
    

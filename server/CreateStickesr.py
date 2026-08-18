@@ -1365,6 +1365,12 @@ async def process_excel(
         )
         '''
 
+
+
+        finally:
+           await browser.close()
+                
+
     old_folder_report_path = None
 
     if old_folder_errors:
@@ -1393,7 +1399,7 @@ async def process_excel(
         "error_count": len(all_errors),
         "report_path": report_path,
         "certificate_error_count": len(certificate_errors),
-        "certificate_report_path": certificate_report_path,
+   
         "old_folder_error_count": len(old_folder_errors),
         "old_folder_report_path": old_folder_report_path,
         "zip_path": zip_path,   # <-- חדש

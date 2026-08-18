@@ -1158,6 +1158,12 @@ async def process_excel(
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
+    # ניקוי קאש ברקודים מריצות קודמות - הוא לא נמחק אף פעם ומצטבר,
+    # ובגלל זה עברנו את מכסת ה-/tmp של Render.
+    barcode_cache_folder = Path(__file__).parent / "_barcodes"
+    if barcode_cache_folder.exists():
+        shutil.rmtree(barcode_cache_folder, ignore_errors=True)
+
     old_folder_errors = []
 
     # קריאת טבלת האקסל
@@ -1335,6 +1341,11 @@ async def process_excel(
 
     # יצירת קובץ ZIP אחד עם כל תוצאות הריצה
     zip_path = zip_output_folder(output_root)
+
+    # מנקים את הקבצים המקוריים (PDF-ים, תמונות שחולצו, תיקיות "ישן" וכו') -
+    # הם כבר בתוך ה-ZIP, ואין טעם להחזיק את שניהם על הדיסק בו-זמנית.
+    # זה בדיוק מה שגרם לחריגה מ-2GB ב-/tmp וקרס את ה-instance.
+    shutil.rmtree(output_root, ignore_errors=True)
 
     return {
         "created_products": created_products,

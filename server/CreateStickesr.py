@@ -1316,6 +1316,7 @@ async def process_excel(
                     photo_data=photo_data,
                 )
                 created_products += 1
+                '''
 
                 certificate_number = val(row, COL_CERTIFICATE)
                 if certificate_folder_path is not None:
@@ -1362,6 +1363,7 @@ async def process_excel(
             ),
             encoding="utf-8-sig",
         )
+        '''
 
     old_folder_report_path = None
 

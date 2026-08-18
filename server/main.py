@@ -229,6 +229,7 @@ def assign_order_to_workday(
             detail=str(error),
         )
 #יצירת סטיקרים
+import json
 import uuid
 from enum import Enum
 
@@ -240,14 +241,19 @@ class JobStatus(str, Enum):
     FAILED = "failed"
 
 
-# מאגר jobs בזיכרון. עובד היטב כל עוד יש worker בודד (ברירת המחדל ב-Render
-# לתוכניות רגילות). אם בעתיד יהיו כמה workers, יהיה צריך Redis/DB משותף.
-pdf_jobs: dict[str, dict] = {}
+# תיקייה לשמירת סטטוס ה-jobs על הדיסק במקום בזיכרון.
+# חייבת להיות באותו נתיב זמני שהתהליכים כותבים אליו, כדי לא לבזבז עוד מקום.
+JOBS_DIR = Path(tempfile.gettempdir()) / "portal_adar_jobs"
+JOBS_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _job_file(job_id: str) -> Path:
+    return JOBS_DIR / f"{job_id}.json"
 
 
 def create_pdf_job() -> str:
     job_id = str(uuid.uuid4())
-    pdf_jobs[job_id] = {
+    job_data = {
         "status": JobStatus.PENDING,
         "progress": 0,
         "total": 0,
@@ -255,15 +261,36 @@ def create_pdf_job() -> str:
         "error": None,
         "work_root": None,
     }
+    _job_file(job_id).write_text(
+        json.dumps(job_data, ensure_ascii=False),
+        encoding="utf-8",
+    )
     return job_id
+
+
+def read_job(job_id: str) -> dict | None:
+    path = _job_file(job_id)
+    if not path.exists():
+        return None
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+
+
+def update_job(job_id: str, **updates):
+    job_data = read_job(job_id) or {}
+    job_data.update(updates)
+    _job_file(job_id).write_text(
+        json.dumps(job_data, ensure_ascii=False),
+        encoding="utf-8",
+    )
 async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, work_root: Path):
     try:
-        pdf_jobs[job_id]["status"] = JobStatus.RUNNING
-        pdf_jobs[job_id]["work_root"] = str(work_root)
+        update_job(job_id, status=JobStatus.RUNNING, work_root=str(work_root))
 
         def progress_callback(progress_index: int, total: int):
-            pdf_jobs[job_id]["progress"] = progress_index
-            pdf_jobs[job_id]["total"] = total
+            update_job(job_id, progress=progress_index, total=total)
 
         result = await process_excel(
             excel_path=str(excel_path),
@@ -271,8 +298,10 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
             progress_callback=progress_callback,
         )
 
-        # שומרים גם סיכום של התהליך
-        summary_path = output_dir / "סיכום_תהליך.txt"
+        # שומרים סיכום של התהליך - שימי לב ש-process_excel כבר מוחקת את
+        # output_dir בסוף (אחרי שיוצרת את ה-ZIP), אז כותבים את הסיכום
+        # לתוך תיקיית work_root במקום, ליד ה-ZIP עצמו.
+        summary_path = work_root / "סיכום_תהליך.txt"
 
         summary_lines = [
             "סיכום יצירת תיקי מוצר",
@@ -289,36 +318,14 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
             encoding="utf-8-sig",
         )
 
-        # ============================
-        # יצירת ZIP
-        # ============================
+        zip_path = result.get("zip_path")
 
-        zip_path = work_root / "product_pdfs.zip"
-
-        with zipfile.ZipFile(
-            zip_path,
-            mode="w",
-            compression=zipfile.ZIP_DEFLATED,
-        ) as zip_file:
-            for file_path in output_dir.rglob("*"):
-                if not file_path.is_file():
-                    continue
-
-                archive_name = file_path.relative_to(output_dir)
-
-                zip_file.write(
-                    filename=file_path,
-                    arcname=archive_name,
-                )
-
-        pdf_jobs[job_id]["zip_path"] = str(zip_path)
-        pdf_jobs[job_id]["status"] = JobStatus.DONE
+        update_job(job_id, zip_path=str(zip_path) if zip_path else None, status=JobStatus.DONE)
 
     except Exception as error:
-        pdf_jobs[job_id]["status"] = JobStatus.FAILED
-        pdf_jobs[job_id]["error"] = str(error)
+        update_job(job_id, status=JobStatus.FAILED, error=str(error))
         shutil.rmtree(work_root, ignore_errors=True)
-#יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
+    #יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
 @app.post("/api/products/create-pdfs")
 async def create_product_pdfs(
     background_tasks: BackgroundTasks,
@@ -363,7 +370,7 @@ async def create_product_pdfs(
 #בדיקת סטטוס יצירת הסטיקרים
 @app.get("/api/products/create-pdfs/status/{job_id}")
 def get_create_pdfs_status(job_id: str):
-    job = pdf_jobs.get(job_id)
+    job = read_job(job_id)
 
     if job is None:
         raise HTTPException(status_code=404, detail="Job לא נמצא")
@@ -383,7 +390,7 @@ def get_create_pdfs_status(job_id: str):
 #הורדת קובץ ה-ZIP המוכן
 @app.get("/api/products/create-pdfs/download/{job_id}")
 def download_create_pdfs_zip(job_id: str):
-    job = pdf_jobs.get(job_id)
+    job = read_job(job_id)
 
     if job is None:
         raise HTTPException(status_code=404, detail="Job לא נמצא")
@@ -401,5 +408,4 @@ def download_create_pdfs_zip(job_id: str):
         media_type="application/zip",
         filename="product_pdfs.zip",
     )
-
     

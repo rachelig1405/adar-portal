@@ -298,10 +298,7 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
             progress_callback=progress_callback,
         )
 
-        # שומרים סיכום של התהליך - שימי לב ש-process_excel כבר מוחקת את
-        # output_dir בסוף (אחרי שיוצרת את ה-ZIP), אז כותבים את הסיכום
-        # לתוך תיקיית work_root במקום, ליד ה-ZIP עצמו.
-        summary_path = work_root / "סיכום_תהליך.txt"
+        zip_path = result.get("zip_path")
 
         summary_lines = [
             "סיכום יצירת תיקי מוצר",
@@ -313,18 +310,19 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
             f"שגיאות תיקיות ישנות: {result.get('old_folder_error_count', 0)}",
         ]
 
-        summary_path.write_text(
-            "\n".join(summary_lines),
-            encoding="utf-8-sig",
-        )
+        summary_text = "\n".join(summary_lines)
 
-        zip_path = result.get("zip_path")
+        # מוסיפים את הסיכום ישירות לתוך ה-ZIP הקיים, כדי שהוא יירד יחד עם שאר הקבצים
+        if zip_path and Path(zip_path).exists():
+            with zipfile.ZipFile(zip_path, mode="a", compression=zipfile.ZIP_DEFLATED) as zip_file:
+                zip_file.writestr("סיכום_תהליך.txt", summary_text.encode("utf-8-sig"))
 
         update_job(job_id, zip_path=str(zip_path) if zip_path else None, status=JobStatus.DONE)
 
     except Exception as error:
         update_job(job_id, status=JobStatus.FAILED, error=str(error))
         shutil.rmtree(work_root, ignore_errors=True)
+   
     #יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
 @app.post("/api/products/create-pdfs")
 async def create_product_pdfs(

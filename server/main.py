@@ -406,4 +406,123 @@ def download_create_pdfs_zip(job_id: str):
         media_type="application/zip",
         filename="product_pdfs.zip",
     )
+
+@app.post("/api/login")
+def login(data: LoginRequest):
+    username = data.username.strip()
+    password = data.password.strip()
+    if not username or not password:
+        raise HTTPException(
+            status_code=400,
+            detail="יש להזין שם משתמש וסיסמה",
+        )
+    try:
+        user_record = get_airtable_user(username)
+    except Exception as error:
+        print("Login error:", error)
+        raise HTTPException(
+            status_code=500,
+            detail="שגיאה בחיבור לשרת",
+        )
+    if not user_record:
+        raise HTTPException(
+            status_code=401,
+            detail="שם המשתמש או הסיסמה שגויים",
+        )
+    fields = user_record.get("fields", {})
+    saved_password = str(
+        fields.get("סיסמא", "")
+    ).strip()
+    print(saved_password)
+    if saved_password != password:
+        raise HTTPException(
+            status_code=401,
+            detail="שם המשתמש או הסיסמה שגויים",
+        )
+    if not fields.get("פעיל", False):
+        raise HTTPException(
+            status_code=403,
+            detail="המשתמש אינו פעיל",
+        )
+    return {
+        "success": True,
+        "user": {
+            "username": fields.get("שם משתמש", ""),
+            "name": fields.get("שם", ""),
+            "role": fields.get("תפקיד", ""),
+            "id": user_record["id"]
+        },
+    }
+#הדפסת מדבקות להזמנות להיום
+@app.get(
+    "/api/labels/today",
+    response_class=PlainTextResponse,
+)
+def print_today_labels():
+    return create_today_orders_zpl()
+@app.get("/api/chat/messages")
+def api_get_chat_messages(
+    limit: int = Query(100, ge=1, le=200),
+):
+    return get_chat_messages(limit=limit)
+@app.post("/api/chat/messages")
+def api_create_chat_message(
+    data: ChatMessageCreate,
+):
+    created_record = create_chat_message(
+        user_id=data.user_id,
+        message=data.message,
+    )
+    return {
+        "success": True,
+        "id": created_record["id"],
+        "message": "ההודעה נשלחה בהצלחה",
+    }
+#הדפסת מדבקות לפי מספר הזמנה
+@app.get("/api/labels/order/{order_number}")
+def get_order_label(order_number: str):
+    records = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=f'{{מספר הזמנה}}="{order_number}"'
+    )
+    if not records:
+        raise HTTPException(
+            status_code=404,
+            detail="הזמנה לא נמצאה",
+        )
+    order = records[0]
+    return Response(
+        content=create_today_orders_zpl(order),
+        media_type="text/plain",
+    )
     
+#החזרת התאריכים החסומים
+@app.get("/api/workdays/blocked-dates")
+def get_blocked_workday_dates():
+
+    records = get_all_airtable_records(
+        table_name=AIRTABLE_WORKERS_TABLE,
+        filter_formula='{מלא לגמרי}=TRUE',
+        fields=[
+            "תאריך ליקוט מינימלי",
+            "מלא לגמרי",
+        ],
+    )
+
+    blocked_dates = []
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        blocked_date = fields.get(
+            "תאריך ליקוט מינימלי"
+        )
+
+        if blocked_date:
+            blocked_dates.append(
+                str(blocked_date)[:10]
+            )
+
+    return {
+        "blocked_dates": blocked_dates
+    }

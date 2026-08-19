@@ -147,7 +147,8 @@ def workday_assignment(max_date:date,order_id:str):
     f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
     f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
     f'),'
-    f'{{סהכ שורות ליקוט}} < {{שורות ליקוט ליום}}'
+        f'VALUE({{סהכ שורות ליקוט}} & "") < '
+        f'VALUE({{שורות ליקוט ליום}} & "")'
     f')'
 ))
         #רשומות של כל הימים כולל המלאים מהיום ועד ליום העבודה המקסימלי
@@ -216,7 +217,8 @@ def workday_assignment(max_date:date,order_id:str):
                                     f'IS_BEFORE({{יום עבודה}}, "{max_order_day}"),'
                                     f'IS_SAME({{יום עבודה}}, "{max_order_day}", "day")'
                                     f'),'
-                                    f'{{סהכ שורות ליקוט}} < {{שורות ליקוט ליום}}'
+                                        f'VALUE({{סהכ שורות ליקוט}} & "") < '
+                                        f'VALUE({{שורות ליקוט ליום}} & "")'
                                     f')'
                                )
                         print("records_of_worksday:", records_of_worksday, flush=True)

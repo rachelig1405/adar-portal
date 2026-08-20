@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { API_URL } from "../config";
-import OrderBarcode from "../components/OrderBarcode";
+import OrderBarcode from "./OrderBarcode";
 
 export default function NewPicking({ onClose,user }) {
   const [orders, setOrders] = useState([]);

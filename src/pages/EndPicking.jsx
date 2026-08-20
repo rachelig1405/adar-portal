@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
+import OrderBarcode from "./OrderBarcode";
 import { API_URL } from "../config";
 export default function EndPicking({ onClose,user}) {
   const [orders, setOrders] = useState([]);
@@ -323,6 +323,9 @@ export default function EndPicking({ onClose,user}) {
                         הערות: {selectedOrder.notes}
                       </div>
                   )}
+                   <div style={{ marginTop: "16px", textAlign: "center" }}>
+                               <OrderBarcode value={selectedOrder.order_number} />
+                    </div>
                 </div>
 
                 <button

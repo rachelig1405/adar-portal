@@ -23,6 +23,8 @@ class OrderCreate(BaseModel):
     line: str | None = ""
     delivery_notes: str | None = ""
     warehouse_notes:str | None = ""
+    cardboard:int | None = None
+
 class PickingEnd(BaseModel):
     order_id: str
     amount:float |None=None

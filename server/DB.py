@@ -167,6 +167,8 @@ def create_order(order: OrderCreate):
 
     if order.warehouse_notes:
         fields["הערות למחסן"] = order.warehouse_notes
+    if order.cardboard:
+            fields["מארזים"] = order.cardboard
 
     payload = {"fields": fields}
 

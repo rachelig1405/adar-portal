@@ -203,6 +203,7 @@ async def import_orders_excel(
     customer_cache: dict[str, str | None] = {}
     agent_cache: dict[str, str | None] = {}
     data_rows = rows[1:] 
+    cardboard=0
 
     for i, row in enumerate(data_rows):
    
@@ -212,6 +213,9 @@ async def import_orders_excel(
             get_value(row, "הזמנה")
         )
         next_order_number = None
+        cardboard=cardboard+normalize_text(
+            get_value(row, "כמות מארזים")
+        )
 
     # האם קיימת שורה הבאה?
         if i + 1 < len(data_rows):
@@ -331,6 +335,7 @@ async def import_orders_excel(
                 record = create_order(
                     order
             )   
+                cardboard=0
 
                 successes.append({
                     "excel_row": excel_row_number,
@@ -351,6 +356,7 @@ async def import_orders_excel(
                     "order_number": order_number,
                     "error": str(error),
                 })
+
 
     return {
      "success": len(successes) == 0,

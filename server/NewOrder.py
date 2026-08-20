@@ -204,6 +204,7 @@ async def import_orders_excel(
     agent_cache: dict[str, str | None] = {}
     data_rows = rows[1:] 
     cardboard=0
+    picking_rows=0
 
     for i, row in enumerate(data_rows):
    
@@ -216,6 +217,7 @@ async def import_orders_excel(
         cardboard=cardboard+normalize_text(
             get_value(row, "כמות מארזים")
         )
+        picking_rows=picking_rows+1
 
     # האם קיימת שורה הבאה?
         if i + 1 < len(data_rows):
@@ -292,12 +294,7 @@ async def import_orders_excel(
                 )
             )
 
-                picking_rows = normalize_integer(
-                    get_value(
-                        row,
-                        "ש.",
-                    )
-            )
+               
 
                 goes_with_us = None
                     
@@ -336,6 +333,7 @@ async def import_orders_excel(
                     order
             )   
                 cardboard=0
+                picking_rows=0
 
                 successes.append({
                     "excel_row": excel_row_number,

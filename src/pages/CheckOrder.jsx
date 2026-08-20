@@ -320,6 +320,9 @@ export default function CheckOrder({ onClose }) {
                         הערות: {selectedOrder.notes}
                       </div>
                   )}
+                   <div style={{ marginTop: "16px", textAlign: "center" }}>
+                                        <OrderBarcode value={selectedOrder.order_number} />
+                   </div>
                 </div>
 
                 <button

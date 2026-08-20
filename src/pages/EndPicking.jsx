@@ -323,9 +323,7 @@ export default function EndPicking({ onClose,user}) {
                         הערות: {selectedOrder.notes}
                       </div>
                   )}
-                   <div style={{ marginTop: "16px", textAlign: "center" }}>
-                               <OrderBarcode value={selectedOrder.order_number} />
-                    </div>
+                
                 </div>
 
                 <button

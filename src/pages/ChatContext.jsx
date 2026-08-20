@@ -8,6 +8,7 @@ export function ChatProvider({ user, children }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const knownMessageIdsRef = useRef(new Set());
   const isFirstLoadRef = useRef(true);
@@ -59,7 +60,6 @@ export function ChatProvider({ user, children }) {
         }
       );
 
-      // לחיצה על ההתראה תפתח את הצ'אט
       notification.onclick = () => {
         window.focus();
         setIsChatOpen(true);
@@ -106,13 +106,13 @@ export function ChatProvider({ user, children }) {
         );
 
         if (incomingNewMessages.length > 0) {
-          // אם הצ'אט כבר פתוח, לא צריך גם Notification דחוף - רק צליל
           playNotificationSound();
 
           if (!isChatOpenRef.current) {
             showBrowserNotification(
               incomingNewMessages[incomingNewMessages.length - 1]
             );
+            setUnreadCount((current) => current + incomingNewMessages.length);
           }
         }
       }
@@ -136,17 +136,45 @@ export function ChatProvider({ user, children }) {
     }
   }
 
-  // ה-polling הזה עכשיו רץ ברמת ה-Provider, כלומר תמיד - לא משנה איזה
-  // עמוד/רכיב מוצג כרגע באתר.
+  // *** זה ה-useEffect שהוחלף - הגרסה החדשה עם Visibility API ***
   useEffect(() => {
+    let intervalId = null;
+
+    function startPolling() {
+      if (intervalId) return;
+
+      loadMessages(false);
+      intervalId = window.setInterval(() => {
+        loadMessages(false);
+      }, 3000);
+    }
+
+    function stopPolling() {
+      if (intervalId) {
+        window.clearInterval(intervalId);
+        intervalId = null;
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.hidden) {
+        stopPolling();
+      } else {
+        startPolling();
+      }
+    }
+
     loadMessages(true);
 
-    const intervalId = window.setInterval(() => {
-      loadMessages(false);
-    }, 3000);
+    if (!document.hidden) {
+      startPolling();
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.clearInterval(intervalId);
+      stopPolling();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -187,7 +215,11 @@ export function ChatProvider({ user, children }) {
     error,
     sendMessage,
     isChatOpen,
-    openChat: () => setIsChatOpen(true),
+    unreadCount,
+    openChat: () => {
+      setIsChatOpen(true);
+      setUnreadCount(0);
+    },
     closeChat: () => setIsChatOpen(false),
   };
 

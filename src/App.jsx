@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Login from "./pages/Login";
 import Portal from "./pages/Portal";
-import createContext from "./pages/ChatContext"
+import { ChatProvider } from "./pages/ChatContext";
 export default function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("adarUser");

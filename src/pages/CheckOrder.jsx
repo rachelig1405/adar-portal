@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
+import OrderBarcode from "./OrderBarcode";
 import { API_URL } from "../config";
 
 export default function CheckOrder({ onClose }) {

@@ -214,9 +214,7 @@ async def import_orders_excel(
             get_value(row, "הזמנה")
         )
         next_order_number = None
-        cardboard=cardboard+normalize_text(
-            get_value(row, "כמות מארזים")
-        )
+        cardboard = cardboard + int(normalize_text(get_value(row, "כמות מארזים")) or 0)
         picking_rows=picking_rows+1
 
     # האם קיימת שורה הבאה?
@@ -332,8 +330,7 @@ async def import_orders_excel(
                 record = create_order(
                     order
             )   
-                cardboard=0
-                picking_rows=0
+               
 
                 successes.append({
                     "excel_row": excel_row_number,
@@ -354,6 +351,8 @@ async def import_orders_excel(
                     "order_number": order_number,
                     "error": str(error),
                 })
+            cardboard=0
+            picking_rows=0
 
 
     return {

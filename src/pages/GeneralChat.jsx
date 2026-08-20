@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "./ChatContext";
 
-export default function GeneralChat({ onClose, user,openChat }) {
-  const { messages, loading, error, sendMessage } = useChat();
+export default function GeneralChat({ onClose, user}) {
+  const { messages, loading, error, sendMessage ,openChat} = useChat();
 
   const messagesEndRef = useRef(null);
 

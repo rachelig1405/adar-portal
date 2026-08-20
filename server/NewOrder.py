@@ -97,7 +97,14 @@ def normalize_date(value) -> str | None:
         f"תאריך לא תקין: {text}"
     )
 
-
+def normalize_number(value) -> int:
+    text = normalize_text(value)
+    if not text:
+        return 0
+    try:
+        return int(float(text))
+    except (TypeError, ValueError):
+        return 0
 
 async def import_orders_excel(
     file: UploadFile
@@ -214,7 +221,7 @@ async def import_orders_excel(
             get_value(row, "הזמנה")
         )
         next_order_number = None
-        cardboard = cardboard + int(normalize_text(get_value(row, "כמות מארזים")) or 0)
+        cardboard = cardboard + normalize_number(get_value(row, "כמות מארזים"))
         picking_rows=picking_rows+1
 
     # האם קיימת שורה הבאה?

@@ -6,6 +6,13 @@ export default function GeneralChat({ onClose, user }) {
 
   const messagesEndRef = useRef(null);
 
+    useEffect(() => {
+    openChat();
+    return () => {
+      closeChat();
+    };
+  }, []);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
       behavior: "smooth",

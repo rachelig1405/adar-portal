@@ -324,6 +324,7 @@ async def import_orders_excel(
                         line=line,
                         delivery_notes=delivery_notes,
                         warehouse_notes=warehouse_notes,
+                        cardboard=cardboard
                 )
 
 

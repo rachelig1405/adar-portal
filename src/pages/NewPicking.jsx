@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { API_URL } from "../config";
+import OrderBarcode from "../components/OrderBarcode";
 
 export default function NewPicking({ onClose,user }) {
   const [orders, setOrders] = useState([]);
@@ -318,7 +319,9 @@ export default function NewPicking({ onClose,user }) {
  
                         תאריך אספקה :  {order.order_date || "ללא תאריך אספקה"}  
                       </div>
+
                     </button>
+                    
                   ))
                 ) : (
                   <div className="empty-search">
@@ -343,7 +346,11 @@ export default function NewPicking({ onClose,user }) {
                       >
                         הערות: {selectedOrder.notes}
                       </div>
+                       
                   )}
+                        <div style={{ marginTop: "16px", textAlign: "center" }}>
+                      <OrderBarcode value={selectedOrder.order_number} />
+                      </div>
                 </div>
 
                 <button

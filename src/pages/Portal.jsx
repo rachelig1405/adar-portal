@@ -5,7 +5,7 @@ import ActionCard from "../components/ActionCard";
 import FrameWindow from "../components/FrameWindow";
 
 import { getMenu } from "../data/menus";
-import { useChat } from "../ChatContext";
+import { useChat } from "./ChatContext";
 
 import NewOrder from "./NewOrder";
 import NewPicking from "./NewPicking";

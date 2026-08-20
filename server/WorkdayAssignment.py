@@ -135,7 +135,7 @@ def create_workdays_until(target_date: date):
     }
 AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
 def workday_assignment(max_date:date,order_id:str):
-    while(1):
+    for attempt in range(2):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
         records_view_shibuts=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula = (
     f'AND('

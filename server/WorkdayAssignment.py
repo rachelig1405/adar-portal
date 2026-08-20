@@ -150,7 +150,9 @@ def workday_assignment(max_date:date,order_id:str):
         f'VALUE({{סהכ שורות ליקוט}} & "") < '
         f'VALUE({{שורות ליקוט ליום}} & "")'
     f')'
-))
+), sort=[
+        ("יום עבודה", "asc")
+    ],)
         #רשומות של כל הימים כולל המלאים מהיום ועד ליום העבודה המקסימלי
         records=get_all_airtable_records(table_name=AIRTABLE_WORKDAY_TABLE,filter_formula=    f'AND('   f'OR('
                 f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
@@ -158,7 +160,9 @@ def workday_assignment(max_date:date,order_id:str):
             f'),'f'OR('
             f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
             f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
-            f')' f')',view="Grid view")
+            f')' f')',sort=[
+        ("יום עבודה", "asc")
+    ],view="Grid view")
         workday=None
         if records_view_shibuts:
             workday=records_view_shibuts[0].get("id")
@@ -219,7 +223,8 @@ def workday_assignment(max_date:date,order_id:str):
                                     f'),'
                                         f'VALUE({{סהכ שורות ליקוט}} & "") < '
                                         f'VALUE({{שורות ליקוט ליום}} & "")'
-                                    f')'
+                                    f')',sort=[
+        ("יום עבודה", "asc")]
                                )
                         print("records_of_worksday:", records_of_worksday, flush=True)
                         

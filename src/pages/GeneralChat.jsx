@@ -1,11 +1,17 @@
 import { useEffect, useRef } from "react";
 import { useChat } from "./ChatContext";
 
-export default function GeneralChat({ onClose, user }) {
+export default function GeneralChat({ onClose, user,openChat }) {
   const { messages, loading, error, sendMessage } = useChat();
 
   const messagesEndRef = useRef(null);
 
+    useEffect(() => {
+    openChat();
+    return () => {
+      closeChat();
+    };
+  }, []);
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({

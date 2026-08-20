@@ -288,7 +288,7 @@ async def import_orders_excel(
                 delivery_date = normalize_date(
                     get_value(
                         row,
-                        "ת.אספקה",
+                        "ת. אספקה",
                 )
             )
 

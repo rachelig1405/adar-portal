@@ -47,34 +47,10 @@ export function ChatProvider({ user, children }) {
   }
 
   function showBrowserNotification(message) {
-    if (typeof Notification === "undefined") {
-      return;
-    }
-
-    if (Notification.permission === "granted") {
-      const notification = new Notification(
-        message.sender_name || "הודעה חדשה בצ׳אט",
-        {
-          body: message.message,
-          icon: "/favicon.ico",
-        }
-      );
-
-      notification.onclick = () => {
-        window.focus();
-        setIsChatOpen(true);
-      };
-    }
+    alert(
+      `הודעה חדשה מ${message.sender_name || "עובד"}:\n${message.message}`
+    );
   }
-
-  useEffect(() => {
-    if (
-      typeof Notification !== "undefined" &&
-      Notification.permission === "default"
-    ) {
-      Notification.requestPermission();
-    }
-  }, []);
 
   async function loadMessages(showLoading = false) {
     if (showLoading) {
@@ -136,7 +112,6 @@ export function ChatProvider({ user, children }) {
     }
   }
 
-  // *** זה ה-useEffect שהוחלף - הגרסה החדשה עם Visibility API ***
   useEffect(() => {
     let intervalId = null;
 

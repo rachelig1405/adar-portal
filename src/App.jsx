@@ -22,10 +22,9 @@ export default function App() {
   }
 
   return user ? (
-    <Portal
-      user={user}
-      onLogout={logout}
-    />
+    <ChatProvider user={user}>
+      <Portal user={user} onLogout={logout} />
+    </ChatProvider>
   ) : (
     <Login onLogin={login} />
   );

@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { useChat } from "./ChatContext";
 
 export default function GeneralChat({ onClose, user}) {
-  const { messages, loading, error, sendMessage ,openChat} = useChat();
+  const { messages, loading, error, sendMessage ,openChat,closeChat } = useChat();
 
   const messagesEndRef = useRef(null);
 

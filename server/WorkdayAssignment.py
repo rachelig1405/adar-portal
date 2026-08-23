@@ -134,7 +134,7 @@ def create_workdays_until(target_date: date):
         ),
     }
 AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
-'''
+
 def workday_assignment(max_date:date,order_id:str):
     for attempt in range(2):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
@@ -253,6 +253,7 @@ def workday_assignment(max_date:date,order_id:str):
 
                 
     return {"success": False,"message": "לא נמצא יום עבודה פנוי"}
+
 
 '''
 def workday_assignment(max_date: date, order_id: str):
@@ -450,7 +451,7 @@ def workday_assignment(max_date: date, order_id: str):
 
 
 
-
+'''
 
 
 

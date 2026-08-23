@@ -345,7 +345,7 @@ def workday_assignment(max_date: date, order_id: str):
                 orders = record["fields"].get("הזמנות 2", [])
 
                 for order in orders:
-                    order1 = order
+                    order1 = get_order_by_record_id(order)
 
                     if order1["fields"].get("סטטוס") != "לפני יצור":
                         continue

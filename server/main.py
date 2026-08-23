@@ -20,6 +20,11 @@ from Models import OrderCreate
 from Models import PickingStart
 from typing import Optional
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
+#הגדרת נתיב לדיסק
+import uuid
+
+PERSISTENT_STORAGE = Path("/var/data")
+PERSISTENT_STORAGE.mkdir(parents=True, exist_ok=True)
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_ORDERS_TABLE = os.getenv("AIRTABLE_ORDERS_TABLE")
@@ -243,9 +248,12 @@ class JobStatus(str, Enum):
 
 # תיקייה לשמירת סטטוס ה-jobs על הדיסק במקום בזיכרון.
 # חייבת להיות באותו נתיב זמני שהתהליכים כותבים אליו, כדי לא לבזבז עוד מקום.
+'''
 JOBS_DIR = Path(tempfile.gettempdir()) / "portal_adar_jobs"
 JOBS_DIR.mkdir(parents=True, exist_ok=True)
-
+'''
+JOBS_DIR = PERSISTENT_STORAGE / "jobs_status"
+JOBS_DIR.mkdir(parents=True, exist_ok=True)
 
 def _job_file(job_id: str) -> Path:
     return JOBS_DIR / f"{job_id}.json"
@@ -324,6 +332,7 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
         shutil.rmtree(work_root, ignore_errors=True)
    
     #יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
+
 @app.post("/api/products/create-pdfs")
 async def create_product_pdfs(
     background_tasks: BackgroundTasks,
@@ -337,7 +346,10 @@ async def create_product_pdfs(
             detail="יש להעלות קובץ Excel מסוג XLSX או XLS.",
         )
 
-    work_root = Path(tempfile.mkdtemp(prefix="portal_adar_products_"))
+    # במקום tempfile.mkdtemp() (שכותב ל-/tmp, מוגבל ל-2GB) -
+    # יוצרים תיקייה בתוך הדיסק הקבוע (10GB)
+    work_root = PERSISTENT_STORAGE / f"job_{uuid.uuid4()}"
+    work_root.mkdir(parents=True, exist_ok=True)
 
     excel_dir = work_root / "excel"
     output_dir = work_root / "output"
@@ -406,7 +418,37 @@ def download_create_pdfs_zip(job_id: str):
         media_type="application/zip",
         filename="product_pdfs.zip",
     )
+@app.get("/api/products/create-pdfs/download/{job_id}")
+def download_create_pdfs_zip(job_id: str, background_tasks: BackgroundTasks):
+    job = read_job(job_id)
 
+    if job is None:
+        raise HTTPException(status_code=404, detail="Job לא נמצא")
+
+    if job["status"] != JobStatus.DONE:
+        raise HTTPException(status_code=409, detail="הקובץ עדיין לא מוכן")
+
+    zip_path = job["zip_path"]
+
+    if not zip_path or not Path(zip_path).exists():
+        raise HTTPException(status_code=404, detail="קובץ ה-ZIP לא נמצא")
+
+    work_root = job.get("work_root")
+
+    def cleanup_after_download():
+        if work_root and Path(work_root).exists():
+            shutil.rmtree(work_root, ignore_errors=True)
+
+        _job_file(job_id).unlink(missing_ok=True)
+
+    background_tasks.add_task(cleanup_after_download)
+
+    return FileResponse(
+        path=zip_path,
+        media_type="application/zip",
+        filename="product_pdfs.zip",
+        background=background_tasks,
+    )
 @app.post("/api/login")
 def login(data: LoginRequest):
     username = data.username.strip()

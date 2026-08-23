@@ -135,6 +135,7 @@ def create_workdays_until(target_date: date):
     }
 AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
 
+'''
 def workday_assignment(max_date:date,order_id:str):
     for attempt in range(2):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
@@ -262,10 +263,6 @@ def workday_assignment(max_date: date, order_id: str):
     extended_records_cache: dict[str, list] = {}
 
     def get_extended_records(until_date: date):
-        """
-        שולפת ימים נוספים בין max_date (לא כולל) ל-until_date,
-        עם קאש כדי לא לחזור על אותה שליפה פעמיים.
-        """
         cache_key = until_date.isoformat()
 
         if cache_key in extended_records_cache:
@@ -326,10 +323,7 @@ def workday_assignment(max_date: date, order_id: str):
 
         if workday:
             if order_id:
-                result = update_order_workflow(
-                    order_id=order_id,
-                    workday_id=workday,
-                )
+                result = update_order_workflow(order_id=order_id, workday_id=workday)
 
                 return {
                     "success": True,
@@ -341,9 +335,7 @@ def workday_assignment(max_date: date, order_id: str):
         else:
             if records:
                 last_record = records[-1]
-                last_workday = date.fromisoformat(
-                    str(last_record["fields"]["יום עבודה"])[:10]
-                )
+                last_workday = date.fromisoformat(str(last_record["fields"]["יום עבודה"])[:10])
 
                 if last_workday < max_date:
                     create_workdays_until(target_date=max_date)
@@ -358,33 +350,24 @@ def workday_assignment(max_date: date, order_id: str):
                     if order1["fields"].get("סטטוס") != "לפני יצור":
                         continue
 
-                    max_order_day_raw = order1["fields"].get(
-                        "תאריך ליקוט מקסימילי"
-                    )
+                    max_order_day_raw = order1["fields"].get("תאריך ליקוט מקסימילי")
 
                     if not max_order_day_raw:
                         continue
 
-                    max_order_day = date.fromisoformat(
-                        str(max_order_day_raw)[:10]
-                    )
+                    max_order_day = date.fromisoformat(str(max_order_day_raw)[:10])
 
-                    # *** התיקון - מחפשים גם בתוך records (עד max_date)
-                    # וגם ב-extended_records (בין max_date ל-max_order_day) ***
                     extended = get_extended_records(max_order_day)
                     candidates = records + extended
 
                     alternative_workday = None
 
                     for candidate in candidates:
-                        candidate_date = date.fromisoformat(
-                            str(candidate["fields"]["יום עבודה"])[:10]
-                        )
+                        candidate_date = date.fromisoformat(str(candidate["fields"]["יום עבודה"])[:10])
 
                         if candidate_date > max_order_day:
                             continue
 
-                        # לא רוצים להזיז הזמנה לאותו יום שהיא כבר בו
                         if candidate.get("id") == record.get("id"):
                             continue
 
@@ -393,47 +376,23 @@ def workday_assignment(max_date: date, order_id: str):
                             break
 
                     if alternative_workday:
-                        update_order_workflow(
-                            order_id=order,
-                            workday_id=alternative_workday["id"],
-                        )
+                        update_order_workflow(order_id=order, workday_id=alternative_workday["id"])
 
-                        moved_rows = int(
-                            order1["fields"].get("שורות ליקוט", 0) or 0
-                        )
+                        moved_rows = int(order1["fields"].get("שורות ליקוט", 0) or 0)
 
                         alternative_workday["fields"]["סהכ שורות ליקוט"] = (
-                            int(
-                                alternative_workday["fields"].get(
-                                    "סהכ שורות ליקוט", 0
-                                )
-                                or 0
-                            )
-                            + moved_rows
+                            int(alternative_workday["fields"].get("סהכ שורות ליקוט", 0) or 0) + moved_rows
                         )
 
                         record["fields"]["סהכ שורות ליקוט"] = (
-                            int(
-                                record["fields"].get(
-                                    "סהכ שורות ליקוט", 0
-                                )
-                                or 0
-                            )
-                            - moved_rows
+                            int(record["fields"].get("סהכ שורות ליקוט", 0) or 0) - moved_rows
                         )
 
-                        current_total = int(
-                            record["fields"].get("סהכ שורות ליקוט", 0) or 0
-                        )
-                        current_limit = int(
-                            record["fields"].get("שורות ליקוט ליום", 0) or 0
-                        )
+                        current_total = int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
+                        current_limit = int(record["fields"].get("שורות ליקוט ליום", 0) or 0)
 
                         if current_total <= current_limit:
-                            result = update_order_workflow(
-                                order_id=order_id,
-                                workday_id=record["id"],
-                            )
+                            result = update_order_workflow(order_id=order_id, workday_id=record["id"])
 
                             return {
                                 "success": True,
@@ -453,7 +412,7 @@ def workday_assignment(max_date: date, order_id: str):
 
 
 
-'''
+
 
 
 

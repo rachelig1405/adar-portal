@@ -22,7 +22,7 @@ from typing import Optional
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
 #הגדרת נתיב לדיסק
 import uuid
-
+import traceback
 PERSISTENT_STORAGE = Path("/var/data")
 PERSISTENT_STORAGE.mkdir(parents=True, exist_ok=True)
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
@@ -217,10 +217,28 @@ async def importOrdersFromExcel(
 def assign_order_to_workday(
     request: WorkdayAssignmentRequest
 ):
+    print(
+        "===== WORKDAY ASSIGNMENT START =====",
+        flush=True
+    )
+    print(
+        "max_date:",
+        request.max_date,
+        "order_id:",
+        request.order_id,
+        flush=True
+    )
+
     try:
         result = workday_assignment(
             max_date=request.max_date,
             order_id=request.order_id,
+        )
+
+        print(
+            "WORKDAY RESULT:",
+            result,
+            flush=True
         )
 
         return result
@@ -229,6 +247,25 @@ def assign_order_to_workday(
         raise
 
     except Exception as error:
+
+        print(
+            "===== WORKDAY ASSIGNMENT ERROR =====",
+            flush=True
+        )
+
+        traceback.print_exc()
+
+        print(
+            "ERROR:",
+            repr(error),
+            flush=True
+        )
+
+        print(
+            "====================================",
+            flush=True
+        )
+
         raise HTTPException(
             status_code=500,
             detail=str(error),

@@ -134,6 +134,7 @@ def create_workdays_until(target_date: date):
         ),
     }
 AIRTABLE_WORKDAY_TABLE=os.getenv("AIRTABLE_WORKDAY_TABLE")
+'''
 def workday_assignment(max_date:date,order_id:str):
     for attempt in range(2):
     #מציאת היום הפוי הראשון עד תאריך ליקוט מקסימלי
@@ -253,8 +254,163 @@ def workday_assignment(max_date:date,order_id:str):
                 
     return {"success": False,"message": "לא נמצא יום עבודה פנוי"}
 
+'''
+def workday_assignment(max_date: date, order_id: str):
+    for attempt in range(2):
+        # שליפה אחת בלבד - במקום שתי שליפות דומות שהיו בקוד המקורי
+        records = get_all_airtable_records(
+            table_name=AIRTABLE_WORKDAY_TABLE,
+            filter_formula=(
+                f'AND('
+                f'OR('
+                f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
+                f'IS_AFTER({{יום עבודה}}, TODAY())'
+                f'),'
+                f'OR('
+                f'IS_BEFORE({{יום עבודה}}, "{max_date}"),'
+                f'IS_SAME({{יום עבודה}}, "{max_date}", "day")'
+                f')'
+                f')'
+            ),
+            sort=[("יום עבודה", "asc")],
+            view="Grid view",
+        )
 
+        def remaining_capacity(record):
+            total = int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
+            limit = int(record["fields"].get("שורות ליקוט ליום", 0) or 0)
+            return limit - total
 
+        # שלב 1: חיפוש יום עם מקום פנוי - בזיכרון בלבד, בלי קריאת API נוספת
+        workday = None
+
+        for record in records:
+            if remaining_capacity(record) > 0:
+                workday = record.get("id")
+                break
+
+        if workday:
+            if order_id:
+                result = update_order_workflow(
+                    order_id=order_id,
+                    workday_id=workday,
+                )
+
+                return {
+                    "success": True,
+                    "record": result,
+                    "message": "ההזמנה שובצה בהצלחה",
+                    "workday id": workday,
+                }
+
+        # שלב 2: לא נמצא יום פנוי ישירות - מנסים לפנות מקום
+        else:
+            if records:
+                last_record = records[-1]
+                last_workday = date.fromisoformat(
+                    str(last_record["fields"]["יום עבודה"])[:10]
+                )
+
+                if last_workday < max_date:
+                    create_workdays_until(target_date=max_date)
+                    continue
+
+            for record in records:
+                orders = record["fields"].get("הזמנות 2", [])
+
+                for order in orders:
+                    order1 = order
+
+                    if order1["fields"].get("סטטוס") != "לפני יצור":
+                        continue
+
+                    max_order_day_raw = order1["fields"].get(
+                        "תאריך ליקוט מקסימילי"
+                    )
+
+                    if not max_order_day_raw:
+                        continue
+
+                    max_order_day = date.fromisoformat(
+                        str(max_order_day_raw)[:10]
+                    )
+
+                    # חיפוש יום חלופי - בזיכרון, מתוך records שכבר שלפנו
+                    alternative_workday = None
+
+                    for candidate in records:
+                        candidate_date = date.fromisoformat(
+                            str(candidate["fields"]["יום עבודה"])[:10]
+                        )
+
+                        if candidate_date > max_order_day:
+                            continue
+
+                        if remaining_capacity(candidate) > 0:
+                            alternative_workday = candidate
+                            break
+
+                    if alternative_workday:
+                        update_order_workflow(
+                            order_id=order,
+                            workday_id=alternative_workday["id"],
+                        )
+
+                        moved_rows = int(
+                            order1["fields"].get("שורות ליקוט", 0) or 0
+                        )
+
+                        # מעדכנים את היום החדש שקיבל את ההזמנה
+                        alternative_workday["fields"]["סהכ שורות ליקוט"] = (
+                            int(
+                                alternative_workday["fields"].get(
+                                    "סהכ שורות ליקוט", 0
+                                )
+                                or 0
+                            )
+                            + moved_rows
+                        )
+
+                        # *** התיקון - מעדכנים גם את היום המקורי, שממנו
+                        # ההזמנה הוסרה, כדי שהחישוב הבא יהיה מדויק ***
+                        record["fields"]["סהכ שורות ליקוט"] = (
+                            int(
+                                record["fields"].get(
+                                    "סהכ שורות ליקוט", 0
+                                )
+                                or 0
+                            )
+                            - moved_rows
+                        )
+
+                        current_total = int(
+                            record["fields"].get("סהכ שורות ליקוט", 0) or 0
+                        )
+                        current_limit = int(
+                            record["fields"].get("שורות ליקוט ליום", 0) or 0
+                        )
+
+                        if current_total <= current_limit:
+                            result = update_order_workflow(
+                                order_id=order_id,
+                                workday_id=record["id"],
+                            )
+
+                            return {
+                                "success": True,
+                                "record": result,
+                            }
+
+            print("send message to agents")
+            return {
+                "success": False,
+                "message": "לא נמצא יום עבודה פנוי",
+            }
+
+    return {
+        "success": False,
+        "message": "לא נמצא יום עבודה פנוי",
+    }
 
 
 

@@ -1158,60 +1158,32 @@ async def process_excel(
     output_root = Path(output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
-    # ניקוי קאש ברקודים מריצות קודמות - הוא לא נמחק אף פעם ומצטבר,
-    # ובגלל זה עברנו את מכסת ה-/tmp של Render.
     barcode_cache_folder = Path(__file__).parent / "_barcodes"
     if barcode_cache_folder.exists():
         shutil.rmtree(barcode_cache_folder, ignore_errors=True)
 
     old_folder_errors = []
 
-    # קריאת טבלת האקסל
     df = pd.read_excel(excel_path)
     df.columns = [str(column) for column in df.columns]
 
     required_columns = [
-        COL_SKU,
-        COL_ITEM_NO,
-        COL_PCS,
-        COL_CBM,
-        COL_BARCODE,
-        COL_PHOTO,
-        COL_WARNING_TYPE,
-        COL_PRODUCER,
-        COL_AGE,
-        COL_X_STICKER,
-        COL_Y_STICKER,
-        COL_BATTERY,
-        COL_CERTIFICATE,
+        COL_SKU, COL_ITEM_NO, COL_PCS, COL_CBM, COL_BARCODE,
+        COL_PHOTO, COL_WARNING_TYPE, COL_PRODUCER, COL_AGE,
+        COL_X_STICKER, COL_Y_STICKER, COL_BATTERY, COL_CERTIFICATE,
     ]
 
-    missing_columns = [
-        column
-        for column in required_columns
-        if column not in df.columns
-    ]
+    missing_columns = [c for c in required_columns if c not in df.columns]
 
     if missing_columns:
-        raise ValueError(
-            "חסרות עמודות באקסל: "
-            + ", ".join(missing_columns)
-        )
-
-    # ======================================
-    # בדיקת תקינות של כל השורות לפני היצירה
-    # ======================================
+        raise ValueError("חסרות עמודות באקסל: " + ", ".join(missing_columns))
 
     all_errors = []
     valid_row_indexes = []
 
     for index, row in df.iterrows():
         excel_row_number = index + 2
-
-        row_errors = validate_product_row(
-            row,
-            excel_row_number
-        )
+        row_errors = validate_product_row(row, excel_row_number)
 
         if row_errors:
             all_errors.extend(row_errors)
@@ -1221,13 +1193,9 @@ async def process_excel(
     report_path = None
 
     if all_errors:
-        report_path = write_validation_report(
-            output_root,
-            all_errors
-        )
+        report_path = write_validation_report(output_root, all_errors)
     else:
         old_report = output_root / "שגיאות_נתונים.txt"
-
         if old_report.exists():
             old_report.unlink()
 
@@ -1237,25 +1205,17 @@ async def process_excel(
             f"דוח השגיאות נוצר כאן:\n{report_path}"
         )
 
-    # ======================================
-    # חילוץ תמונות רק לאחר בדיקת התקינות
-    # ======================================
-
     extracted_images_dir = output_root / "_excel_images"
-
-    image_map = extract_excel_images_by_sku(
-        excel_path,
-        extracted_images_dir
-    )
+    image_map = extract_excel_images_by_sku(excel_path, extracted_images_dir)
 
     total = len(valid_row_indexes)
     created_products = 0
 
-    # ======================================
-    # יצירת PDF רק לשורות התקינות.
-    # הדפדפן מוחזר (נסגר ונפתח מחדש) כל BROWSER_RECYCLE_EVERY מוצרים
-    # כדי למנוע הצטברות זיכרון בריצות עם הרבה שורות.
-    # ======================================
+    # ה-ZIP נפתח *מיד* בהתחלה, ונכתב אליו מוצר-מוצר במקום בסוף בבת אחת
+    zip_path = output_root.parent / "כל_המוצרים.zip"
+    if zip_path.exists():
+        zip_path.unlink()
+
     BROWSER_RECYCLE_EVERY = 150
 
     async def launch_browser(p):
@@ -1264,87 +1224,82 @@ async def process_excel(
             args=["--no-sandbox", "--disable-dev-shm-usage"],
         )
 
-    async with async_playwright() as p:
-        browser = await launch_browser(p)
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        async with async_playwright() as p:
+            browser = await launch_browser(p)
 
-        try:
-            for progress_index, dataframe_index in enumerate(
-                valid_row_indexes,
-                start=1,
-            ):
-                # מיחזור דפדפן לפני שהזיכרון מצטבר מדי
-                if progress_index > 1 and (progress_index - 1) % BROWSER_RECYCLE_EVERY == 0:
-                    await browser.close()
-                    browser = await launch_browser(p)
+            try:
+                for progress_index, dataframe_index in enumerate(
+                    valid_row_indexes, start=1,
+                ):
+                    if progress_index > 1 and (progress_index - 1) % BROWSER_RECYCLE_EVERY == 0:
+                        await browser.close()
+                        browser = await launch_browser(p)
 
-                row = df.loc[dataframe_index]
-                sku = val(row, COL_SKU)
-                item_no = val(row, COL_ITEM_NO)
-                clean_sku = safe_name(sku)
+                    row = df.loc[dataframe_index]
+                    sku = val(row, COL_SKU)
+                    item_no = val(row, COL_ITEM_NO)
+                    clean_sku = safe_name(sku)
 
-                folder_name = (
-                    clean_sku
-                    or safe_name(item_no)
-                    or f"row_{dataframe_index + 2}"
-                )
-
-                product_dir = output_root / folder_name
-                product_dir.mkdir(parents=True, exist_ok=True)
-
-                old_folder_copied, old_folder_result = copy_old_sku_folder(
-                    sku=sku,
-                    product_dir=product_dir,
-                )
-                if not old_folder_copied:
-                    old_folder_errors.append(
-                        f"מק״ט {sku}: {old_folder_result}"
+                    folder_name = (
+                        clean_sku or safe_name(item_no) or f"row_{dataframe_index + 2}"
                     )
 
-                photo_path = image_map.get(clean_sku)
-                photo_data = (
-                    local_file_to_data_uri(str(photo_path))
-                    if photo_path
-                    else ""
-                )
+                    product_dir = output_root / folder_name
+                    product_dir.mkdir(parents=True, exist_ok=True)
 
-                await render_templates(
-                    row,
-                    product_dir,
-                    browser,
-                    photo_data=photo_data,
-                )
-                created_products += 1
+                    old_folder_copied, old_folder_result = copy_old_sku_folder(
+                        sku=sku, product_dir=product_dir,
+                    )
+                    if not old_folder_copied:
+                        old_folder_errors.append(f"מק״ט {sku}: {old_folder_result}")
 
-                if progress_callback:
-                    progress_callback(progress_index, total)
-        finally:
-            await browser.close()
+                    photo_path = image_map.get(clean_sku)
+                    photo_data = (
+                        local_file_to_data_uri(str(photo_path)) if photo_path else ""
+                    )
 
-    old_folder_report_path = None
+                    await render_templates(row, product_dir, browser, photo_data=photo_data)
+                    created_products += 1
 
-    if old_folder_errors:
-        old_folder_report_path = (
-            output_root / "שגיאות_תיקיות_ישנות.txt"
-        )
+                    # *** החדש - כותבים את קבצי המוצר הזה ל-ZIP מיד,
+                    # ואז מוחקים אותם מהדיסק - לפני שעוברים למוצר הבא ***
+                    for file_path in product_dir.rglob("*"):
+                        if file_path.is_file():
+                            arcname = file_path.relative_to(output_root)
+                            zf.write(file_path, arcname)
 
-        old_folder_report_path.write_text(
-            "\n".join(
-                [
-                    "דוח שגיאות בהעתקת תיקיות ישנות",
-                    "=" * 40,
-                    "",
+                    shutil.rmtree(product_dir, ignore_errors=True)
+
+                    if progress_callback:
+                        progress_callback(progress_index, total)
+            finally:
+                await browser.close()
+
+        # תמונות שחולצו מהאקסל - גם אלה נכתבות לזיפ ואז נמחקות
+        if extracted_images_dir.exists():
+            for file_path in extracted_images_dir.rglob("*"):
+                if file_path.is_file():
+                    arcname = file_path.relative_to(output_root)
+                    zf.write(file_path, arcname)
+            shutil.rmtree(extracted_images_dir, ignore_errors=True)
+
+        old_folder_report_path = None
+
+        if old_folder_errors:
+            old_folder_report_path = output_root / "שגיאות_תיקיות_ישנות.txt"
+            old_folder_report_path.write_text(
+                "\n".join([
+                    "דוח שגיאות בהעתקת תיקיות ישנות", "=" * 40, "",
                     *old_folder_errors,
-                ]
-            ),
-            encoding="utf-8-sig",
-        )
+                ]),
+                encoding="utf-8-sig",
+            )
+            zf.write(old_folder_report_path, "שגיאות_תיקיות_ישנות.txt")
 
-    # יצירת קובץ ZIP אחד עם כל תוצאות הריצה
-    zip_path = zip_output_folder(output_root)
+        if report_path and report_path.exists():
+            zf.write(report_path, "שגיאות_נתונים.txt")
 
-    # מנקים את הקבצים המקוריים (PDF-ים, תמונות שחולצו, תיקיות "ישן" וכו') -
-    # הם כבר בתוך ה-ZIP, ואין טעם להחזיק את שניהם על הדיסק בו-זמנית.
-    # זה בדיוק מה שגרם לחריגה מ-2GB ב-/tmp וקרס את ה-instance.
     shutil.rmtree(output_root, ignore_errors=True)
 
     return {

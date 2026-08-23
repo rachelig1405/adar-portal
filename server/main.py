@@ -396,7 +396,7 @@ def get_create_pdfs_status(job_id: str):
 
     return response
 
-
+'''
 #הורדת קובץ ה-ZIP המוכן
 @app.get("/api/products/create-pdfs/download/{job_id}")
 def download_create_pdfs_zip(job_id: str):
@@ -418,6 +418,7 @@ def download_create_pdfs_zip(job_id: str):
         media_type="application/zip",
         filename="product_pdfs.zip",
     )
+ '''
 @app.get("/api/products/create-pdfs/download/{job_id}")
 def download_create_pdfs_zip(job_id: str, background_tasks: BackgroundTasks):
     job = read_job(job_id)

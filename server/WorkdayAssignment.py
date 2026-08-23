@@ -345,12 +345,19 @@ def workday_assignment(max_date: date, order_id: str):
                 orders = record["fields"].get("הזמנות 2", [])
 
                 for order in orders:
+                    print(
+        "ORDER LINK VALUE:",
+        order,
+        "TYPE:",
+        type(order),
+        flush=True
+    )
                     order1 = get_order_by_record_id(order)
 
-                    if order1["fields"].get("סטטוס") != "לפני יצור":
+                    if order1.get("fields").get("סטטוס") != "לפני יצור":
                         continue
 
-                    max_order_day_raw = order1["fields"].get("תאריך ליקוט מקסימילי")
+                    max_order_day_raw = order1.get("fields").get("תאריך ליקוט מקסימילי")
 
                     if not max_order_day_raw:
                         continue

@@ -337,9 +337,12 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
 
         else:
             if(order_status=="לפני יצור"):
-                order_status="לא נבדק ולא  עבר ליקוט"
+                order_status="לא נבדק ולא עבר ליקוט"
+            elif order_status=="בליקוט":
+                order_status="לא נבדק, באמצע ליקוט"
             else:
                 order_status="לא נבדק"
+                
 
 
 

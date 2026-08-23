@@ -205,7 +205,8 @@ def workday_assignment(max_date:date,order_id:str):
                 print("הזמנות ליום עבודה",orders,flush=True)
                 #מעבר על כל הזמנה והזמנה לבדוק אם אפשר להזיז אותה
                 for order in orders:
-                    order1=order
+                    order1 = get_order_by_record_id(order)
+
                     if order1["fields"].get("סטטוס")=="לפני יצור":
                         print(order1,flush=True)
                         max_order_day = order1["fields"].get("תאריך ליקוט מקסימילי")

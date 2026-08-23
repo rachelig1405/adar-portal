@@ -234,8 +234,9 @@ def workday_assignment(max_date:date,order_id:str):
                             print("if שני",flush=True)
                             update_order_workflow(order_id=order,workday_id=records_of_worksday[0].get("id"))
                             #אם היום התפנה בעקבות הזזת ההזמנה
-                            total = int(record["fields"].get("סהכ שורות ליקוט", 0))
                             order = int(order1["fields"].get("שורות ליקוט", 0))
+                            total = int(record["fields"].get("סהכ שורות ליקוט", 0))-order
+                            
                             limit = int(record["fields"].get("שורות ליקוט ליום", 0))
 
                             if total  <= limit:

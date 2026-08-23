@@ -256,8 +256,41 @@ def workday_assignment(max_date:date,order_id:str):
 
 '''
 def workday_assignment(max_date: date, order_id: str):
+    extended_records_cache: dict[str, list] = {}
+
+    def get_extended_records(until_date: date):
+        """
+        שולפת ימים נוספים בין max_date (לא כולל) ל-until_date,
+        עם קאש כדי לא לחזור על אותה שליפה פעמיים.
+        """
+        cache_key = until_date.isoformat()
+
+        if cache_key in extended_records_cache:
+            return extended_records_cache[cache_key]
+
+        if until_date <= max_date:
+            extended_records_cache[cache_key] = []
+            return []
+
+        extra_records = get_all_airtable_records(
+            table_name=AIRTABLE_WORKDAY_TABLE,
+            filter_formula=(
+                f'AND('
+                f'IS_AFTER({{יום עבודה}}, "{max_date}"),'
+                f'OR('
+                f'IS_BEFORE({{יום עבודה}}, "{until_date}"),'
+                f'IS_SAME({{יום עבודה}}, "{until_date}", "day")'
+                f')'
+                f')'
+            ),
+            sort=[("יום עבודה", "asc")],
+            view="Grid view",
+        )
+
+        extended_records_cache[cache_key] = extra_records
+        return extra_records
+
     for attempt in range(2):
-        # שליפה אחת בלבד - במקום שתי שליפות דומות שהיו בקוד המקורי
         records = get_all_airtable_records(
             table_name=AIRTABLE_WORKDAY_TABLE,
             filter_formula=(
@@ -281,7 +314,6 @@ def workday_assignment(max_date: date, order_id: str):
             limit = int(record["fields"].get("שורות ליקוט ליום", 0) or 0)
             return limit - total
 
-        # שלב 1: חיפוש יום עם מקום פנוי - בזיכרון בלבד, בלי קריאת API נוספת
         workday = None
 
         for record in records:
@@ -303,7 +335,6 @@ def workday_assignment(max_date: date, order_id: str):
                     "workday id": workday,
                 }
 
-        # שלב 2: לא נמצא יום פנוי ישירות - מנסים לפנות מקום
         else:
             if records:
                 last_record = records[-1]
@@ -335,15 +366,23 @@ def workday_assignment(max_date: date, order_id: str):
                         str(max_order_day_raw)[:10]
                     )
 
-                    # חיפוש יום חלופי - בזיכרון, מתוך records שכבר שלפנו
+                    # *** התיקון - מחפשים גם בתוך records (עד max_date)
+                    # וגם ב-extended_records (בין max_date ל-max_order_day) ***
+                    extended = get_extended_records(max_order_day)
+                    candidates = records + extended
+
                     alternative_workday = None
 
-                    for candidate in records:
+                    for candidate in candidates:
                         candidate_date = date.fromisoformat(
                             str(candidate["fields"]["יום עבודה"])[:10]
                         )
 
                         if candidate_date > max_order_day:
+                            continue
+
+                        # לא רוצים להזיז הזמנה לאותו יום שהיא כבר בו
+                        if candidate.get("id") == record.get("id"):
                             continue
 
                         if remaining_capacity(candidate) > 0:
@@ -360,7 +399,6 @@ def workday_assignment(max_date: date, order_id: str):
                             order1["fields"].get("שורות ליקוט", 0) or 0
                         )
 
-                        # מעדכנים את היום החדש שקיבל את ההזמנה
                         alternative_workday["fields"]["סהכ שורות ליקוט"] = (
                             int(
                                 alternative_workday["fields"].get(
@@ -371,8 +409,6 @@ def workday_assignment(max_date: date, order_id: str):
                             + moved_rows
                         )
 
-                        # *** התיקון - מעדכנים גם את היום המקורי, שממנו
-                        # ההזמנה הוסרה, כדי שהחישוב הבא יהיה מדויק ***
                         record["fields"]["סהכ שורות ליקוט"] = (
                             int(
                                 record["fields"].get(
@@ -411,7 +447,6 @@ def workday_assignment(max_date: date, order_id: str):
         "success": False,
         "message": "לא נמצא יום עבודה פנוי",
     }
-
 
 
 

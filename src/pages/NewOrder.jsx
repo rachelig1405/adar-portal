@@ -264,7 +264,7 @@ useEffect(() => {
             <option value="">בחר קו</option>
             <option value="סוסנא">סוסנא</option>
             <option value="משאית שלנו">משאית שלנו</option>
-            <option value="קו אלי ירושלים">ירושלים</option>
+            <option value="קו אלי ירשלים ">ירושלים</option>
     
             <option value="קו אלי ברטעה">ברטעה</option>
             <option value="איסוף עצמי">איסוף עצמי</option>

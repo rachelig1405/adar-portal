@@ -68,7 +68,8 @@ export default function CheckOrder({ onClose }) {
         order.display,
         order.amount,
         order.notes,
-        order.order_date
+        order.order_date,
+        order.same_customer_date
       ]
         .filter(Boolean)
         .join(" ")
@@ -319,6 +320,18 @@ export default function CheckOrder({ onClose }) {
                       >
                         הערות: {selectedOrder.notes}
                       </div>
+                  )}
+                    {selectedOrder.same_customer_date && (
+                    <div
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          marginTop: "6px",
+                        }}
+                      >
+                         {selectedOrder.same_customer_date}
+                      </div>
+                       
                   )}
                    <div style={{ marginTop: "16px", textAlign: "center" }}>
                                         <OrderBarcode value={selectedOrder.order_number} />

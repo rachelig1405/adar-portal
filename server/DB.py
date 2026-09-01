@@ -324,7 +324,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
 )
     )
 
-    for record in records:
+    for record in all_record:
         fields = record.get("fields", {})
 
         customer = fields.get("שם לקוח", "")

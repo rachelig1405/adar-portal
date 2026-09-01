@@ -258,7 +258,7 @@ def workday_assignment(max_date:date,order_id:str):
     return {"success": False,"message": "לא נמצא יום עבודה פנוי"}
 
 
-'''
+
 def workday_assignment(max_date: date, order_id: str):
     #שמירת כל טבלת ימי עבודה בזיכרון במקום לקרוא לאירטבל שוב ושוב
     extended_records_cache: dict[str, list] = {}
@@ -419,7 +419,161 @@ def workday_assignment(max_date: date, order_id: str):
         "success": False,
         "message": "לא נמצא יום עבודה פנוי",
     }
+'''
+MAX_RECURSION_DEPTH = 15  # הגנה נוספת מפני שרשראות ארוכות מדי
 
+
+def workday_assignment(max_date: date, order_id: str):
+    # קאש משותף לכל הקריאות הרקורסיביות - נמנע משליפות כפולות
+    workdays_cache: dict[str, list] = {}
+
+    def get_records_until(until_date: date):
+        cache_key = until_date.isoformat()
+
+        if cache_key in workdays_cache:
+            return workdays_cache[cache_key]
+
+        recs = get_all_airtable_records(
+            table_name=AIRTABLE_WORKDAY_TABLE,
+            filter_formula=(
+                f'AND('
+                f'OR('
+                f'IS_SAME({{יום עבודה}}, TODAY(), "day"),'
+                f'IS_AFTER({{יום עבודה}}, TODAY())'
+                f'),'
+                f'OR('
+                f'IS_BEFORE({{יום עבודה}}, "{until_date}"),'
+                f'IS_SAME({{יום עבודה}}, "{until_date}", "day")'
+                f')'
+                f')'
+            ),
+            sort=[("יום עבודה", "asc")],
+            view="Grid view",
+        )
+
+        workdays_cache[cache_key] = recs
+        return recs
+
+    def remaining_capacity(record):
+        total = int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
+        limit = int(record["fields"].get("שורות ליקוט ליום", 0) or 0)
+        return limit - total
+
+    def try_find_day(target_order_id, target_max_date, visited, depth=0):
+        """
+        מנסה למצוא יום עבודה פנוי להזמנה נתונה, עד תאריך נתון.
+        אם לא נמצא ישירות - מנסה רקורסיבית "לפנות מקום" על ידי
+        הזזת הזמנה אחרת שתופסת מקום ביום מתאים.
+        מחזירה את ה-record של היום שנמצא, או None אם נכשל.
+        """
+
+        if depth > MAX_RECURSION_DEPTH:
+            return None
+
+        records = get_records_until(target_max_date)
+
+        # שלב 1 - חיפוש ישיר של יום פנוי
+        for record in records:
+            if remaining_capacity(record) > 0:
+                return record
+
+        # שלב 2 - אין יום פנוי ישירות, מנסים לפנות מקום
+        for record in records:
+            orders = record["fields"].get("הזמנות 2", [])
+
+            for order in orders:
+                if order in visited:
+                    continue
+
+                order1 = get_order_by_record_id(order)
+
+                if order1.get("fields", {}).get("סטטוס") != "לפני יצור":
+                    continue
+
+                other_max_day_raw = order1.get("fields", {}).get(
+                    "תאריך ליקוט מקסימילי"
+                )
+
+                if not other_max_day_raw:
+                    continue
+
+                other_max_day = date.fromisoformat(
+                    str(other_max_day_raw)[:10]
+                )
+                #אם ההזמנה באותו תאריך אספקה אין צורך להזיז
+                if other_max_day==target_max_date:
+                    continue
+
+                visited.add(order)
+
+                # *** הקריאה הרקורסיבית - מחפשים מקום להזמנה
+                # שאותה רוצים להזיז, בדיוק באותה שיטה ***
+                new_home = try_find_day(
+                    order, other_max_day, visited, depth + 1
+                )
+
+                if new_home is not None:
+                    # הזזה בפועל של ההזמנה למקום החדש שנמצא
+                    update_order_workflow(
+                        order_id=order, workday_id=new_home["id"]
+                    )
+
+                    moved_rows = int(
+                        order1["fields"].get("שורות ליקוט", 0) or 0
+                    )
+
+                    new_home["fields"]["סהכ שורות ליקוט"] = (
+                        int(new_home["fields"].get("סהכ שורות ליקוט", 0) or 0)
+                        + moved_rows
+                    )
+
+                    record["fields"]["סהכ שורות ליקוט"] = (
+                        int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
+                        - moved_rows
+                    )
+
+                    # היום הזה עכשיו התפנה - הוא מועמד תקף
+                    return record
+
+        return None
+
+    for attempt in range(2):
+        records = get_records_until(max_date)
+
+        if records:
+            last_workday = date.fromisoformat(
+                str(records[-1]["fields"]["יום עבודה"])[:10]
+            )
+
+            if last_workday < max_date:
+                create_workdays_until(target_date=max_date)
+                workdays_cache.clear()
+                continue
+
+        target_day = try_find_day(order_id, max_date, visited={order_id})
+
+        if target_day:
+            result = update_order_workflow(
+                order_id=order_id, workday_id=target_day["id"]
+            )
+
+            return {
+                "success": True,
+                "record": result,
+                "message": "ההזמנה שובצה בהצלחה",
+                "workday id": target_day["id"],
+            }
+
+        print("send message to agents")
+        return {
+            "success": False,
+            "message": "לא נמצא יום עבודה פנוי",
+        }
+
+    return {
+        "success": False,
+        "message": "לא נמצא יום עבודה פנוי",
+    }
 
 
 

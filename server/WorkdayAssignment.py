@@ -537,6 +537,8 @@ def workday_assignment(max_date: date, order_id: str):
 
         return None
 
+
+
     for attempt in range(2):
         records = get_records_until(max_date)
 

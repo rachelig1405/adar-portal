@@ -13,7 +13,7 @@ from pydantic import BaseModel
 from fastapi import File, UploadFile
 from python_calamine import CalamineWorkbook
 from fastapi import FastAPI
-from DB import create_order,find_customer_record_id,find_agent_record_id
+from DB import create_order,find_customer_record_id,find_agent_record_id,get_all_airtable_records
 
 
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
@@ -212,6 +212,32 @@ async def import_orders_excel(
     data_rows = rows[1:] 
     cardboard=0
     picking_rows=0
+    existing_records = get_all_airtable_records(
+    AIRTABLE_ORDERS_TABLE,
+    fields=["מספר הזמנה"]
+)
+
+ # קריאה אחת בלבד ל-Airtable
+    existing_records = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        fields=["מספר הזמנה"]
+    )
+
+    existing_order_numbers = {
+        str(
+            record.get("fields", {}).get(
+                "מספר הזמנה",
+                ""
+            )
+        ).strip()
+        for record in existing_records
+        if record.get("fields", {}).get("מספר הזמנה")
+    }
+
+    data_rows = rows[1:]
+
+    cardboard = 0
+    picking_rows = 0
 
     for i, row in enumerate(data_rows):
    
@@ -232,6 +258,7 @@ async def import_orders_excel(
             get_value(next_row, "הזמנה")
             )
         if next_order_number !=order_number:
+          
             customer_number = normalize_text(
             row[2] if len(row) > 2 else None
             )
@@ -245,6 +272,17 @@ async def import_orders_excel(
                     raise ValueError(
                         "מספר הזמנה חסר"
                 )
+                if order_number in existing_order_numbers:
+                                errors.append({
+                                    "excel_row": excel_row_number,
+                                    "order_number": order_number,
+                                    "error": "ההזמנה כבר קיימת במערכת",
+                                })
+                
+                                cardboard = 0
+                                picking_rows = 0
+                                continue
+                
 
                 if not customer_number:
                     raise ValueError(
@@ -337,6 +375,7 @@ async def import_orders_excel(
                 record = create_order(
                     order
             )   
+                existing_order_numbers.add(order_number)
                
 
                 successes.append({

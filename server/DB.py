@@ -141,6 +141,17 @@ def create_order(order: OrderCreate):
         "לקוח": [order.customer_id],
         "סטטוס": "לפני יצור"
     }
+    existing_records = get_all_airtable_records(
+            AIRTABLE_ORDERS_TABLE,
+               filter_formula=(
+            f'{{מספר הזמנה}}="{fields["מספר הזמנה"]}"'
+        ),
+        )
+    if existing_records:
+        raise HTTPException(
+            status_code=409,
+            detail=f'הזמנה מספר {fields["מספר הזמנה"]} כבר קיימת במערכת'
+        )
 
     if order.agent_id:
       fields["סוכן"] = [order.agent_id]

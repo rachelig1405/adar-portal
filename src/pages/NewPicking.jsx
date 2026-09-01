@@ -81,7 +81,8 @@ export default function NewPicking({ onClose,user }) {
         order.customer_name,
         order.display,
         order.notes,
-        order.order_date
+        order.order_date,
+        order.same_customer_date
       ]
         .filter(Boolean)
         .join(" ")
@@ -345,6 +346,18 @@ export default function NewPicking({ onClose,user }) {
                         }}
                       >
                         הערות: {selectedOrder.notes}
+                      </div>
+                       
+                  )}
+                   {selectedOrder.same_customer_date && (
+                    <div
+                        style={{
+                          color: "red",
+                          fontWeight: "bold",
+                          marginTop: "6px",
+                        }}
+                      >
+                        : {selectedOrder.same_customer_date}
                       </div>
                        
                   )}

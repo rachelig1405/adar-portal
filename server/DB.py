@@ -312,8 +312,35 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                  
 
      
+        # בטבלת גיבוב ספירת הזמנות של אותו לקוח באותו תאריך אספקה
+    same_customer_date_counts = {}
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        customer = fields.get("שם לקוח", "")
+        delivery_date = fields.get("תאריך אספקה", "")
+
+        # אם שם הלקוח הוא Lookup
+        if isinstance(customer, list):
+            customer = ", ".join(
+                str(value) for value in customer
+            )
+
+        customer = str(customer).strip()
+        delivery_date = str(delivery_date).strip()
+
+        if customer and delivery_date:
+            key = (customer, delivery_date)
+
+            same_customer_date_counts[key] = (
+                same_customer_date_counts.get(key, 0) + 1
+            )
 
     orders = []
+
+    orders = []
+  
 
     for record in records:
         fields = record.get("fields", {})
@@ -328,7 +355,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)
         order_date=fields.get("תאריך אספקה", "")
-    
+       
         line=fields.get("קו הפצה", "")
         order_status=fields.get("סטטוס", "")
 
@@ -353,6 +380,19 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
             customer_name = ", ".join(
                 str(value) for value in customer_name
             )
+        same_customer_date_count = same_customer_date_counts.get(
+            (
+                str(customer_name).strip(),
+                str(order_date).strip()
+            ),
+            0
+        )
+
+        same_customer_date = (
+            "יש הזמנה נוספת לאותו לקוח"
+            if same_customer_date_count > 1
+            else ""
+        )
         if isinstance(segment, list):
             segment = ", ".join(
                 str(value) for value in segment
@@ -400,7 +440,8 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
             "picking_lines": picking_lines,
             "segment": segment,
             "order_status": order_status,
-            "order_date":order_date
+            "order_date":order_date,
+            "same_customer_date":same_customer_date
             
         })
 

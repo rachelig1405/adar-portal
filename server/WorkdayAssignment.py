@@ -260,8 +260,9 @@ def workday_assignment(max_date:date,order_id:str):
 
 '''
 def workday_assignment(max_date: date, order_id: str):
+    #שמירת כל טבלת ימי עבודה בזיכרון במקום לקרוא לאירטבל שוב ושוב
     extended_records_cache: dict[str, list] = {}
-
+    #פונקצית עזר המקבל תאריך יעד והופכת אותו למחרוזת ובודקת אם כבר שלפנו את הנתונים האלה בעבר בריצה הנוכחית. אם כן - מחזירה מהקאש מיד, בלי לקרוא שוב ל-Airtable.
     def get_extended_records(until_date: date):
         cache_key = until_date.isoformat()
 
@@ -291,6 +292,7 @@ def workday_assignment(max_date: date, order_id: str):
         return extra_records
 
     for attempt in range(2):
+        #שליפת כל ימי העבודה מהיום ועד לתאריך ליקוט מקסימלי של ההזמנה אותה רוצים לשבץ
         records = get_all_airtable_records(
             table_name=AIRTABLE_WORKDAY_TABLE,
             filter_formula=(
@@ -308,6 +310,7 @@ def workday_assignment(max_date: date, order_id: str):
             sort=[("יום עבודה", "asc")],
             view="Grid view",
         )
+        #פונקציית עזר לחישוב כמה שורות ליקוט נשארו ליום עבודה
 
         def remaining_capacity(record):
             total = int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
@@ -315,12 +318,12 @@ def workday_assignment(max_date: date, order_id: str):
             return limit - total
 
         workday = None
-
+        #חיפוש היום הראשון הפנוי שניתן לשבץ בו
         for record in records:
             if remaining_capacity(record) > 0:
                 workday = record.get("id")
                 break
-
+        #במידה ונמצא יום פנוי עדכון ההזמנה ליום הפנוי
         if workday:
             if order_id:
                 result = update_order_workflow(order_id=order_id, workday_id=workday)

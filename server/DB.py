@@ -298,7 +298,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         AIRTABLE_ORDERS_TABLE,
         filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
                
-                ("תאריך אספקה", "asc"),("שורות ליקוט", "desc")
+                ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
                 ],)
         if action==2:
                    if user_id:

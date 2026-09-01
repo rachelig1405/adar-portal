@@ -314,6 +314,15 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
      
         # בטבלת גיבוב ספירת הזמנות של אותו לקוח באותו תאריך אספקה
     same_customer_date_counts = {}
+    all_record=get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+            filter_formula=(
+                'OR('
+                    'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
+                    'IS_AFTER({תאריך אספקה}, TODAY())'
+                ')'
+)
+    )
 
     for record in records:
         fields = record.get("fields", {})
@@ -337,7 +346,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                 same_customer_date_counts.get(key, 0) + 1
             )
 
-    orders = []
+   
 
     orders = []
   

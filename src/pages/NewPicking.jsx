@@ -357,7 +357,7 @@ export default function NewPicking({ onClose,user }) {
                           marginTop: "6px",
                         }}
                       >
-                        : {selectedOrder.same_customer_date}
+                         {selectedOrder.same_customer_date}
                       </div>
                        
                   )}

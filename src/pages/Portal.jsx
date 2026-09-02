@@ -17,7 +17,7 @@ import CreateProductPdfs from "./CreateStickers";
 import TodayLabelsPrint from "./TodayLabels";
 import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
-import PickingSummary from "./PickingSummary";
+import PickingSummary from "./PickingSummary ";
 
 
 const INTERNAL_COMPONENTS = {

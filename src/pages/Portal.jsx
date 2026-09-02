@@ -145,7 +145,7 @@ export default function Portal({ user, onLogout }) {
             <p>כל פעולות המחסן והמשרד במקום אחד</p>
           </div>
         </section>
-        <PickingSummary />
+       
 
         <section className="actions-section">
           <div className="section-title-row">

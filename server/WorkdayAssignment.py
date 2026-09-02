@@ -460,24 +460,15 @@ def workday_assignment(max_date: date, order_id: str):
         return limit - total
 
     def try_find_day(target_order_id, target_max_date, visited, depth=0):
-        """
-        מנסה למצוא יום עבודה פנוי להזמנה נתונה, עד תאריך נתון.
-        אם לא נמצא ישירות - מנסה רקורסיבית "לפנות מקום" על ידי
-        הזזת הזמנה אחרת שתופסת מקום ביום מתאים.
-        מחזירה את ה-record של היום שנמצא, או None אם נכשל.
-        """
-
         if depth > MAX_RECURSION_DEPTH:
             return None
 
         records = get_records_until(target_max_date)
 
-        # שלב 1 - חיפוש ישיר של יום פנוי
         for record in records:
             if remaining_capacity(record) > 0:
                 return record
 
-        # שלב 2 - אין יום פנוי ישירות, מנסים לפנות מקום
         for record in records:
             orders = record["fields"].get("הזמנות 2", [])
 
@@ -490,87 +481,71 @@ def workday_assignment(max_date: date, order_id: str):
                 if order1.get("fields", {}).get("סטטוס") != "לפני יצור":
                     continue
 
-                other_max_day_raw = order1.get("fields", {}).get(
-                    "תאריך ליקוט מקסימילי"
-                )
+                other_max_day_raw = order1.get("fields", {}).get("תאריך ליקוט מקסימילי")
 
                 if not other_max_day_raw:
                     continue
 
-                other_max_day = date.fromisoformat(
-                    str(other_max_day_raw)[:10]
-                )
-                #אם ההזמנה באותו תאריך אספקה אין צורך להזיז
-                if other_max_day==target_max_date:
-                    continue
+                other_max_day = date.fromisoformat(str(other_max_day_raw)[:10])
 
                 visited.add(order)
 
-                # *** הקריאה הרקורסיבית - מחפשים מקום להזמנה
-                # שאותה רוצים להזיז, בדיוק באותה שיטה ***
-                new_home = try_find_day(
-                    order, other_max_day, visited, depth + 1
-                )
+                new_home = try_find_day(order, other_max_day, visited, depth + 1)
 
                 if new_home is not None:
-                    # הזזה בפועל של ההזמנה למקום החדש שנמצא
-                    update_order_workflow(
-                        order_id=order, workday_id=new_home["id"]
-                    )
+                    update_order_workflow(order_id=order, workday_id=new_home["id"])
 
-                    moved_rows = int(
-                        order1["fields"].get("שורות ליקוט", 0) or 0
-                    )
+                    moved_rows = int(order1["fields"].get("שורות ליקוט", 0) or 0)
 
                     new_home["fields"]["סהכ שורות ליקוט"] = (
-                        int(new_home["fields"].get("סהכ שורות ליקוט", 0) or 0)
-                        + moved_rows
+                        int(new_home["fields"].get("סהכ שורות ליקוט", 0) or 0) + moved_rows
                     )
 
                     record["fields"]["סהכ שורות ליקוט"] = (
-                        int(record["fields"].get("סהכ שורות ליקוט", 0) or 0)
-                        - moved_rows
+                        int(record["fields"].get("סהכ שורות ליקוט", 0) or 0) - moved_rows
                     )
 
-                    # היום הזה עכשיו התפנה - הוא מועמד תקף
                     return record
+
+                # התיקון - נסיגה: מסירים מ-visited כדי לאפשר ניסיון עתידי מהקשר אחר
+                visited.discard(order)
 
         return None
 
 
 
-    for attempt in range(2):
-        records = get_records_until(max_date)
+        for attempt in range(2):
+            records = get_records_until(max_date)
 
-        if records:
-            last_workday = date.fromisoformat(
-                str(records[-1]["fields"]["יום עבודה"])[:10]
-            )
+            if records:
+                last_workday = date.fromisoformat(
+                    str(records[-1]["fields"]["יום עבודה"])[:10]
+                )
 
-            if last_workday < max_date:
-                create_workdays_until(target_date=max_date)
-                workdays_cache.clear()
-                continue
+                if last_workday < max_date:
+                    create_workdays_until(target_date=max_date)
+                    workdays_cache.clear()
+                    continue
 
-        target_day = try_find_day(order_id, max_date, visited={order_id})
+            target_day = try_find_day(order_id, max_date, visited={order_id})
 
-        if target_day:
-            result = update_order_workflow(
-                order_id=order_id, workday_id=target_day["id"]
-            )
+            if target_day:
+                result = update_order_workflow(
+                    order_id=order_id, workday_id=target_day["id"]
+                )
 
+                return {
+                    "success": True,
+                    "record": result,
+                    "message": "ההזמנה שובצה בהצלחה",
+                    "workday id": target_day["id"],
+                }
+
+            print("send message to agents")
             return {
-                "success": True,
-                "record": result,
-                "message": "ההזמנה שובצה בהצלחה",
-                "workday id": target_day["id"],
+                "success": False,
+                "message": "לא נמצא יום עבודה פנוי",
             }
-
-        print("send message to agents")
-        return {
-            "success": False,
-            "message": "לא נמצא יום עבודה פנוי",
-        }
 
     return {
         "success": False,

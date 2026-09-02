@@ -664,7 +664,7 @@ def get_picking_summary():
             if end_date_israel == today_israel:
                 picked_today += picking_rows
 
-            remaining_today = max(
+    remaining_today = max(
                 total_today - picked_today,
                 0
             )

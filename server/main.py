@@ -626,6 +626,7 @@ def get_picking_summary():
             "שורות ליקוט",
             "סטטוס",
             "יום עבודה",
+            "שעת התחלה"
         ],
     )
 
@@ -645,13 +646,23 @@ def get_picking_summary():
         total_today += picking_rows
 
         # הזמנה שכבר סיימה ליקוט
-        if status in [
-            "מלוקט",
-            "בבדיקה",
-            "נבדק",
-            "הועמס",
-        ]:
-            picked_today += picking_rows
+        start_time = fields.get("שעת התחלה")
+
+        if start_time:
+            start_datetime = datetime.fromisoformat(
+                start_time.replace("Z", "+00:00")
+            )
+
+            start_date_israel = start_datetime.astimezone(
+                ZoneInfo("Asia/Jerusalem")
+            ).date()
+
+            today_israel = datetime.now(
+                ZoneInfo("Asia/Jerusalem")
+            ).date()
+            if start_date_israel == today_israel:
+
+                picked_today += picking_rows
 
     remaining_today = max(
         total_today - picked_today,

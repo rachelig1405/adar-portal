@@ -614,14 +614,9 @@ def get_picking_summary():
     records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
         filter_formula=(
-    'OR('
-        '{בצפי}=1,'
-        'AND('
-            'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
-            '{קו הפצה}!="סוסנא"'
-        ')'
-    ')'
-),
+    
+        '{בצפי}=1')
+       
         fields=[
             "שורות ליקוט",
             "סטטוס",

@@ -614,9 +614,14 @@ def get_picking_summary():
     records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
         filter_formula=(
-    
-        '{בצפי}=1')
-       
+    'OR('
+        '{בצפי}=1,'
+        'AND('
+            'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
+            '{קו הפצה}!="סוסנא"'
+        ')'
+    ')'
+),
         fields=[
             "שורות ליקוט",
             "סטטוס",
@@ -641,28 +646,28 @@ def get_picking_summary():
         total_today += picking_rows
 
         # הזמנה שכבר סיימה ליקוט
-        start_time = fields.get("שעת התחלה")
+        end_time = fields.get("שעת סיום")
 
-        if start_time:
-            start_datetime = datetime.fromisoformat(
-                start_time.replace("Z", "+00:00")
+        if end_time:
+            end_datetime = datetime.fromisoformat(
+                end_time.replace("Z", "+00:00")
             )
 
-            start_date_israel = start_datetime.astimezone(
+            end_date_israel = end_datetime.astimezone(
                 ZoneInfo("Asia/Jerusalem")
             ).date()
 
             today_israel = datetime.now(
                 ZoneInfo("Asia/Jerusalem")
             ).date()
-            if start_date_israel == today_israel:
 
+            if end_date_israel == today_israel:
                 picked_today += picking_rows
 
-    remaining_today = max(
-        total_today - picked_today,
-        0
-    )
+            remaining_today = max(
+                total_today - picked_today,
+                0
+            )
 
     return {
         "picked_today": picked_today,

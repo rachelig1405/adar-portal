@@ -606,3 +606,60 @@ def get_blocked_workday_dates():
     return {
         "blocked_dates": blocked_dates
     }
+#נתוני ליקוט
+
+@app.get("/api/dashboard/picking-summary")
+def get_picking_summary():
+
+    records = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=(
+    'OR('
+        '{בצפי}=1,'
+        'AND('
+            'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
+            '{קו הפצה}!="סוסנא"'
+        ')'
+    ')'
+),
+        fields=[
+            "שורות ליקוט",
+            "סטטוס",
+            "יום עבודה",
+        ],
+    )
+
+    total_today = 0
+    picked_today = 0
+
+    for record in records:
+        fields = record.get("fields", {})
+
+        picking_rows = int(
+            fields.get("שורות ליקוט", 0) or 0
+        )
+
+        status = fields.get("סטטוס", "")
+
+        # כל השורות שתוכננו להיום
+        total_today += picking_rows
+
+        # הזמנה שכבר סיימה ליקוט
+        if status in [
+            "מלוקט",
+            "בבדיקה",
+            "נבדק",
+            "הועמס",
+        ]:
+            picked_today += picking_rows
+
+    remaining_today = max(
+        total_today - picked_today,
+        0
+    )
+
+    return {
+        "picked_today": picked_today,
+        "remaining_today": remaining_today,
+        "total_today": total_today,
+    }

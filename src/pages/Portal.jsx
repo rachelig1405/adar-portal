@@ -17,6 +17,8 @@ import CreateProductPdfs from "./CreateStickers";
 import TodayLabelsPrint from "./TodayLabels";
 import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
+import PickingSummary from "./PickingSummary";
+
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -143,6 +145,7 @@ export default function Portal({ user, onLogout }) {
             <p>כל פעולות המחסן והמשרד במקום אחד</p>
           </div>
         </section>
+        <PickingSummary />
 
         <section className="actions-section">
           <div className="section-title-row">

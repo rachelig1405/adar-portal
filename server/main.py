@@ -613,7 +613,7 @@ def get_picking_summary():
 
     records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
-        filter_formula=(
+     filter_formula=(
     'OR('
         '{בצפי}=1,'
         'AND('

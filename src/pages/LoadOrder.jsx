@@ -6,6 +6,7 @@ export default function LoadingOrders({ onClose,user}) {
 
   const [search, setSearch] = useState("");
   const [selectedLine, setSelectedLine] = useState("");
+  const [palletAmounts, setPalletAmounts] = useState({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -136,6 +137,12 @@ function toggleOrder(order) {
       },
     }));
   }
+  function updatePalletAmount(orderId, value) {
+  setPalletAmounts((current) => ({
+    ...current,
+    [orderId]: value,
+  }));
+}
 
 
   function updateOrderFile(orderId, file) {
@@ -254,10 +261,15 @@ async function submit(event) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          orders: selectedList.map((order) => ({
-            order_id: order.id,
-            notes: order.notes?.trim() || "",
-          })),
+        orders: selectedList.map((order) => ({
+        order_id: order.id,
+        notes: order.notes?.trim() || "",
+        amount: Number(
+          palletAmounts[order.id] ??
+          orders.find((item) => item.id === order.id)?.amount ??
+          0
+        ),
+})),
         }),
       }
     );
@@ -493,6 +505,27 @@ const selectedTotalAmount = useMemo(() => {
                               )
                             }
                           />
+                          <div className="pallet-input-wrapper">
+                            <input
+                              type="number"
+                              min="0"
+                              step="1"
+                              value={
+                                palletAmounts[order.id] ?? order.amount ?? 0
+                              }
+                              onChange={(event) =>
+                                updatePalletAmount(
+                                  order.id,
+                                  event.target.value
+                                )
+                              }
+                              onClick={(event) =>
+                                event.stopPropagation()
+                              }
+                            />
+
+                            <span>עדכון משטחים</span>
+                          </div>
 
                           <label>
                             קובץ או תמונה להזמנה

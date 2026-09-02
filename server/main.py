@@ -177,7 +177,8 @@ def loading_orders(data: LoadingRequest):
         record = update_order_workflow(
             order.order_id,
             status="הועמס",
-            LoadingNotes=order.notes
+            LoadingNotes=order.notes,
+            amount=order.amount
         )
 
         results.append(record)

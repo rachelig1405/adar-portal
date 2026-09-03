@@ -162,6 +162,7 @@ def check_order(data: PickingEnd):
 class LoadingOrder(BaseModel):
     order_id: str
     notes: str | None = None
+    amount: int | None = None
 
 
 class LoadingRequest(BaseModel):

@@ -293,6 +293,64 @@ JOBS_DIR.mkdir(parents=True, exist_ok=True)
 '''
 JOBS_DIR = PERSISTENT_STORAGE / "jobs_status"
 JOBS_DIR.mkdir(parents=True, exist_ok=True)
+import time
+
+#ניקוי הרצות ישנות
+def cleanup_old_pdf_jobs(max_age_hours: int = 6):
+    """
+    מוחק עבודות PDF ישנות שלא הורדו.
+
+    ברירת מחדל:
+    כל job שגילו מעל 6 שעות נמחק.
+    """
+
+    now = time.time()
+    max_age_seconds = max_age_hours * 60 * 60
+
+    # מחיקת תיקיות job_* ישנות
+    for path in PERSISTENT_STORAGE.glob("job_*"):
+        try:
+            if not path.is_dir():
+                continue
+
+            age_seconds = now - path.stat().st_mtime
+
+            if age_seconds > max_age_seconds:
+                print(
+                    f"Deleting old PDF job: {path}",
+                    flush=True,
+                )
+
+                shutil.rmtree(
+                    path,
+                    ignore_errors=True,
+                )
+
+        except Exception as error:
+            print(
+                f"Failed cleaning old job {path}: {error}",
+                flush=True,
+            )
+
+    # מחיקת קבצי status ישנים
+    if JOBS_DIR.exists():
+        for status_file in JOBS_DIR.glob("*.json"):
+            try:
+                age_seconds = (
+                    now - status_file.stat().st_mtime
+                )
+
+                if age_seconds > max_age_seconds:
+                    status_file.unlink(
+                        missing_ok=True
+                    )
+
+            except Exception as error:
+                print(
+                    f"Failed cleaning job status "
+                    f"{status_file}: {error}",
+                    flush=True,
+                )
 
 def _job_file(job_id: str) -> Path:
     return JOBS_DIR / f"{job_id}.json"

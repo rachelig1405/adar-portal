@@ -409,7 +409,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         )
 
         same_customer_date = (
-             "יש הזמנה נוספת לאותו לקוח באותו תאריך אספקה" 
+             "יש הזמנה נוספת לאותו לקוח באותו תאריך אספקה נא לאחד משטחים" 
             if same_customer_date_count > 1
             else ""
         )

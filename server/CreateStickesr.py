@@ -1261,20 +1261,7 @@ async def process_excel(
 
                     await render_templates(row, product_dir, browser, photo_data=photo_data)
                     created_products += 1
-                    if (
-                        photo_path
-                        and Path(photo_path).exists()
-                    ):
-                        try:
-                            Path(photo_path).unlink(
-                                missing_ok=True
-                            )
-                        except Exception as error:
-                            print(
-                                f"Failed deleting image "
-                                f"{photo_path}: {error}",
-                                flush=True,
-                            )
+              
 
                     # *** החדש - כותבים את קבצי המוצר הזה ל-ZIP מיד,
                     # ואז מוחקים אותם מהדיסק - לפני שעוברים למוצר הבא ***

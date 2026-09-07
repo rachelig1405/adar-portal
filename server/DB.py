@@ -3,7 +3,7 @@ import requests
 from fastapi import FastAPI, HTTPException
 
 from datetime import datetime, timezone,date
-
+from urllib.parse import quote
 from zoneinfo import ZoneInfo
 AIRTABLE_TOKEN = os.getenv("AIRTABLE_TOKEN")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")

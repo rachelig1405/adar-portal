@@ -438,6 +438,12 @@ def workday_assignment(max_date: date, order_id: str):
 
     def get_records_until(until_date: date):
         cache_key = until_date.isoformat()
+        print(
+                            "=== cache_key ===",
+                            cache_key,
+                            
+                            flush=True
+                        )
 
         if cache_key in workdays_cache:
             return workdays_cache[cache_key]
@@ -459,6 +465,13 @@ def workday_assignment(max_date: date, order_id: str):
             sort=[("יום עבודה", "asc")],
             view="Grid view",
         )
+        print(
+                                    "=== recs ===",
+                               recs ,
+                                    
+                                    
+                                    flush=True
+                                )
 
         workdays_cache[cache_key] = recs
         return recs
@@ -532,6 +545,12 @@ def workday_assignment(max_date: date, order_id: str):
 
 
     for attempt in range(2):
+            print(
+                    "=== ENTER LOOP ===",
+                    
+                    flush=True
+                )
+            
             records = get_records_until(max_date)
 
             if records:

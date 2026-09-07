@@ -464,6 +464,10 @@ def workday_assignment(max_date: date, order_id: str):
             return None
 
         records = get_records_until(target_max_date)
+        print(
+                    records,
+                    flush=True
+                )
 
         for record in records:
             if remaining_capacity(record) > 0:
@@ -471,6 +475,10 @@ def workday_assignment(max_date: date, order_id: str):
 
         for record in records:
             orders = record["fields"].get("הזמנות 2", [])
+            print(
+                                orders,
+                                flush=True
+                            )
 
             for order in orders:
                 if order in visited:

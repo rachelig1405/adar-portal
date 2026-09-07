@@ -1226,3 +1226,155 @@
   cursor: not-allowed;
   opacity: 0.45;
 }
+.picking-summary {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 2fr;
+  align-items: center;
+  gap: 28px;
+
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 22px 32px;
+  margin: 18px 0;
+
+  box-shadow: 0 10px 30px rgba(45, 75, 110, 0.10);
+}
+
+.picking-summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.picking-summary-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #607086;
+}
+
+.picking-summary-value {
+  font-size: 38px;
+  line-height: 1.1;
+  color: #2f7de1;
+  margin: 5px 0;
+}
+
+.picking-summary-unit {
+  font-size: 14px;
+  color: #8a97a8;
+}
+
+.picking-summary-divider {
+  width: 1px;
+  height: 58px;
+  background: #dfe7f1;
+}
+
+.picking-progress-wrapper {
+  width: 100%;
+}
+
+.picking-progress-text {
+  font-weight: 700;
+  color: #33445a;
+  margin-bottom: 8px;
+  text-align: right;
+}
+
+.picking-progress-track {
+  width: 100%;
+  height: 14px;
+  background: #e8eef6;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.picking-progress-bar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #43c85a,
+    #6dd96f
+  );
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.employee-switcher {
+  position: relative;
+}
+
+.employee-switcher-button {
+  border: none;
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.employee-switcher-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 12px;
+  width: 220px;
+  z-index: 50;
+}
+
+.employee-switcher-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.employee-switcher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.employee-switcher-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: right;
+  width: 100%;
+}
+
+.employee-switcher-item:hover {
+  background: #f5f5f5;
+}
+
+.employee-switcher-item.active {
+  background: #eef6ff;
+}
+
+.employee-switcher-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.employee-switcher-current {
+  margin-right: auto;
+  font-size: 11px;
+  color: #3b82f6;
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import Login from "./pages/Login";
 import Portal from "./pages/Portal";
 import { ChatProvider } from "./pages/ChatContext";
+
 export default function App() {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("adarUser");
@@ -10,10 +11,7 @@ export default function App() {
 
   function login(userData) {
     setUser(userData);
-    localStorage.setItem(
-      "adarUser",
-      JSON.stringify(userData)
-    );
+    localStorage.setItem("adarUser", JSON.stringify(userData));
   }
 
   function logout() {
@@ -23,7 +21,7 @@ export default function App() {
 
   return user ? (
     <ChatProvider user={user}>
-      <Portal user={user} onLogout={logout} />
+      <Portal user={user} onLogout={logout} onSwitchUser={login} />
     </ChatProvider>
   ) : (
     <Login onLogin={login} />

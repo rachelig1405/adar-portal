@@ -18,7 +18,7 @@ import TodayLabelsPrint from "./TodayLabels";
 import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
 import PickingSummary from "./PickingSummary ";
-
+import EmployeeSwitcher from "./EmployeeSwitcher";
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -44,7 +44,7 @@ function getRoleTitle(role) {
   return roleTitles[role] || "עובד";
 }
 
-export default function Portal({ user, onLogout }) {
+export default function Portal({ user, onLogout ,onSwitchUser}) {
   const [activeAction, setActiveAction] = useState(null);
   const { unreadCount } = useChat();
 
@@ -116,6 +116,9 @@ export default function Portal({ user, onLogout }) {
 
             <div className="role-pill">{getRoleTitle(user.role)}</div>
           </div>
+          {user.role === "warehouse" && (
+            <EmployeeSwitcher currentUser={user} onSwitchUser={onSwitchUser} />
+          )}
 
           <button
             type="button"

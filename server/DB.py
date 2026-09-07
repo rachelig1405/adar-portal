@@ -941,4 +941,88 @@ def start_picking_order(
     # שמעדכן את ההזמנה לסטטוס בליקוט
     # ומקשר אליה את העובד
 
- 
+ # שליפת כל המשתמשים לפי תפקיד
+def get_airtable_users_by_role(role: str):
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        raise RuntimeError(
+            "חסרים משתני AIRTABLE_TOKEN או AIRTABLE_BASE_ID"
+        )
+
+    table_name = quote(
+        AIRTABLE_WORKERS_TABLE,
+        safe="",
+    )
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{table_name}"
+    )
+
+    safe_role = (
+        role
+        .replace("\\", "\\\\")
+        .replace("'", "\\'")
+    )
+
+    formula = (
+        f"AND({{תפקיד}}='{safe_role}', {{פעיל}}=TRUE())"
+    )
+    print(formula)
+
+    response = requests.get(
+        url,
+        headers={
+            "Authorization": f"Bearer {AIRTABLE_TOKEN}",
+        },
+        params={
+            "filterByFormula": formula,
+        },
+        timeout=20,
+    )
+
+    if not response.ok:
+        print("Airtable error:", response.text)
+        raise RuntimeError(
+            "שגיאה בקריאת המשתמשים מ-Airtable"
+        )
+
+    return response.json().get("records", [])
+
+
+# שליפת משתמש בודד לפי record id
+def get_airtable_user_by_id(record_id: str):
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        raise RuntimeError(
+            "חסרים משתני AIRTABLE_TOKEN או AIRTABLE_BASE_ID"
+        )
+
+    table_name = quote(
+        AIRTABLE_WORKERS_TABLE,
+        safe="",
+    )
+
+    safe_record_id = quote(record_id, safe="")
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{table_name}/{safe_record_id}"
+    )
+
+    response = requests.get(
+        url,
+        headers={
+            "Authorization": f"Bearer {AIRTABLE_TOKEN}",
+        },
+        timeout=20,
+    )
+
+    if response.status_code == 404:
+        return None
+
+    if not response.ok:
+        print("Airtable error:", response.text)
+        raise RuntimeError(
+            "שגיאה בקריאת המשתמש מ-Airtable"
+        )
+
+    return response.json()

@@ -734,3 +734,85 @@ def get_picking_summary():
         "remaining_today": remaining_today,
         "total_today": total_today,
     }
+#החלפה מבירה בין משתמשים
+class QuickLoginRequest(BaseModel):
+    userId: str
+
+
+@app.get("/api/users")
+def list_users(role: str = None):
+    if not role:
+        raise HTTPException(
+            status_code=400,
+            detail="יש לציין role",
+        )
+
+    try:
+        records = get_airtable_users_by_role(role)
+    except RuntimeError as error:
+        print("List users error:", error)
+        raise HTTPException(
+            status_code=500,
+            detail="שגיאה בחיבור לשרת",
+        )
+
+    users = []
+    for record in records:
+        fields = record.get("fields", {})
+        users.append({
+            "id": record["id"],
+            "name": fields.get("שם", ""),
+        })
+
+    return {"users": users}
+
+
+@app.post("/api/quick-login")
+def quick_login(data: QuickLoginRequest):
+    user_id = data.userId.strip()
+
+    if not user_id:
+        raise HTTPException(
+            status_code=400,
+            detail="חסר מזהה משתמש",
+        )
+
+    try:
+        user_record = get_airtable_user_by_id(user_id)
+    except RuntimeError as error:
+        print("Quick login error:", error)
+        raise HTTPException(
+            status_code=500,
+            detail="שגיאה בחיבור לשרת",
+        )
+
+    if not user_record:
+        raise HTTPException(
+            status_code=404,
+            detail="משתמש לא נמצא",
+        )
+
+    fields = user_record.get("fields", {})
+
+    # קריטי: הבדיקה חייבת לקרות בשרת, לא לסמוך על מה שהקליינט שולח
+    if fields.get("תפקיד") != "warehouse":
+        raise HTTPException(
+            status_code=403,
+            detail="פעולה זו מותרת למחסנאים בלבד",
+        )
+
+    if not fields.get("פעיל", False):
+        raise HTTPException(
+            status_code=403,
+            detail="המשתמש אינו פעיל",
+        )
+
+    return {
+        "success": True,
+        "user": {
+            "username": fields.get("שם משתמש", ""),
+            "name": fields.get("שם", ""),
+            "role": fields.get("תפקיד", ""),
+            "id": user_record["id"],
+        },
+    }

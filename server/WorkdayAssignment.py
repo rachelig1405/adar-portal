@@ -424,6 +424,15 @@ MAX_RECURSION_DEPTH = 15  # הגנה נוספת מפני שרשראות ארוכ
 
 
 def workday_assignment(max_date: date, order_id: str):
+    print(
+        "=== ENTER workday_assignment ===",
+        "max_date:",
+        max_date,
+        "order_id:",
+        order_id,
+        flush=True
+    )
+
     # קאש משותף לכל הקריאות הרקורסיביות - נמנע משליפות כפולות
     workdays_cache: dict[str, list] = {}
 

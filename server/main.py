@@ -38,7 +38,7 @@ from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records,get_airtable_user_by_id,get_airtable_users_by_role
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl

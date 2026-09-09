@@ -297,10 +297,10 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                         '),'
                         'AND('
                              'OR('
-                                                        '{קו הפצה} = "איסוף עצמי",'
-                                                        '{קו הפצה} = "משאית שלנו,'
+                                 '{קו הפצה} = "איסוף עצמי",'
+                                 '{קו הפצה} = "משאית שלנו,'
                                                         
-                                                        '),'
+                                 '),'
                             'IS_SAME({תאריך אספקה}, TODAY(), "day")'
                         ')'
                     ')'

@@ -1040,16 +1040,9 @@ def get_today_attendance(employee_id: str):
 
     records = get_all_airtable_records(
         AIRTABLE_ATTENDANCE_TABLE,
-        filter_formula=(
-            f'AND('
-            f'{{תאריך}}="{today_str}",'
-            f'{{עובד}}="{employee_id}"'
-            f')'
-        ),
+        filter_formula=f'{{תאריך}}="{today_str}"',
     )
 
-    # Airtable formula על שדה Link לא תמיד עובד ישירות עם ה-id,
-    # אז נסנן גם ידנית ליתר ביטחון
     filtered = []
     for record in records:
         fields = record.get("fields", {})

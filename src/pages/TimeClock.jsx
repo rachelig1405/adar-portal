@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 
-export default function TimeClock({ user }) {
+export default function TimeClock({ onClose,user  }) {
   const [status, setStatus] = useState(null); // "not_clocked_in" | "clocked_in" | "clocked_out"
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);

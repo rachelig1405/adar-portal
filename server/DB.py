@@ -290,7 +290,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                 'AND('
                     'OR('
                         '{קו הפצה} = "סוסנא",'
-                        '{קו הפצה} = "קו אלי ירשלים",'
+                        '{קו הפצה} = "קו אלי ירשלים ",'
                         '{קו הפצה} = "קו אלי ברטעה"'
                     '),'
                     '{בצפי} = 1'

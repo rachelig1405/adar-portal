@@ -34,11 +34,12 @@ AIRTABLE_WORKERS_TABLE= os.getenv("AIRTABLE_WORKERS_TABLE")
 AIRTABLE_USERS_TABLE = os.getenv(
     "AIRTABLE_USERS_TABLE"
 )
+AIRTABLE_ATTENDANCE_TABLE=os.getenv("AIRTABLE_ATTENDANCE_TABLE")
 from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees
-from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records,get_airtable_user_by_id,get_airtable_users_by_role
+from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records,get_airtable_user_by_id,get_airtable_users_by_role,get_today_attendance,create_attendance_record,update_attendance_clock_out
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl
@@ -816,3 +817,90 @@ def quick_login(data: QuickLoginRequest):
             "id": user_record["id"],
         },
     }
+#החתמת שעות
+class AttendanceRequest(BaseModel):
+    userId: str
+
+
+@app.get("/api/attendance/status")
+def attendance_status(userId: str):
+    if not userId:
+        raise HTTPException(status_code=400, detail="חסר מזהה עובד")
+
+    try:
+        record = get_today_attendance(userId)
+    except Exception as error:
+        print("Attendance status error:", error)
+        raise HTTPException(status_code=500, detail="שגיאה בשרת")
+
+    if not record:
+        return {"status": "not_clocked_in"}
+
+    fields = record.get("fields", {})
+
+    if fields.get("שעת יציאה"):
+        return {"status": "clocked_out"}
+
+    return {"status": "clocked_in"}
+
+
+@app.post("/api/attendance/clock-in")
+def clock_in(data: AttendanceRequest):
+    user_id = data.userId.strip()
+
+    if not user_id:
+        raise HTTPException(status_code=400, detail="חסר מזהה עובד")
+
+    # ולידציה: המשתמש חייב להיות warehouse
+    user_record = get_airtable_user_by_id(user_id)
+
+    if not user_record:
+        raise HTTPException(status_code=404, detail="עובד לא נמצא")
+
+    fields = user_record.get("fields", {})
+
+    if fields.get("תפקיד") != "warehouse":
+        raise HTTPException(
+            status_code=403,
+            detail="החתמת שעון מותרת למחסנאים בלבד",
+        )
+
+    existing = get_today_attendance(user_id)
+
+    if existing:
+        raise HTTPException(
+            status_code=409,
+            detail="כבר בוצעה החתמת כניסה היום",
+        )
+
+    result = create_attendance_record(user_id)
+
+    return {"success": True, "record": result}
+
+
+@app.post("/api/attendance/clock-out")
+def clock_out(data: AttendanceRequest):
+    user_id = data.userId.strip()
+
+    if not user_id:
+        raise HTTPException(status_code=400, detail="חסר מזהה עובד")
+
+    existing = get_today_attendance(user_id)
+
+    if not existing:
+        raise HTTPException(
+            status_code=404,
+            detail="לא נמצאה החתמת כניסה היום",
+        )
+
+    fields = existing.get("fields", {})
+
+    if fields.get("שעת יציאה"):
+        raise HTTPException(
+            status_code=409,
+            detail="כבר בוצעה החתמת יציאה היום",
+        )
+
+    result = update_attendance_clock_out(existing["id"])
+
+    return {"success": True, "record": result}

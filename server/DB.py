@@ -16,6 +16,7 @@ AIRTABLE_USERS_TABLE = os.getenv(
     "AIRTABLE_USERS_TABLE"
    
 )
+AIRTABLE_ATTENDANCE_TABLE=os.getenv("AIRTABLE_ATTENDANCE_TABLE")
 AIRTABLE_CHAT_TABLE=os.getenv("AIRTABLE_CHAT_TABLE")
 from Models import CustomerCreate,OrderCreate
 def airtable_headers():
@@ -1030,6 +1031,92 @@ def get_airtable_user_by_id(record_id: str):
         print("Airtable error:", response.text)
         raise RuntimeError(
             "שגיאה בקריאת המשתמש מ-Airtable"
+        )
+
+    return response.json()
+#החתמת שעות
+def get_today_attendance(employee_id: str):
+    today_str = date.today().isoformat()
+
+    records = get_all_airtable_records(
+        AIRTABLE_ATTENDANCE_TABLE,
+        filter_formula=(
+            f'AND('
+            f'{{תאריך}}="{today_str}",'
+            f'{{עובד}}="{employee_id}"'
+            f')'
+        ),
+    )
+
+    # Airtable formula על שדה Link לא תמיד עובד ישירות עם ה-id,
+    # אז נסנן גם ידנית ליתר ביטחון
+    filtered = []
+    for record in records:
+        fields = record.get("fields", {})
+        linked = fields.get("עובד") or []
+        if employee_id in linked:
+            filtered.append(record)
+
+    return filtered[0] if filtered else None
+
+
+def create_attendance_record(employee_id: str):
+    now = datetime.now(ZoneInfo("Asia/Jerusalem"))
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{AIRTABLE_ATTENDANCE_TABLE}"
+    )
+
+    payload = {
+        "fields": {
+            "עובד": [employee_id],
+            "תאריך": now.date().isoformat(),
+            "שעת כניסה": now.isoformat(),
+        }
+    }
+
+    response = requests.post(
+        url,
+        headers=airtable_headers(),
+        json=payload,
+        timeout=30,
+    )
+
+    if response.status_code not in (200, 201):
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
+        )
+
+    return response.json()
+
+
+def update_attendance_clock_out(record_id: str):
+    now = datetime.now(ZoneInfo("Asia/Jerusalem"))
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{AIRTABLE_ATTENDANCE_TABLE}/{record_id}"
+    )
+
+    payload = {
+        "fields": {
+            "שעת יציאה": now.isoformat(),
+        }
+    }
+
+    response = requests.patch(
+        url,
+        headers=airtable_headers(),
+        json=payload,
+        timeout=30,
+    )
+
+    if response.status_code not in (200, 201):
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
         )
 
     return response.json()

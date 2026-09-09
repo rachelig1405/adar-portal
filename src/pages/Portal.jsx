@@ -19,6 +19,7 @@ import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
 import PickingSummary from "./PickingSummary ";
 import EmployeeSwitcher from "./EmployeeSwitcher";
+import Timelock from "./TimeClock"
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -31,6 +32,7 @@ const INTERNAL_COMPONENTS = {
   OrderStickers: TodayLabelsPrint,
   generalChat: GeneralChat,
   UpdateInvoice: UpdateInvoice,
+  Timelock: Timelock
 };
 
 function getRoleTitle(role) {

@@ -18,7 +18,12 @@ const warehouse = [
   title: "עדכון חשבונית",
   subtitle: "",
   icon: "📄",
-  color:"pink"}
+  color:"pink"},
+  {key: "Timelock",
+  title: "עדכון כניסה ויציאה",
+  subtitle: "",
+  icon: "✅",
+  color:"blue"}
  
 
 ];

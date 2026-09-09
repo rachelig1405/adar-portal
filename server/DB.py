@@ -296,7 +296,7 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
                             '{בצפי} = 1'
                         '),'
                         'AND('
-                            '{קו הפצה} != "סוסנא",'
+                            '{בצפי}!=1,'
                             'IS_SAME({תאריך אספקה}, TODAY(), "day")'
                         ')'
                     ')'

@@ -32,7 +32,7 @@ const INTERNAL_COMPONENTS = {
   OrderStickers: TodayLabelsPrint,
   generalChat: GeneralChat,
   UpdateInvoice: UpdateInvoice,
-  Timelock: Timelock
+
 };
 
 function getRoleTitle(role) {
@@ -45,7 +45,62 @@ function getRoleTitle(role) {
 
   return roleTitles[role] || "עובד";
 }
+import { API_URL } from "../config"; // אם עדיין לא מיובא
 
+// בתוך הקומפוננטה Portal:
+
+async function handleTimeClockAction() {
+  try {
+    const statusResponse = await fetch(
+      `${API_URL}/api/attendance/status?userId=${user.id}`
+    );
+
+    const statusData = await statusResponse.json();
+
+    if (!statusResponse.ok) {
+      alert(statusData.detail || "שגיאה בטעינת סטטוס נוכחות");
+      return;
+    }
+
+    if (statusData.status === "clocked_out") {
+      alert("כבר סיימת את יום העבודה היום");
+      return;
+    }
+
+    const isClockIn = statusData.status === "not_clocked_in";
+    const confirmMessage = isClockIn
+      ? "האם להחתים כניסה עכשיו?"
+      : "האם להחתים יציאה עכשיו?";
+
+    const confirmed = window.confirm(confirmMessage);
+
+    if (!confirmed) {
+      return;
+    }
+
+    const endpoint = isClockIn
+      ? "/api/attendance/clock-in"
+      : "/api/attendance/clock-out";
+
+    const actionResponse = await fetch(`${API_URL}${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user.id }),
+    });
+
+    const actionData = await actionResponse.json();
+
+    if (!actionResponse.ok) {
+      alert(actionData.detail || "שגיאה בהחתמה");
+      return;
+    }
+
+    alert(isClockIn ? "כניסה הוחתמה בהצלחה" : "יציאה הוחתמה בהצלחה");
+  } catch (error) {
+    console.error(error);
+    alert("שגיאה בתקשורת עם השרת");
+  }
+}
 export default function Portal({ user, onLogout ,onSwitchUser}) {
   const [activeAction, setActiveAction] = useState(null);
   const { unreadCount } = useChat();
@@ -81,6 +136,10 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
     if (item.key === "stickers" && user.role !== "admin") {
       alert("הפעולה מותרת למנהל המערכת בלבד");
       return;
+        if (item.key === "timeClock") {
+    handleTimeClockAction();
+    return;
+  }
     }
 
     const isInternalPage = Boolean(INTERNAL_COMPONENTS[item.key]);

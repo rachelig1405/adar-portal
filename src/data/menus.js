@@ -19,7 +19,7 @@ const warehouse = [
   subtitle: "",
   icon: "📄",
   color:"pink"},
-  {key: "Timelock",
+  {key: "timeClock",
   title: "עדכון כניסה ויציאה",
   subtitle: "",
   icon: "✅",

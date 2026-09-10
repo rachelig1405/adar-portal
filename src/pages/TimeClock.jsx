@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 
-export default function TimeClock({ onClose,user  }) {
+export default function TimeClock({ onClose, user }) {
   const [status, setStatus] = useState(null); // "not_clocked_in" | "clocked_in" | "clocked_out"
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -36,6 +36,12 @@ export default function TimeClock({ onClose,user  }) {
   }, []);
 
   async function handleClockIn() {
+    const confirmed = window.confirm("האם להחתים כניסה עכשיו?");
+
+    if (!confirmed) {
+      return;
+    }
+
     setActionLoading(true);
     setError("");
 
@@ -61,6 +67,12 @@ export default function TimeClock({ onClose,user  }) {
   }
 
   async function handleClockOut() {
+    const confirmed = window.confirm("האם להחתים יציאה עכשיו?");
+
+    if (!confirmed) {
+      return;
+    }
+
     setActionLoading(true);
     setError("");
 
@@ -100,7 +112,7 @@ export default function TimeClock({ onClose,user  }) {
           onClick={handleClockIn}
           disabled={actionLoading}
         >
-          {actionLoading ? "מחתים..." : "🟢 כניסה"}
+          {actionLoading ? "מחתים..." : "כניסה"}
         </button>
       )}
 
@@ -111,7 +123,7 @@ export default function TimeClock({ onClose,user  }) {
           onClick={handleClockOut}
           disabled={actionLoading}
         >
-          {actionLoading ? "מחתים..." : "🔴 יציאה"}
+          {actionLoading ? "מחתים..." : "יציאה"}
         </button>
       )}
 

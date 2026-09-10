@@ -1045,11 +1045,13 @@ def get_today_attendance(employee_id: str):
 
     records = get_all_airtable_records(
         AIRTABLE_ATTENDANCE_TABLE,
-        filter_formula=f'  IS_SAME('
+     filter_formula=(
+        'IS_SAME('
         '{תאריך},'
-        'DATETIME_PARSE({today_str}, "D/M/YYYY"),'
+        f'DATETIME_PARSE("{today_str}", "D/M/YYYY"),'
         '"day"'
-    ')'
+        ')'
+    )
     )
 
     filtered = []

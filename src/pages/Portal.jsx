@@ -49,7 +49,35 @@ import { API_URL } from "../config"; // אם עדיין לא מיובא
 
 // בתוך הקומפוננטה Portal:
 
-async function handleTimeClockAction() {
+
+export default function Portal({ user, onLogout ,onSwitchUser}) {
+  const [activeAction, setActiveAction] = useState(null);
+  const { unreadCount } = useChat();
+
+  const menu = useMemo(() => {
+    return getMenu(user.role);
+  }, [user.role]);
+
+  const activeMenuItem = useMemo(() => {
+    if (!activeAction) {
+      return null;
+    }
+
+    return menu.find((item) => item.key === activeAction) || null;
+  }, [activeAction, menu]);
+
+  const normalizedRole = String(user?.role || "")
+    .trim()
+    .toLowerCase();
+
+  const isWarehouse = normalizedRole === "warehouse";
+
+  const ActiveInternalComponent =
+    activeAction && INTERNAL_COMPONENTS[activeAction]
+      ? INTERNAL_COMPONENTS[activeAction]
+      : null;
+
+  async function handleTimeClockAction() {
   try {
     const statusResponse = await fetch(
       `${API_URL}/api/attendance/status?userId=${user.id}`
@@ -101,33 +129,6 @@ async function handleTimeClockAction() {
     alert("שגיאה בתקשורת עם השרת");
   }
 }
-export default function Portal({ user, onLogout ,onSwitchUser}) {
-  const [activeAction, setActiveAction] = useState(null);
-  const { unreadCount } = useChat();
-
-  const menu = useMemo(() => {
-    return getMenu(user.role);
-  }, [user.role]);
-
-  const activeMenuItem = useMemo(() => {
-    if (!activeAction) {
-      return null;
-    }
-
-    return menu.find((item) => item.key === activeAction) || null;
-  }, [activeAction, menu]);
-
-  const normalizedRole = String(user?.role || "")
-    .trim()
-    .toLowerCase();
-
-  const isWarehouse = normalizedRole === "warehouse";
-
-  const ActiveInternalComponent =
-    activeAction && INTERNAL_COMPONENTS[activeAction]
-      ? INTERNAL_COMPONENTS[activeAction]
-      : null;
-
   function closeActiveAction() {
     setActiveAction(null);
   }
@@ -136,7 +137,7 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
     if (item.key === "stickers" && user.role !== "admin") {
       alert("הפעולה מותרת למנהל המערכת בלבד");
       return;
-        if (item.key === "timeClock") {
+     if (item.key === "timeClock") {
     handleTimeClockAction();
     return;
   }

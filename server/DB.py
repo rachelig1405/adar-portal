@@ -1040,6 +1040,7 @@ def get_airtable_user_by_id(record_id: str):
     return response.json()
 #החתמת שעות
 def get_today_attendance(employee_id: str):
+    print("!!!!! NEW VERSION OF get_today_attendance IS RUNNING !!!!!",flush=True)
     today_str = date.today().isoformat()
 
     records = get_all_airtable_records(
@@ -1051,7 +1052,7 @@ def get_today_attendance(employee_id: str):
     for record in records:
         fields = record.get("fields", {})
         linked = fields.get("עובד") or []
-        print("DEBUG record:", record["id"], "linked:", linked, "date:")
+        print("DEBUG record:", record["id"], "linked:", linked, "date:",flush=True)
         if employee_id in linked:
             filtered.append(record)
 

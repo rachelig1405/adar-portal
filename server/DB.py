@@ -1040,26 +1040,30 @@ def get_airtable_user_by_id(record_id: str):
     return response.json()
 #החתמת שעות
 def get_today_attendance(employee_id: str):
-    print("!!!!! NEW VERSION OF get_today_attendance IS RUNNING !!!!!",flush=True)
-    today_str = date.today().isoformat()
+    print("!!!!! NEW VERSION OF get_today_attendance IS RUNNING !!!!!", flush=True)
 
-    records = get_all_airtable_records(
-        AIRTABLE_ATTENDANCE_TABLE,
-     filter_formula=(
-        'IS_SAME('
-        '{תאריך},'
-        f'DATETIME_PARSE("{today_str}", "D/M/YYYY"),'
-        '"day"'
-        ')'
-    )
-    )
+    records = get_all_airtable_records(AIRTABLE_ATTENDANCE_TABLE)
+    print("!!!!! RECORDS COUNT:", len(records), flush=True)
+
+    today_str = datetime.now(
+        ZoneInfo("Asia/Jerusalem")
+    ).date().isoformat()
+    print("!!!!! TODAY STR:", today_str, flush=True)
 
     filtered = []
     for record in records:
         fields = record.get("fields", {})
         linked = fields.get("עובד") or []
-        print("DEBUG record:", record["id"], "linked:", linked, "date:",flush=True)
-        if employee_id in linked:
+        record_date = str(fields.get("תאריך", "")).strip()
+
+        print(
+            "DEBUG record:", record["id"],
+            "linked:", linked,
+            "date:", repr(record_date),
+            flush=True,
+        )
+
+        if employee_id in linked and record_date == today_str:
             filtered.append(record)
 
     return filtered[0] if filtered else None

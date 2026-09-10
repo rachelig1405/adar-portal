@@ -1051,6 +1051,7 @@ def get_today_attendance(employee_id: str):
     for record in records:
         fields = record.get("fields", {})
         linked = fields.get("עובד") or []
+        print("DEBUG record:", record["id"], "linked:", linked, "date:")
         if employee_id in linked:
             filtered.append(record)
 

@@ -20,7 +20,7 @@ import GeneralChat from "./GeneralChat";
 import PickingSummary from "./PickingSummary ";
 import EmployeeSwitcher from "./EmployeeSwitcher";
 import Timelock from "./TimeClock"
-
+import AttendanceStatusBadge from "./AttendanceStatusBadge";
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
   startPicking: NewPicking,
@@ -178,6 +178,7 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
             <div className="hello">שלום, {user.name} 👋</div>
 
             <div className="role-pill">{getRoleTitle(user.role)}</div>
+            {isWarehouse && <AttendanceStatusBadge user={user} />}
           </div>
           {user.role === "warehouse" && (
             <EmployeeSwitcher currentUser={user} onSwitchUser={onSwitchUser} />

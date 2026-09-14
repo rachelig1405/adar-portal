@@ -115,7 +115,7 @@ def start_picking(data: PickingStart):
     record = update_order_workflow(
         data.order_id,
         employee_id=data.employee_id,
-        status="בליקוט",
+        status="בליקוט", 
         start_time=True,
     )
 
@@ -840,8 +840,10 @@ def attendance_status(userId: str):
 
     if fields.get("שעת יציאה"):
         return {"status": "clocked_out"}
+    if fields.get("שעת כניסה"):
 
-    return {"status": "clocked_in"}
+        return {"status": "clocked_in"}
+    return {"status": "not_clocked_in"}
 
 
 @app.post("/api/attendance/clock-in")

@@ -35,6 +35,7 @@ const INTERNAL_COMPONENTS = {
 
 };
 
+
 function getRoleTitle(role) {
   const roleTitles = {
     warehouse: "מחסנאי",

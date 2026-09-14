@@ -1072,6 +1072,8 @@ def get_today_attendance(employee_id: str):
             print(
                         "record selected",
                         record,
+                        "start time: ",
+                        fields.get("שעת כניסה"),
                         flush=True,
                     )
     

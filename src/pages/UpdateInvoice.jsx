@@ -29,7 +29,7 @@ export default function UpdateInvoice({ onClose }) {
 
       try {
         const [ordersResponse] = await Promise.all([
-          fetch(`${API_URL}/api/orders/filter_by_status?status=מלוקט`),
+          fetch(`${API_URL}/api/orders/filter_by_status?action=3`),
          
         ]);
 

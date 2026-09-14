@@ -280,7 +280,7 @@ def get_employees():
 
     return employees
 #החזת טבלת הזמנות לפי סטטוס מסוים
-def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: str|None=None):
+def get_orders_filter_by_status(    status: str |None=None,action: int|None=None,user_id: str|None=None):
     if action==1:
          records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
@@ -313,22 +313,30 @@ def get_orders_filter_by_status(    status: str ,action: int|None=None,user_id: 
         ],
     )
     else :
-        records = get_all_airtable_records(
-        AIRTABLE_ORDERS_TABLE,
-        filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
-               
-                ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
-                ],)
-        if action==2:
-                   if user_id:
-                        records = [
-                        record
-                        for record in records
-                        if user_id in (
-                            record.get("fields", {}).get("עובדים") or []
-                        )
-                    ]
-                 
+        if action==3:
+              records = get_all_airtable_records(
+                    AIRTABLE_ORDERS_TABLE,
+                    filter_formula=f'{{חשבונית}}=""',   sort= [ ("עדיפות", "desc"),
+                           
+                            ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
+                            ],)
+        else:
+            records = get_all_airtable_records(
+            AIRTABLE_ORDERS_TABLE,
+            filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
+                
+                    ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
+                    ],)
+            if action==2:
+                    if user_id:
+                            records = [
+                            record
+                            for record in records
+                            if user_id in (
+                                record.get("fields", {}).get("עובדים") or []
+                            )
+                        ]
+                    
 
      
         # בטבלת גיבוב ספירת הזמנות של אותו לקוח באותו תאריך אספקה

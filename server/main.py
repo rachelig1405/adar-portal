@@ -100,7 +100,7 @@ def GetEmployes():
 
 
 @app.get("/api/orders/filter_by_status")
-def Get_orders_filter_by_status(status: str = Query(..., description="סטטוס ההזמנות"), action: Optional[int] = Query(None, description="פעולה"),
+def Get_orders_filter_by_status(status: str = Query(None, description="סטטוס ההזמנות"), action: Optional[int] = Query(None, description="פעולה"),
     user_id: Optional[str] = Query(None, description="מזהה המשתמש"),):
     return get_orders_filter_by_status(status=status,action=action,user_id=user_id)
    

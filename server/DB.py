@@ -1069,6 +1069,12 @@ def get_today_attendance(employee_id: str):
 
         if employee_id in linked and record_date == today_str:
             filtered.append(record)
+            print(
+                        "record selected",
+                        record,
+                        flush=True,
+                    )
+    
 
     return filtered[0] if filtered else None
 

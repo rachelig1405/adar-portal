@@ -1141,3 +1141,31 @@ def update_attendance_clock_out(record_id: str):
         )
 
     return response.json()
+def get_record_by_id(table_name: str, record_id: str):
+    if not AIRTABLE_TOKEN or not AIRTABLE_BASE_ID:
+        raise RuntimeError(
+            "חסרים משתני AIRTABLE_TOKEN או AIRTABLE_BASE_ID"
+        )
+
+    encoded_table = quote(table_name, safe="")
+    encoded_record_id = quote(record_id, safe="")
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/{encoded_table}/{encoded_record_id}"
+    )
+
+    response = requests.get(
+        url,
+        headers={"Authorization": f"Bearer {AIRTABLE_TOKEN}"},
+        timeout=20,
+    )
+
+    if response.status_code == 404:
+        return None
+
+    if not response.ok:
+        print("Airtable error:", response.text)
+        raise RuntimeError("שגיאה בקריאת הרשומה מ-Airtable")
+
+    return response.json()

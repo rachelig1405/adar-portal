@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 
-export default function PickingSummary() {
+export default function PickingSummary({user}) {
   const [data, setData] = useState({
     picked_today: 0,
     remaining_today: 0,
     total_today: 0,
+    user_piciking_line:0,
+    user_avg:0
   });
 
   const [loading, setLoading] = useState(true);
@@ -14,7 +16,7 @@ export default function PickingSummary() {
     async function loadSummary() {
       try {
         const response = await fetch(
-          `${API_URL}/api/dashboard/picking-summary`
+          `${API_URL}/api/dashboard/picking-summary?userId=${user.id}`
         );
 
         if (!response.ok) {

@@ -214,6 +214,8 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
           </div>
         </section>
        
+       {isWarehouse && <PickingSummary user={user} />}
+
 
         <section className="actions-section">
           <div className="section-title-row">

@@ -38,7 +38,7 @@ AIRTABLE_ATTENDANCE_TABLE=os.getenv("AIRTABLE_ATTENDANCE_TABLE")
 from DB import get_customers
 from DB import create_customer
 from DB import get_table_records
-from DB import get_employees
+from DB import get_employees,get_record_by_id
 from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records,get_airtable_user_by_id,get_airtable_users_by_role,get_today_attendance,create_attendance_record,update_attendance_clock_out
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
@@ -670,13 +670,17 @@ def get_blocked_workday_dates():
 #נתוני ליקוט
 
 @app.get("/api/dashboard/picking-summary")
-def get_picking_summary():
+def get_picking_summary(userId: str):
 
     records = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,
      filter_formula=(
+    'AND('
     'OR('
-        '{בצפי}=1,'
+        'AND('
+                    '{בצפי}=1'
+                    '{קו הפצה}="סוסנא"'
+                '),'
         'AND('
             'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
             '{קו הפצה}!="סוסנא"'
@@ -706,34 +710,31 @@ def get_picking_summary():
         # כל השורות שתוכננו להיום
         total_today += picking_rows
 
-        # הזמנה שכבר סיימה ליקוט
-        end_time = fields.get("שעת סיום")
+        
 
-        if end_time:
-            end_datetime = datetime.fromisoformat(
-                end_time.replace("Z", "+00:00")
-            )
-
-            end_date_israel = end_datetime.astimezone(
-                ZoneInfo("Asia/Jerusalem")
-            ).date()
-
-            today_israel = datetime.now(
-                ZoneInfo("Asia/Jerusalem")
-            ).date()
-
-            if end_date_israel == today_israel:
-                picked_today += picking_rows
+        if status!="לפני יצור" and status!="בליקוט":
+            picked_today += picking_rows
 
     remaining_today = max(
                 total_today - picked_today,
                 0
             )
+    if not userId:
+        raise HTTPException(status_code=400, detail="חסר מזהה עובד")
 
+    try:
+        userRecord= get_record_by_id(AIRTABLE_WORKERS_TABLE, userId)
+        user_piciking_line=userRecord.get("fields", {}).get("סהכ שורות להיום")   
+        user_avg=userRecord.get("fields", {}).get("ממוצע זמן ליקוט להיום") 
+    except Exception as error:
+        print("Picking summary error:", error)
+        raise HTTPException(status_code=500, detail="שגיאה בשרת")
     return {
         "picked_today": picked_today,
         "remaining_today": remaining_today,
         "total_today": total_today,
+        "user_piciking_line": user_piciking_line,
+        "user_avg": user_avg
     }
 #החלפה מבירה בין משתמשים
 class QuickLoginRequest(BaseModel):

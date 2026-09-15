@@ -112,46 +112,50 @@ export function ChatProvider({ user, children }) {
     }
   }
 
-  useEffect(() => {
-    let intervalId = null;
+ useEffect(() => {
+  let intervalId = null;
 
-    function startPolling() {
-      if (intervalId) return;
+  const pollingInterval = isChatOpen ? 5000 : 30000;
 
+  function startPolling() {
+    if (intervalId || document.hidden) return;
+
+    intervalId = window.setInterval(() => {
       loadMessages(false);
-      intervalId = window.setInterval(() => {
-        loadMessages(false);
-      }, 3000);
+    }, pollingInterval);
+  }
+
+  function stopPolling() {
+    if (intervalId) {
+      window.clearInterval(intervalId);
+      intervalId = null;
     }
+  }
 
-    function stopPolling() {
-      if (intervalId) {
-        window.clearInterval(intervalId);
-        intervalId = null;
-      }
-    }
-
-    function handleVisibilityChange() {
-      if (document.hidden) {
-        stopPolling();
-      } else {
-        startPolling();
-      }
-    }
-
-    loadMessages(true);
-
-    if (!document.hidden) {
+  function handleVisibilityChange() {
+    if (document.hidden) {
+      stopPolling();
+    } else {
+      loadMessages(false);
       startPolling();
     }
+  }
 
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+  // טעינה אחת מיידית
+  loadMessages(true);
 
-    return () => {
-      stopPolling();
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, []);
+  startPolling();
+
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+
+  return () => {
+    stopPolling();
+    document.removeEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+  };
+}, [isChatOpen]);
 
   async function sendMessage(text) {
     const cleanText = text.trim();

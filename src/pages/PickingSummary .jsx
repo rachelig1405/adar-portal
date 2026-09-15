@@ -55,7 +55,7 @@ export default function PickingSummary({user}) {
     <div className="picking-summary">
       <div className="picking-summary-item">
         <span>לוקטו היום</span>
-        <strong>{data.all_piciking}</strong>
+        <strong>{data.picked_today}</strong>
         <small>סה"כ שורות ליקוט</small>
       </div>
 
@@ -77,7 +77,7 @@ export default function PickingSummary({user}) {
 
       <div className="picking-progress-wrapper">
         <div>
-          {data.picked_today} מתוך {data.total_today}
+          {data.all_piciking} מתוך {data.total_today}
         </div>
 
         <div className="picking-progress-track">

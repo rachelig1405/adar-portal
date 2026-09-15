@@ -48,7 +48,7 @@ export default function PickingSummary({user}) {
 
   const progress =
     data.total_today > 0
-      ? (data.picked_today / data.total_today) * 100
+      ? (data.all_piciking / data.total_today) * 100
       : 0;
 
   return (

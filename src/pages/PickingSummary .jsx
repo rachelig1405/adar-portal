@@ -7,7 +7,8 @@ export default function PickingSummary({user}) {
     remaining_today: 0,
     total_today: 0,
     user_piciking_line:0,
-    user_avg:0
+    user_avg:0,
+    all_piciking:0
   });
 
   const [loading, setLoading] = useState(true);
@@ -75,7 +76,7 @@ export default function PickingSummary({user}) {
 
       <div className="picking-progress-wrapper">
         <div>
-          {data.picked_today} מתוך {data.total_today}
+          {data.all_picikinga.total_today}
         </div>
 
         <div className="picking-progress-track">

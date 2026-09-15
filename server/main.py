@@ -746,7 +746,8 @@ def get_picking_summary(userId: str):
         "remaining_today": remaining_today,
         "total_today": total_today,
         "user_piciking_line": user_piciking_line,
-        "user_avg": user_avg
+        "user_avg": user_avg,
+        "all_piciking":all_piciking
     }
 #החלפה מבירה בין משתמשים
 class QuickLoginRequest(BaseModel):

@@ -676,14 +676,15 @@ def get_picking_summary(userId: str):
         AIRTABLE_ORDERS_TABLE,
      filter_formula=(
     'AND('
-    'OR('
-        'AND('
-                    '{בצפי}=1,'
-                    '{קו הפצה}="סוסנא"'
-                '),'
-        'AND('
-            'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
-            '{קו הפצה}!="סוסנא"'
+        'OR('
+            'AND('
+                '{בצפי}=1,'
+                '{קו הפצה}="סוסנא"'
+            '),'
+            'AND('
+                'IS_SAME({תאריך אספקה}, TODAY(), "day"),'
+                '{קו הפצה}!="סוסנא"'
+            ')'
         ')'
     ')'
 ),

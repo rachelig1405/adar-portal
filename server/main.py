@@ -678,7 +678,7 @@ def get_picking_summary(userId: str):
     'AND('
     'OR('
         'AND('
-                    '{בצפי}=1'
+                    '{בצפי}=1,'
                     '{קו הפצה}="סוסנא"'
                 '),'
         'AND('

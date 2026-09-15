@@ -54,13 +54,23 @@ export default function PickingSummary({user}) {
       <div className="picking-summary-item">
         <span>לוקטו היום</span>
         <strong>{data.picked_today}</strong>
-        <small>שורות ליקוט</small>
+        <small>סה"כ שורות ליקוט</small>
       </div>
 
       <div className="picking-summary-item">
         <span>נשאר ללקט</span>
         <strong>{data.remaining_today}</strong>
+        <small>שורות ליקוט לצפי</small>
+      </div>
+      <div className="picking-summary-item">
+        <span>אתה ליקטת היום</span>
+        <strong>{data.user_piciking_line}</strong>
         <small>שורות ליקוט</small>
+      </div>
+        <div className="picking-summary-item">
+        <span>ממצוע זמן ליקוט שלך</span>
+        <strong>{data.user_avg}</strong>
+        <small>לשורת ליקוט</small>
       </div>
 
       <div className="picking-progress-wrapper">

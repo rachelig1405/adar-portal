@@ -698,6 +698,12 @@ def get_picking_summary(userId: str):
 
     total_today = 0
     picked_today = 0
+    all_piciking=0
+    today_str = datetime.now(
+    ZoneInfo("Asia/Jerusalem")
+ ).date().isoformat()
+
+
 
     for record in records:
         fields = record.get("fields", {})
@@ -710,14 +716,19 @@ def get_picking_summary(userId: str):
 
         # כל השורות שתוכננו להיום
         total_today += picking_rows
+        start_time_raw = str(fields.get("שעת התחלה", ""))
+        started_today = start_time_raw[:10] == today_str
+        if started_today:
+            picked_today+=picking_rows
+
 
         
 
         if status!="לפני יצור" and status!="בליקוט":
-            picked_today += picking_rows
+            all_piciking += picking_rows
 
     remaining_today = max(
-                total_today - picked_today,
+                total_today - all_piciking,
                 0
             )
     if not userId:

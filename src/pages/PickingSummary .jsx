@@ -7,7 +7,9 @@ export default function PickingSummary({user}) {
     remaining_today: 0,
     total_today: 0,
     user_piciking_line:0,
-    user_avg:0
+    user_avg:0,
+    all_piciking:0
+     
   });
 
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ export default function PickingSummary({user}) {
     <div className="picking-summary">
       <div className="picking-summary-item">
         <span>לוקטו היום</span>
-        <strong>{data.picked_today}</strong>
+        <strong>{data.all_piciking}</strong>
         <small>סה"כ שורות ליקוט</small>
       </div>
 
@@ -70,7 +72,7 @@ export default function PickingSummary({user}) {
         <div className="picking-summary-item">
         <span>ממצוע זמן ליקוט שלך</span>
         <strong>{data.user_avg}</strong>
-        <small>לשורת</small>
+        <small>לשורת ליקוט </small>
       </div>
 
       <div className="picking-progress-wrapper">

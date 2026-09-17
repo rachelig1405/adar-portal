@@ -318,14 +318,14 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                     AIRTABLE_ORDERS_TABLE,
                     filter_formula=f'{{חשבונית}}=""',   sort= [ ("עדיפות", "desc"),
                            
-                            ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
+                            ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), ("עדיפות קו הפצה", "asc"),
                             ],)
         else:
             records = get_all_airtable_records(
             AIRTABLE_ORDERS_TABLE,
             filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
                 
-                    ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
+                    ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), ("עדיפות קו הפצה", "asc"),
                     ],)
             if action==2:
                     if user_id:
@@ -351,15 +351,7 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                 ')'
 )
     )
-    records.sort(
-    key=lambda record: (
-        0
-        if str(
-            record.get("fields", {}).get("קו הפצה", "")
-        ).strip() == "סוסנא"
-        else 1
-    )
-)
+  
 
     for record in all_record:
         fields = record.get("fields", {})

@@ -336,6 +336,7 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                                 record.get("fields", {}).get("עובדים") or []
                             )
                         ]
+    
                     
 
      
@@ -350,6 +351,15 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                 ')'
 )
     )
+    records.sort(
+    key=lambda record: (
+        0
+        if str(
+            record.get("fields", {}).get("קו הפצה", "")
+        ).strip() == "סוסנא"
+        else 1
+    )
+)
 
     for record in all_record:
         fields = record.get("fields", {})

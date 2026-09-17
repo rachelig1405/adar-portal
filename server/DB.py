@@ -318,14 +318,14 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                     AIRTABLE_ORDERS_TABLE,
                     filter_formula=f'{{חשבונית}}=""',   sort= [ ("עדיפות", "desc"),
                            
-                            ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("עדיפות קו הפצה", "asc"),("לקוח","asc")
+                            ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
                             ],)
         else:
             records = get_all_airtable_records(
             AIRTABLE_ORDERS_TABLE,
             filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
                 
-                    ("תאריך אספקה", "asc"),("שורות ליקוט", "desc"),("עדיפות קו הפצה", "asc"),("לקוח","asc"), 
+                    ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
                     ],)
             if action==2:
                     if user_id:

@@ -492,8 +492,7 @@ def find_customer_record_id(
     records = get_all_airtable_records(
         AIRTABLE_CUSTOMERS_TABLE,
         filter_formula=(
-            f'({{מספר לקוח}} & "") = "{customer_number}"'
-
+            f'{{מספר לקוח}}="{customer_number}"'
         ),
     )
 
@@ -509,6 +508,14 @@ def find_agent_record_id(
 ) -> str | None:
     if not agent_name:
         return None
+    agent_name = str(agent_name).strip()
+
+    # מניעת שבירת נוסחת Airtable
+    safe_agent_name = (
+        agent_name
+        .replace("\\", "\\\\")
+        .replace('"', '\\"')
+    )
 
     records = get_all_airtable_records(
         AIRTABLE_AGENTS_TABLE,

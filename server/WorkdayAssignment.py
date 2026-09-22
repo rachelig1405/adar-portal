@@ -545,43 +545,41 @@ def workday_assignment(max_date: date, order_id: str):
 
 
     for attempt in range(2):
-            print(
-                    "=== ENTER LOOP ===",
-                    
-                    flush=True
-                )
-            
-            records = get_records_until(max_date)
+        print("=== ENTER LOOP ===", flush=True)
 
-            if records:
-                last_workday = date.fromisoformat(
-                    str(records[-1]["fields"]["יום עבודה"])[:10]
-                )
+        records = get_records_until(max_date)
 
-                if last_workday < max_date:
-                    create_workdays_until(target_date=max_date)
-                    workdays_cache.clear()
-                    continue
+        if attempt == 0:
+            creation_result = create_workdays_until(target_date=max_date)
 
-            target_day = try_find_day(order_id, max_date, visited={order_id})
+            if creation_result.get("created_count", 0) > 0:
+                workdays_cache.clear()
+                continue
 
-            if target_day:
-                result = update_order_workflow(
-                    order_id=order_id, workday_id=target_day["id"]
-                )
+        target_day = try_find_day(order_id, max_date, visited={order_id})
 
-                return {
-                    "success": True,
-                    "record": result,
-                    "message": "ההזמנה שובצה בהצלחה",
-                    "workday id": target_day["id"],
-                }
+        if target_day:
+            result = update_order_workflow(
+                order_id=order_id, workday_id=target_day["id"]
+            )
 
-            print("send message to agents")
             return {
-                "success": False,
-                "message": "לא נמצא יום עבודה פנוי",
+                "success": True,
+                "record": result,
+                "message": "ההזמנה שובצה בהצלחה",
+                "workday id": target_day["id"],
             }
+
+        print("send message to agents")
+        return {
+            "success": False,
+            "message": "לא נמצא יום עבודה פנוי",
+        }
+
+    return {
+        "success": False,
+        "message": "לא נמצא יום עבודה פנוי",
+    }
 
     return {
         "success": False,

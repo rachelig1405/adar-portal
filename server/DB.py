@@ -492,7 +492,8 @@ def find_customer_record_id(
     records = get_all_airtable_records(
         AIRTABLE_CUSTOMERS_TABLE,
         filter_formula=(
-            f'{{מספר לקוח}}="{customer_number}"'
+            f'({{מספר לקוח}} & "") = "{customer_number}"'
+
         ),
     )
 

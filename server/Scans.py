@@ -29,6 +29,7 @@ class ScanRequest(BaseModel):
     worker_id: str
     notes: str | None = None
     confirm_overage: bool = False
+    confirm_not_in_forecast: bool = False
 #פונקציה למציאת או יצירת העמסה
 def get_or_create_today_loading():
     now = datetime.now(
@@ -143,6 +144,35 @@ def create_loading_scan(
         "fields",
         {}
     )
+    in_forecast = (
+    order_fields.get("בצפי", 0)
+    or 0
+)
+
+    is_not_in_forecast = (
+        int(in_forecast) != 1
+    )
+    if (
+    is_not_in_forecast
+    and not scan.confirm_not_in_forecast
+):
+        return {
+            "success": False,
+            "code": "NOT_IN_FORECAST",
+            "message": (
+                "משטח זה לא מופיע "
+                "בצפי האספקה להיום."
+            ),
+            "order_number": scan.order_number,
+            "customer": (
+                order_fields.get(
+                    "שם לקוח",
+                    ""
+                )
+                or ""
+            ),
+            "requires_confirmation": True,
+        }
 
     # --------------------------------
     # 3. הצפי שהבודק הזין
@@ -198,7 +228,10 @@ def create_loading_scan(
             "remaining": 0,
             "requires_confirmation": True,
         }
-
+    has_exception = (
+        is_overage
+        or is_not_in_forecast
+)
     # --------------------------------
     # 6. יצירת רשומת סריקה
     # --------------------------------
@@ -215,8 +248,13 @@ def create_loading_scan(
         # Link to העמסות
         "העמסות": [loading_id],
 
-        "יש חריגה": is_overage,
+        "יש חריגה": has_exception,
     }
+    if is_not_in_forecast:
+        scan_fields["סוג חריגה"] = "לא בצפי"
+
+    elif is_overage:
+        scan_fields["סוג חריגה"] = "מעל הצפי"
 
     if is_overage:
         scan_fields["סוג חריגה"] = (

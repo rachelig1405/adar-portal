@@ -251,7 +251,7 @@ def create_loading_scan(
         "יש חריגה": has_exception,
     }
     if is_not_in_forecast:
-        scan_fields["סוג חריגה"] = "לא בצפי"
+        scan_fields["סוג החריגה"] = "לא בצפי"
 
     elif is_overage:
         scan_fields["סוג חריגה"] = "מעל הצפי"

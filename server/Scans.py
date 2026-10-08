@@ -204,7 +204,7 @@ def create_loading_scan(
     # --------------------------------
 
     scan_fields = {
-        "זמן": now.isoformat(),
+        "תאריך ושעה": now.isoformat(),
 
         # Link to הזמנות
         "הזמנה": [order_id],

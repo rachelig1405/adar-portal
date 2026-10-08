@@ -20,6 +20,10 @@ from Models import OrderCreate
 from Models import PickingStart
 from typing import Optional
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
+from Scans import (
+    ScanRequest,
+    create_loading_scan,
+)
 #הגדרת נתיב לדיסק
 import uuid
 import traceback
@@ -933,3 +937,9 @@ def clock_out(data: AttendanceRequest):
     result = update_attendance_clock_out(existing["id"])
 
     return {"success": True, "record": result}
+#אנדפוינט לסריקה
+@app.post("/api/loading/scan")
+def ScanLoading(
+    scan: ScanRequest
+):
+    return create_loading_scan(scan)

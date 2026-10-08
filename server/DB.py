@@ -180,7 +180,33 @@ def create_order(order: OrderCreate):
     if order.warehouse_notes:
         fields["הערות למחסן"] = order.warehouse_notes
     if order.cardboard:
-            fields["מארזים"] = order.cardboard
+        fields["מארזים"] = order.cardboard
+        same_date_orders = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=(
+            f'IS_SAME('
+            f'{{תאריך אספקה}}, '
+            f'DATETIME_PARSE("{order.delivery_date}"), '
+            f'"day"'
+            f')'
+        )
+    )
+
+        same_customers = [
+        record
+        for record in same_date_orders
+        if order.customer_id in (
+            record.get("fields", {}).get("לקוח") or []
+        )
+    ]
+
+        if len(same_customers) > 0:
+        # כאן המשך הקוד שלך
+            total_customer_amount = sum(
+            record.get("fields", {}).get("כמות משטחים משוערכת", 0) or 0
+            for record in same_customers
+            )
+            total_amount= order.cardboard/36+ total_customer_amount 
 
     payload = {"fields": fields}
 

@@ -145,7 +145,7 @@ def finish_loading(
         "נסגר על ידי": [
             request.worker_id
         ],
-        "פערים": len(gaps),
+        "פערים": gaps,
     }
 
     if request.notes:

@@ -141,7 +141,7 @@ def finish_loading(
 
     fields = {
         "סטטוס": status,
-        "זמן סיום": now.isoformat(),
+        "זמן": now.isoformat(),
         "נסגר על ידי": [
             request.worker_id
         ],

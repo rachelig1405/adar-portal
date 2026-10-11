@@ -23,6 +23,7 @@ from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequ
 from Scans import (
     ScanRequest,
     create_loading_scan,
+    get_loading_summary
 )
 #הגדרת נתיב לדיסק
 import uuid
@@ -943,3 +944,7 @@ def ScanLoading(
     scan: ScanRequest
 ):
     return create_loading_scan(scan)
+#סיכום הסריקה
+@app.get("/api/loading/summary")
+def loading_summary():
+    return get_loading_summary()

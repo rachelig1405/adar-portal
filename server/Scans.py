@@ -322,3 +322,71 @@ def create_loading_scan(
 
         "exception": is_overage,
     }
+    def get_loading_summary():
+    # כל ההזמנות שנמצאות בצפי
+    orders = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula="{בצפי}=1"
+    )
+
+    total_expected = 0
+    total_loaded = 0
+
+    order_list = []
+
+    for record in orders:
+        fields = record.get("fields", {})
+
+        expected = (
+            fields.get("כמות משטחים", 0)
+            or 0
+        )
+
+        loaded = (
+            fields.get("משטחים שהועמסו", 0)
+            or 0
+        )
+
+        remaining = max(
+            expected - loaded,
+            0
+        )
+
+        total_expected += expected
+        total_loaded += loaded
+
+        order_list.append({
+            "order_id": record["id"],
+            "order_number": (
+                fields.get("מספר הזמנה", "")
+            ),
+            "customer": (
+                fields.get("שם לקוח", "")
+                or ""
+            ),
+            "expected": expected,
+            "loaded": loaded,
+            "remaining": remaining,
+            "complete": (
+                loaded == expected
+                and expected > 0
+            ),
+            "over": loaded > expected,
+        })
+
+    total_remaining = max(
+        total_expected - total_loaded,
+        0
+    )
+
+    return {
+        "success": True,
+
+        "summary": {
+            "expected": total_expected,
+            "loaded": total_loaded,
+            "remaining": total_remaining,
+        },
+
+        "orders": order_list,
+    }

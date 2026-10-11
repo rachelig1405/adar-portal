@@ -25,6 +25,9 @@ from Scans import (
     create_loading_scan,
     get_loading_summary
 )
+
+from FinishLoading import (FinishLoadingRequest,
+    finish_loading)
 #הגדרת נתיב לדיסק
 import uuid
 import traceback
@@ -948,3 +951,8 @@ def ScanLoading(
 @app.get("/api/loading/summary")
 def loading_summary():
     return get_loading_summary()
+@app.post("/api/loading/finish")
+def finish_loading_api(
+    request: FinishLoadingRequest
+):
+    return finish_loading(request)

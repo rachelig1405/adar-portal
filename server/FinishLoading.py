@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException
 from pydantic import BaseModel
-
+from Scans import get_loading_summary
 from DB import (
     airtable_headers,
     get_all_airtable_records,

@@ -122,7 +122,13 @@ def finish_loading(
     # --------------------------------
     # 4. קביעת סטטוס
     # --------------------------------
-
+    total_missing = sum(
+    max(
+        gap["expected"] - gap["loaded"],
+        0
+    )
+    for gap in gaps
+)
     if len(gaps) == 0:
         status = "נסגרה תקין"
     else:
@@ -145,7 +151,7 @@ def finish_loading(
         "נסגר על ידי": [
             request.worker_id
         ],
-        "פערים": gaps,
+        "פערים": total_missing,
     }
 
     if request.notes:

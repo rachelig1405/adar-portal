@@ -322,7 +322,7 @@ def create_loading_scan(
 
         "exception": is_overage,
     }
-    def get_loading_summary():
+def get_loading_summary():
     # כל ההזמנות שנמצאות בצפי
     orders = get_all_airtable_records(
         AIRTABLE_ORDERS_TABLE,

@@ -276,9 +276,15 @@ export default function ScanLoading({ user }) {
 
           video: {
             facingMode: {
-              ideal: "environment",
+                ideal: "environment",
             },
-          },
+            width: {
+                ideal: 1920,
+            },
+            height: {
+                ideal: 1080,
+            },
+        },
         },
 
         videoElement,

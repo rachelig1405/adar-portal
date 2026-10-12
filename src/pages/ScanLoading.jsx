@@ -284,6 +284,11 @@ export default function ScanLoading({ user }) {
             height: {
                 ideal: 1080,
             },
+            advanced: [
+            {
+            focusMode: "continuous",
+            },
+  ],
         },
         },
 

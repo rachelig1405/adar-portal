@@ -52,7 +52,7 @@ function getRoleTitle(role) {
   return roleTitles[role] || "עובד";
 }
 import { API_URL } from "../config"; // אם עדיין לא מיובא
-import CreateOZProductPdfs from "./CreateOZStickers";
+
 
 // בתוך הקומפוננטה Portal:
 

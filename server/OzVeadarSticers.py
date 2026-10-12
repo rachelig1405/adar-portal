@@ -768,7 +768,7 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
         "scale_x": scale_x,
         "scale_y": scale_y,
         "scale": scale,
-       ,
+       
         "barcode_width_mr": BARCODE_WIDTH_MR_MM,
         
         "barcode_width_st": BARCODE_WIDTH_ST_MM,

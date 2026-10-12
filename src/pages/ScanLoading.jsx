@@ -239,90 +239,101 @@ export default function ScanLoading({ user }) {
   // =====================================================
 
   async function startCamera() {
-    if (loading || cameraOpen) {
-      return;
+  if (loading || cameraOpen) {
+    return;
+  }
+
+  setMessage("");
+  setLastScan(null);
+  scanInProgressRef.current = false;
+
+  try {
+    // קודם מציגים את אזור המצלמה
+    setCameraOpen(true);
+
+    // מחכים ש-React באמת יצור את <video>
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+    const videoElement = videoRef.current;
+
+    if (!videoElement) {
+      throw new Error(
+        "Video element not available"
+      );
     }
 
-    setMessage("");
-    setLastScan(null);
+    const reader =
+      new BrowserMultiFormatReader();
 
-    scanInProgressRef.current = false;
+    const controls =
+      await reader.decodeFromConstraints(
+        {
+          audio: false,
 
-    try {
-      const reader =
-        new BrowserMultiFormatReader();
-
-      setCameraOpen(true);
-
-      const controls =
-        await reader.decodeFromConstraints(
-          {
-            audio: false,
-
-            video: {
-              facingMode: {
-                ideal: "environment",
-              },
+          video: {
+            facingMode: {
+              ideal: "environment",
             },
           },
+        },
 
-          videoRef.current,
+        videoElement,
 
-          async (
-            result,
-            error,
-            controlsFromCallback
-          ) => {
-            if (!result) {
-              return;
-            }
-
-            if (
-              scanInProgressRef.current
-            ) {
-              return;
-            }
-
-            const orderNumber =
-              result.getText()?.trim();
-
-            if (!orderNumber) {
-              return;
-            }
-
-            // מונע קריאה נוספת של אותו ברקוד
-            scanInProgressRef.current =
-              true;
-
-            // סוגרים מיד את המצלמה
-            try {
-              controlsFromCallback?.stop();
-            } catch {}
-
-            stopCamera();
-
-            // שולחים לשרת
-            await processScan(
-              orderNumber
-            );
+        async (
+          result,
+          error,
+          controlsFromCallback
+        ) => {
+          if (!result) {
+            return;
           }
-        );
 
-      controlsRef.current = controls;
+          if (
+            scanInProgressRef.current
+          ) {
+            return;
+          }
 
-    } catch (error) {
-      console.error(
-        "Camera error:",
-        error
+          const orderNumber =
+            result.getText()?.trim();
+
+          if (!orderNumber) {
+            return;
+          }
+
+          scanInProgressRef.current = true;
+
+          try {
+            controlsFromCallback?.stop();
+          } catch {}
+
+          stopCamera();
+
+          await processScan(
+            orderNumber
+          );
+        }
       );
 
-      stopCamera();
+    controlsRef.current = controls;
 
-      setMessage(
-        "לא ניתן לפתוח את המצלמה. יש לבדוק שאושרה הרשאת מצלמה."
-      );
-    }
+  } catch (error) {
+    console.error(
+      "Camera error:",
+      error
+    );
+
+    stopCamera();
+
+    setMessage(
+      "לא ניתן לפתוח את המצלמה"
+    );
   }
+}
 
   // =====================================================
   // קריאה ל-API

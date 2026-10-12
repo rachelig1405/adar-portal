@@ -73,6 +73,7 @@ const admin=[
   {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"green", url:LINKS.check},
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
   {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"yellow"},
+  {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
   {
   key: "generalChat",
   title: "צ׳אט עובדים",

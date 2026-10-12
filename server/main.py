@@ -16,6 +16,7 @@ from pathlib import Path
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 from CreateStickesr import process_excel
+from OzVeadarSticers import process_excel as oz_process_excel
 from Models import OrderCreate
 from Models import PickingStart
 from typing import Optional
@@ -51,6 +52,7 @@ from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl
+
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
     "http://localhost:5173",
@@ -399,20 +401,41 @@ def update_job(job_id: str, **updates):
         json.dumps(job_data, ensure_ascii=False),
         encoding="utf-8",
     )
-async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, work_root: Path):
+
+async def _run_pdfs_job(
+    job_id: str,
+    excel_path: Path,
+    output_dir: Path,
+    work_root: Path,
+    processor,
+):
     try:
-        update_job(job_id, status=JobStatus.RUNNING, work_root=str(work_root))
+        update_job(
+            job_id,
+            status=JobStatus.RUNNING,
+            work_root=str(work_root),
+            error=None,
+        )
 
         def progress_callback(progress_index: int, total: int):
-            update_job(job_id, progress=progress_index, total=total)
+            update_job(
+                job_id,
+                progress=progress_index,
+                total=total,
+            )
 
-        result = await process_excel(
+        result = await processor(
             excel_path=str(excel_path),
             output_root=str(output_dir),
             progress_callback=progress_callback,
         )
 
         zip_path = result.get("zip_path")
+
+        if not zip_path or not Path(zip_path).is_file():
+            raise FileNotFoundError(
+                "תהליך יצירת המדבקות הסתיים ללא קובץ ZIP תקין"
+            )
 
         summary_lines = [
             "סיכום יצירת תיקי מוצר",
@@ -426,17 +449,62 @@ async def run_create_pdfs_job(job_id: str, excel_path: Path, output_dir: Path, w
 
         summary_text = "\n".join(summary_lines)
 
-        # מוסיפים את הסיכום ישירות לתוך ה-ZIP הקיים, כדי שהוא יירד יחד עם שאר הקבצים
-        if zip_path and Path(zip_path).exists():
-            with zipfile.ZipFile(zip_path, mode="a", compression=zipfile.ZIP_DEFLATED) as zip_file:
-                zip_file.writestr("סיכום_תהליך.txt", summary_text.encode("utf-8-sig"))
+        with zipfile.ZipFile(
+            zip_path,
+            mode="a",
+            compression=zipfile.ZIP_DEFLATED,
+        ) as zip_file:
+            zip_file.writestr(
+                "סיכום_תהליך.txt",
+                summary_text.encode("utf-8-sig"),
+            )
 
-        update_job(job_id, zip_path=str(zip_path) if zip_path else None, status=JobStatus.DONE)
+        update_job(
+            job_id,
+            zip_path=str(zip_path),
+            status=JobStatus.DONE,
+        )
 
     except Exception as error:
-        update_job(job_id, status=JobStatus.FAILED, error=str(error))
+        update_job(
+            job_id,
+            status=JobStatus.FAILED,
+            error=str(error),
+        )
         shutil.rmtree(work_root, ignore_errors=True)
-   
+
+
+# ממשק קיים - המדבקות הישנות
+async def run_create_pdfs_job(
+    job_id: str,
+    excel_path: Path,
+    output_dir: Path,
+    work_root: Path,
+):
+    await _run_pdfs_job(
+        job_id,
+        excel_path,
+        output_dir,
+        work_root,
+        processor=process_excel,
+    )
+
+
+# ממשק חדש - המדבקות החדשות
+async def run_create_pdfs_new_job(
+    job_id: str,
+    excel_path: Path,
+    output_dir: Path,
+    work_root: Path,
+):
+    await _run_pdfs_job(
+        job_id,
+        excel_path,
+        output_dir,
+        work_root,
+        processor=oz_process_excel,
+    )
+    
     #יצירת סטיקרים - פותחת job ברקע ומחזירה מיידית job_id
 
 @app.post("/api/products/create-pdfs")
@@ -956,3 +1024,129 @@ def finish_loading_api(
     request: FinishLoadingRequest
 ):
     return finish_loading(request)
+    
+# ==========================================
+# API חדש - יצירת מדבקות MR ו-ST החדשות
+# ==========================================
+
+@app.post("/api/products/create-pdfs-new")
+async def create_product_pdfs_new(
+    background_tasks: BackgroundTasks,
+    excel_file: UploadFile = File(...),
+):
+    excel_name = excel_file.filename or ""
+
+    if not excel_name.lower().endswith((".xlsx", ".xls")):
+        raise HTTPException(
+            status_code=400,
+            detail="יש להעלות קובץ Excel מסוג XLSX או XLS.",
+        )
+
+    # תיקיית עבודה נפרדת לכל בקשה
+    work_root = PERSISTENT_STORAGE / f"job_new_{uuid.uuid4()}"
+    work_root.mkdir(parents=True, exist_ok=True)
+
+    excel_dir = work_root / "excel"
+    output_dir = work_root / "output"
+
+    excel_dir.mkdir(parents=True, exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_excel_name = Path(excel_name).name
+    excel_path = excel_dir / safe_excel_name
+
+    # שמירת האקסל לדיסק הקבוע
+    with excel_path.open("wb") as destination:
+        while chunk := await excel_file.read(1024 * 1024):
+            destination.write(chunk)
+
+    job_id = create_pdf_job()
+
+    # הפעלת מנגנון המדבקות החדש
+    background_tasks.add_task(
+        run_create_pdfs_new_job,
+        job_id=job_id,
+        excel_path=excel_path,
+        output_dir=output_dir,
+        work_root=work_root,
+    )
+
+    return {"job_id": job_id}
+
+
+# ==========================================
+# בדיקת סטטוס המדבקות החדשות
+# ==========================================
+
+@app.get("/api/products/create-pdfs-new/status/{job_id}")
+def get_create_pdfs_new_status(job_id: str):
+    job = read_job(job_id)
+
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Job לא נמצא"
+        )
+
+    response = {
+        "status": job["status"],
+        "progress": job["progress"],
+        "total": job["total"],
+    }
+
+    if job["status"] == JobStatus.FAILED:
+        response["error"] = job["error"]
+
+    return response
+
+
+# ==========================================
+# הורדת ZIP של המדבקות החדשות
+# ==========================================
+
+@app.get("/api/products/create-pdfs-new/download/{job_id}")
+def download_create_pdfs_new_zip(
+    job_id: str,
+    background_tasks: BackgroundTasks,
+):
+    job = read_job(job_id)
+
+    if job is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Job לא נמצא"
+        )
+
+    if job["status"] != JobStatus.DONE:
+        raise HTTPException(
+            status_code=409,
+            detail="הקובץ עדיין לא מוכן"
+        )
+
+    zip_path = job["zip_path"]
+
+    if not zip_path or not Path(zip_path).exists():
+        raise HTTPException(
+            status_code=404,
+            detail="קובץ ה-ZIP לא נמצא"
+        )
+
+    work_root = job.get("work_root")
+
+    def cleanup_after_download():
+        if work_root and Path(work_root).exists():
+            shutil.rmtree(
+                work_root,
+                ignore_errors=True
+            )
+
+        _job_file(job_id).unlink(missing_ok=True)
+
+    background_tasks.add_task(cleanup_after_download)
+
+    return FileResponse(
+        path=zip_path,
+        media_type="application/zip",
+        filename="product_pdfs_new.zip",
+        background=background_tasks,
+    )

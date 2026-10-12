@@ -285,8 +285,8 @@ export default function ScanLoading({ user }) {
     true
 );
 
-const reader =
-  new BrowserMultiFormatReader(hints);
+    const reader =
+        new BrowserMultiFormatReader(hints);
 
     const controls =
       await reader.decodeFromConstraints(

@@ -21,7 +21,9 @@ import PickingSummary from "./PickingSummary ";
 import EmployeeSwitcher from "./EmployeeSwitcher";
 import Timelock from "./TimeClock";
 import ScanLoading from "./ScanLoading";
+import CreateOZProductPdfs from "./CreateOZStickers";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
+
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
   startPicking: NewPicking,
@@ -33,7 +35,8 @@ const INTERNAL_COMPONENTS = {
   OrderStickers: TodayLabelsPrint,
   generalChat: GeneralChat,
   UpdateInvoice: UpdateInvoice,
-  ScanLoading: ScanLoading
+  ScanLoading: ScanLoading,
+  OZstickers: CreateOZProductPdfs
 
 };
 
@@ -49,6 +52,7 @@ function getRoleTitle(role) {
   return roleTitles[role] || "עובד";
 }
 import { API_URL } from "../config"; // אם עדיין לא מיובא
+import CreateOZProductPdfs from "./CreateOZStickers";
 
 // בתוך הקומפוננטה Portal:
 

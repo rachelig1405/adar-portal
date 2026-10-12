@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
 
+import {
+  BarcodeFormat,
+  DecodeHintType
+} from "@zxing/library";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function ScanLoading({ user }) {
@@ -266,8 +271,22 @@ export default function ScanLoading({ user }) {
       );
     }
 
-    const reader =
-      new BrowserMultiFormatReader();
+    const hints = new Map();
+
+    hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+        BarcodeFormat.CODE_128
+    ]
+    );
+
+    hints.set(
+    DecodeHintType.TRY_HARDER,
+    true
+);
+
+const reader =
+  new BrowserMultiFormatReader(hints);
 
     const controls =
       await reader.decodeFromConstraints(

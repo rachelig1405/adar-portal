@@ -23,7 +23,12 @@ const warehouse = [
   title: "עדכון כניסה ויציאה",
   subtitle: "",
   icon: "✅",
-  color:"blue"}
+  color:"blue"},
+  {key: "ScanLoading",
+  title: "העמסה בסריקה",
+  subtitle: "",
+  icon: "🏁",
+  color:"green"}
  
 
 ];
@@ -79,7 +84,13 @@ const admin=[
   title: "עדכון חשבונית",
   subtitle: "",
   icon: "📄",
-  color:"pink"}
+  color:"pink"},
+    {key: "ScanLoading",
+  title: "העמסה בסריקה",
+  subtitle: "",
+  icon: "🏁",
+  color:"green"}
+ 
 ];
 export function getMenu(role) {
   if (role === "warehouse") return warehouse;

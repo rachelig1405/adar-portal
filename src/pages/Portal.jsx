@@ -19,7 +19,8 @@ import UpdateInvoice from "./UpdateInvoice";
 import GeneralChat from "./GeneralChat";
 import PickingSummary from "./PickingSummary ";
 import EmployeeSwitcher from "./EmployeeSwitcher";
-import Timelock from "./TimeClock"
+import Timelock from "./TimeClock";
+import ScanLoading from "./ScanLoading";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -32,6 +33,7 @@ const INTERNAL_COMPONENTS = {
   OrderStickers: TodayLabelsPrint,
   generalChat: GeneralChat,
   UpdateInvoice: UpdateInvoice,
+  ScanLoading: ScanLoading
 
 };
 

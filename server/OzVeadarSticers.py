@@ -549,11 +549,11 @@ html, body {
 
 .reference-logo {
     position: absolute;
-    top: 9mm;
+    top: 7mm;
     left: 50%;
     transform: translateX(-50%);
-    width: 62mm;
-    height: 57mm;
+    width: 65mm;
+    height: 60mm;
     object-fit: contain;
 }
 
@@ -562,7 +562,7 @@ html, body {
 .description {
    
     position: absolute;
-    top: 78mm;
+    top: 82mm;
     right: 18mm;
     left: 18mm;
     max-height: 37mm;

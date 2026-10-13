@@ -737,19 +737,22 @@ html, body {
 .sku {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
-    font-size: 5.74pt;
+    font-size: 3.5mm;
+    line-height: 1.15;
     white-space: nowrap;
-}
+
+
 
 .description {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
     direction: rtl;
-    font-size: 3.93pt;
+    font-size: 2.8mm;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: .3mm;
+    line-height:1.5;
 }
 
 .barcode {

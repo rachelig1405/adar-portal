@@ -602,7 +602,7 @@ html, body {
 .mini-sku {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
-    font-size: 3.7mm;
+    font-size: 4mm;
     line-height: 1.15;
     white-space: nowrap;
 }
@@ -610,7 +610,7 @@ html, body {
 .mini-name {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
-    font-size: 2.8mm;
+    font-size: 2.9mm;
     line-height: 1.15;
     direction: rtl;
     white-space: nowrap;

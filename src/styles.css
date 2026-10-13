@@ -1790,17 +1790,15 @@
   .scan-loading__manual-button {
     min-height: 56px;
   }
-  .scan-loading-overlay {
+.scan-loading-overlay {
   position: fixed;
-
   inset: 0;
-
-  z-index: 9999;
-
+  width: 100vw;
+  height: 100vh;
+  z-index: 999999;
   background: #eef7ff;
-
   overflow-y: auto;
-
+  overflow-x: hidden;
   direction: rtl;
 }
 .scan-loading__close {

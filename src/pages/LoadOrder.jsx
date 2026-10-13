@@ -15,6 +15,7 @@ export default function LoadingOrders({ onClose,user}) {
   action: 1,
   user_id: user.id,
 });
+
   useEffect(() => {
     async function loadOrders() {
       setLoading(true);

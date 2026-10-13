@@ -494,6 +494,9 @@ async function startCamera() {
           confirm_not_in_forecast:
             options.confirm_not_in_forecast ||
             false,
+          confirm_not_in_line:
+            options.confirm_not_in_line ||
+            false,
         }),
       }
     );
@@ -526,6 +529,29 @@ async function startCamera() {
         }
       );
     }
+    if (
+      data.code ===
+      "NOT_IN_LINE"
+    ) {
+      const confirmed =
+        window.confirm(
+          "משטח זה לא מופיע בקו הפצה סוסנא.\n\nהאם לאשר את הסריקה?"
+        );
+
+      if (!confirmed) {
+        return null;
+      }
+
+      return requestScan(
+        orderNumber,
+        {
+          ...options,
+          confirm_not_in_line:
+            true,
+        }
+      );
+    }
+
 
     // ==========================================
     // מעבר לכמות שהוגדרה

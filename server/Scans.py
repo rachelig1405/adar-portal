@@ -30,6 +30,7 @@ class ScanRequest(BaseModel):
     notes: str | None = None
     confirm_overage: bool = False
     confirm_not_in_forecast: bool = False
+    confirm_not_in_line: bool = False
 #פונקציה למציאת או יצירת העמסה
 def get_or_create_today_loading():
     now = datetime.now(
@@ -182,11 +183,12 @@ def create_loading_scan(
         }
     if (
         line!="סוסנא"
+        and not scan.confirm_not_in_line
     
 ):
         return {
                 "success": False,
-                "code": "NOT_IN_FORECAST",
+                "code": "NOT_IN_LINE",
                 "message": (
                     "משטח זה לא מופיע "
                     "בקו הפצה סוסנא"
@@ -260,6 +262,7 @@ def create_loading_scan(
     has_exception = (
         is_overage
         or is_not_in_forecast
+        or 
 )
     # --------------------------------
     # 6. יצירת רשומת סריקה
@@ -285,9 +288,9 @@ def create_loading_scan(
     elif is_overage:
         scan_fields["סוג החריגה"] = "מעל הצפי"
 
-    if is_overage:
+    if line !="סוסנא":
         scan_fields["סוג החריגה"] = (
-            "מעל הצפי"
+            "לא בקו הפצה סוסנא"
         )
 
     if scan.notes:

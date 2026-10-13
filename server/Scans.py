@@ -184,23 +184,23 @@ def create_loading_scan(
         line!="סוסנא"
     
 ):
-        return {
-            "success": False,
-            "code": "NOT_IN_FORECAST",
-            "message": (
-                "משטח זה לא מופיע "
-                "בקו הפצה סוסנא"
-            ),
-            "order_number": scan.order_number,
-            "customer": (
-                order_fields.get(
-                    "שם לקוח",
-                    ""
-                )
-                or ""
-            ),
-            "requires_confirmation": True,
-        }
+            return {
+                "success": False,
+                "code": "NOT_IN_FORECAST",
+                "message": (
+                    "משטח זה לא מופיע "
+                    "בקו הפצה סוסנא"
+                ),
+                "order_number": scan.order_number,
+                "customer": (
+                    order_fields.get(
+                        "שם לקוח",
+                        ""
+                    )
+                    or ""
+                ),
+                "requires_confirmation": True,
+            }
 
 
     # --------------------------------

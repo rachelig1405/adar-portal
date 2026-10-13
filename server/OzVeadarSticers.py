@@ -749,10 +749,11 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
     barcode_digits = clean_digits(barcode_value)
    
     name= val(row, COL_NAME)
-    if len(barcode_digits) != 13:
-        raise ValueError(
-           f"ברקוד לא תקין למק״ט {sku}: {barcode_digits}"
-        )
+    if len(barcode_digits) not in (12, 13):
+    raise ValueError(
+        f"ברקוד לא תקין למק״ט {sku}: {barcode_digits}. "
+        "נדרשות 12 ספרות עבור UPC-A או 13 עבור EAN-13"
+    )
     
     scale_x = 1
     scale_y = 1   

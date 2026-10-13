@@ -96,7 +96,7 @@ const admin=[
 const other=[
   
 
-  {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"pink"},
+  {key:"stickers",title:"יצירת סטיקרים צעצועים",subtitle:"", icon: "📄",color:"pink"},
   {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
   {
   key: "generalChat",

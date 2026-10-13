@@ -93,9 +93,25 @@ const admin=[
   color:"green"}
  
 ];
+const other=[
+  
+
+  {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"pink"},
+  {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
+  {
+  key: "generalChat",
+  title: "צ׳אט עובדים",
+  subtitle: "התכתבות כללית בין עובדי החברה",
+  icon: "💬",
+  color:"yellow"
+},
+
+ 
+];
 export function getMenu(role) {
   if (role === "warehouse") return warehouse;
   if (role === "office") return office;
   if (role === "admin") return admin;
+  if (role === "other") return other;
   return [...office, ...warehouse.filter(w => !office.find(o => o.key === w.key))];
 }

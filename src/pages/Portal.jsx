@@ -47,6 +47,7 @@ function getRoleTitle(role) {
     office: "משרד",
     manager: "מנהל מחסן",
     admin: "מנהל מערכת",
+    other: "",
   };
 
   return roleTitles[role] || "עובד";

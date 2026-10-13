@@ -184,7 +184,7 @@ def create_loading_scan(
         line!="סוסנא"
     
 ):
-            return {
+        return {
                 "success": False,
                 "code": "NOT_IN_FORECAST",
                 "message": (
@@ -200,7 +200,7 @@ def create_loading_scan(
                     or ""
                 ),
                 "requires_confirmation": True,
-            }
+        }
 
 
     # --------------------------------

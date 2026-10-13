@@ -560,8 +560,7 @@ html, body {
 /* תיאור המוצר */
 
 .description {
-    font-family: "FbMatritsaNarrow", sans-serif;
-    font-weight: 500;
+   
     position: absolute;
     top: 78mm;
     right: 18mm;
@@ -578,8 +577,7 @@ html, body {
 /* מק"ט בצד ימין */
 
 .sku {
-    font-family: "FbMatritsaNarrow", sans-serif;
-    font-weight: 500;
+   
     position: absolute;
     top: 137mm;
     right: 18mm;
@@ -631,8 +629,7 @@ html, body {
 }
 /* כמות - מתחת למק"ט בצד ימין */
 .quantity {
-    font-family: "FbMatritsaNarrow", sans-serif;
-    font-weight: 500;
+    
     position: absolute;
     top: 163mm;
     right: 18mm;

@@ -262,7 +262,7 @@ def create_loading_scan(
     has_exception = (
         is_overage
         or is_not_in_forecast
-        or 
+        or line!="סוסנא"
 )
     # --------------------------------
     # 6. יצירת רשומת סריקה

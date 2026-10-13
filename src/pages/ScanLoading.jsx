@@ -8,7 +8,7 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function ScanLoading({ user }) {
+export default function ScanLoading({ user, onClose, }) {
   const videoRef = useRef(null);
   const controlsRef = useRef(null);
   const scanInProgressRef = useRef(false);
@@ -668,204 +668,206 @@ async function startCamera() {
   // =====================================================
 
   return (
-    <div className="scan-loading">
-      <h1>
-        העמסה בסריקה
-      </h1>
+    <div className="scan-loading-overlay">
+        <div className="scan-loading">
+        <h1>
+            העמסה בסריקה
+        </h1>
 
-      {/* סיכום */}
+        {/* סיכום */}
 
-     <div className="scan-loading__summary">
+        <div className="scan-loading__summary">
 
-  <div className="scan-loading__summary-card">
-    <span className="scan-loading__summary-label">
-      בצפי
-    </span>
+    <div className="scan-loading__summary-card">
+        <span className="scan-loading__summary-label">
+        בצפי
+        </span>
 
-    <span className="scan-loading__summary-value">
-      {summary.expected}
-    </span>
-  </div>
+        <span className="scan-loading__summary-value">
+        {summary.expected}
+        </span>
+    </div>
 
-  <div className="scan-loading__summary-card">
-    <span className="scan-loading__summary-label">
-      הועמסו
-    </span>
+    <div className="scan-loading__summary-card">
+        <span className="scan-loading__summary-label">
+        הועמסו
+        </span>
 
-    <span className="scan-loading__summary-value">
-      {summary.loaded}
-    </span>
-  </div>
+        <span className="scan-loading__summary-value">
+        {summary.loaded}
+        </span>
+    </div>
 
-  <div className="scan-loading__summary-card">
-    <span className="scan-loading__summary-label">
-      נותרו
-    </span>
+    <div className="scan-loading__summary-card">
+        <span className="scan-loading__summary-label">
+        נותרו
+        </span>
 
-    <span className="scan-loading__summary-value">
-      {summary.remaining}
-    </span>
-  </div>
+        <span className="scan-loading__summary-value">
+        {summary.remaining}
+        </span>
+    </div>
 
-</div>
+    </div>
 
-      {/* כפתור סריקה */}
+        {/* כפתור סריקה */}
 
-      {!cameraOpen && (
-        <button
-        className="scan-loading__scan-button"
-        onClick={startCamera}
-        disabled={loading}
+        {!cameraOpen && (
+            <button
+            className="scan-loading__scan-button"
+            onClick={startCamera}
+            disabled={loading}
+            >
+            {loading
+                ? "מעבד סריקה..."
+                : "📷 סרוק משטח"}
+            </button>
+        )}
+
+        {/* מצלמה */}
+
+        {cameraOpen && (
+            <div
+            style={{
+                marginTop: 20,
+            }}
+            >
+            <div
+                className="scan-loading__camera"
+            >
+                <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="scan-loading__video"
+                />
+
+                {/* מסגרת לכיוון הברקוד */}
+                <div className="scan-loading__target" />
+
+                
+            </div>
+
+            <button
+                onClick={stopCamera}
+                style={{
+                width: "100%",
+                marginTop: 10,
+                fontSize: 22,
+                padding: 15,
+                }}
+            >
+                ביטול
+            </button>
+            </div>
+        )}
+
+        {/* הודעה */}
+
+        {message && (
+            <div
+            style={{
+                marginTop: 25,
+                padding: 18,
+                fontSize: 23,
+                fontWeight: "bold",
+                borderRadius: 12,
+                background: "#eee",
+            }}
+            >
+            {message}
+            </div>
+        )}
+
+        {/* תוצאת הסריקה */}
+
+        {lastScan && (
+            <div
+            style={{
+                marginTop: 20,
+                padding: 22,
+                border:
+                "2px solid #ccc",
+                borderRadius: 16,
+                fontSize: 22,
+            }}
+            >
+            <h2>
+                הזמנה{" "}
+                {lastScan.order_number}
+            </h2>
+
+            <div>
+                צפי:{" "}
+                {lastScan.expected}
+            </div>
+
+            <div>
+                הועמסו:{" "}
+                {lastScan.loaded}
+            </div>
+
+            <div>
+                נותרו:{" "}
+                {lastScan.remaining}
+            </div>
+            </div>
+        )}
+
+        {/* הזנה ידנית */}
+
+        <form
+            onSubmit={submitManual}
+            style={{
+            marginTop: 30,
+            display: "flex",
+            gap: 10,
+            }}
         >
-        {loading
-            ? "מעבד סריקה..."
-            : "📷 סרוק משטח"}
-        </button>
-      )}
-
-      {/* מצלמה */}
-
-      {cameraOpen && (
-        <div
-          style={{
-            marginTop: 20,
-          }}
-        >
-          <div
-            className="scan-loading__camera"
-          >
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              className="scan-loading__video"
+            <input
+            value={manualOrder}
+            onChange={(e) =>
+                setManualOrder(
+                e.target.value
+                )
+            }
+            placeholder="הקלד מספר הזמנה"
+            style={{
+                flex: 1,
+                fontSize: 22,
+                padding: 15,
+            }}
             />
 
-            {/* מסגרת לכיוון הברקוד */}
-            <div className="scan-loading__target" />
-
-            
-          </div>
-
-          <button
-            onClick={stopCamera}
+            <button
+            type="submit"
+            disabled={loading}
             style={{
-              width: "100%",
-              marginTop: 10,
-              fontSize: 22,
-              padding: 15,
+                fontSize: 20,
+                padding:
+                "10px 25px",
             }}
-          >
-            ביטול
-          </button>
-        </div>
-      )}
-
-      {/* הודעה */}
-
-      {message && (
-        <div
-          style={{
-            marginTop: 25,
-            padding: 18,
-            fontSize: 23,
-            fontWeight: "bold",
-            borderRadius: 12,
-            background: "#eee",
-          }}
-        >
-          {message}
-        </div>
-      )}
-
-      {/* תוצאת הסריקה */}
-
-      {lastScan && (
-        <div
-          style={{
-            marginTop: 20,
-            padding: 22,
-            border:
-              "2px solid #ccc",
-            borderRadius: 16,
-            fontSize: 22,
-          }}
-        >
-          <h2>
-            הזמנה{" "}
-            {lastScan.order_number}
-          </h2>
-
-          <div>
-            צפי:{" "}
-            {lastScan.expected}
-          </div>
-
-          <div>
-            הועמסו:{" "}
-            {lastScan.loaded}
-          </div>
-
-          <div>
-            נותרו:{" "}
-            {lastScan.remaining}
-          </div>
-        </div>
-      )}
-
-      {/* הזנה ידנית */}
-
-      <form
-        onSubmit={submitManual}
-        style={{
-          marginTop: 30,
-          display: "flex",
-          gap: 10,
-        }}
-      >
-        <input
-          value={manualOrder}
-          onChange={(e) =>
-            setManualOrder(
-              e.target.value
-            )
-          }
-          placeholder="הקלד מספר הזמנה"
-          style={{
-            flex: 1,
-            fontSize: 22,
-            padding: 15,
-          }}
-        />
-
+            >
+            אישור
+            </button>
+        </form>
         <button
-          type="submit"
-          disabled={loading}
-          style={{
-            fontSize: 20,
-            padding:
-              "10px 25px",
-          }}
+        type="button"
+        className="scan-loading__finish-button"
+        onClick={finishLoading}
+        disabled={
+            finishing ||
+            loadingFinished
+        }
         >
-          אישור
+        {finishing
+            ? "מסיים העמסה..."
+            : loadingFinished
+            ? "✓ ההעמסה הסתיימה"
+            : "🏁 סיום העמסה"}
         </button>
-      </form>
-      <button
-    type="button"
-    className="scan-loading__finish-button"
-    onClick={finishLoading}
-    disabled={
-        finishing ||
-        loadingFinished
-    }
-    >
-    {finishing
-        ? "מסיים העמסה..."
-        : loadingFinished
-        ? "✓ ההעמסה הסתיימה"
-        : "🏁 סיום העמסה"}
-    </button>
+        </div>
     </div>
   );
 }

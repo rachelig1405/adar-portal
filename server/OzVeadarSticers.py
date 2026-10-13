@@ -350,9 +350,15 @@ def barcode_url(barcode_value: str) -> str:
     """
     digits = clean_digits(barcode_value)
 
-    if len(digits) != 13:
+    if len(digits) == 12:
+        barcode_type = "UPCA"
+
+    elif len(digits) == 13:
+        barcode_type = "EANX"
+
+    else:
         raise ValueError(
-            f"ברקוד EAN-13 חייב להכיל בדיוק 13 ספרות. התקבל: {digits}"
+            f"הברקוד חייב להכיל 12 או 13 ספרות. התקבל: {digits}"
         )
 
     barcode_folder = Path(__file__).parent / "_barcodes"
@@ -363,7 +369,7 @@ def barcode_url(barcode_value: str) -> str:
         zint_exe = get_zint_executable()
         command = [
             str(zint_exe),
-            "--barcode=EANX",
+            f"--barcode={barcode_type}",
             f"--data={digits}",
             f"--output={svg_path}",
             "--height=50",
@@ -729,25 +735,17 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
     Y_html = 25
     barcode_digits = clean_digits(barcode_value)
    
-
+    name= val(row, COL_NAME),
     if len(barcode_digits) != 13:
         raise ValueError(
            f"ברקוד לא תקין למק״ט {sku}: {barcode_digits}"
         )
-
-    barcode_first = barcode_digits[0]
-    barcode_left = barcode_digits[1:7]
-    barcode_right = barcode_digits[7:13]
-
     
     scale_x = 1
     scale_y = 1   
     scale = (scale_x + scale_y) / 2
     
-    try:
-        cbm = f"{float(cbm):.4f}"
-    except (ValueError, TypeError):
-        cbm = ""
+   
     context = {
         "sku": sku,
         
@@ -755,9 +753,7 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
         
         "barcode": clean_digits(barcode_value),
         "barcode_url": barcode_url(barcode_value),
-        "barcode_first": barcode_first,
-        "barcode_left": barcode_left,
-        "barcode_right": barcode_right,
+      
         "photo_data": photo_data,
         "range": range,
         "logo": local_file_to_data_uri(str(LOGO_PATH)),
@@ -768,7 +764,7 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
         "scale_x": scale_x,
         "scale_y": scale_y,
         "scale": scale,
-       
+        "name":name,
         "barcode_width_mr": BARCODE_WIDTH_MR_MM,
         
         "barcode_width_st": BARCODE_WIDTH_ST_MM,

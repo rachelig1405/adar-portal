@@ -568,7 +568,7 @@ html, body {
     max-height: 37mm;
     text-align: right;
     direction: rtl;
-    font-size: 9mm;
+    font-size: 11mm;
     line-height: 1.2;
     overflow: hidden;
     overflow-wrap: break-word;

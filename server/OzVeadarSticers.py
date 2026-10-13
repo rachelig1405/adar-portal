@@ -552,8 +552,8 @@ html, body {
     top: 7mm;
     left: 50%;
     transform: translateX(-50%);
-    width: 65mm;
-    height: 60mm;
+    width: 80mm;
+    height: 70mm;
     object-fit: contain;
 }
 

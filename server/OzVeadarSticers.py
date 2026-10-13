@@ -16,8 +16,8 @@ from playwright.async_api import async_playwright
 # =========================
 # שמות עמודות באקסל
 # =========================
-COL_SKU = " CUSTOMER ITEM NO"          # מק"ט / קוד פנימי
-COL_ITEM_NO = "STICKER ITEM NO"    # ITEM NO
+COL_SKU = "CUSTOMER ITEM NO"          # מק"ט / קוד פנימי
+
 COL_PCS = "OUTER"                  # PCS
 
 COL_BARCODE = "BARCODE"            # ברקוד EAN13 - 12/13 ספרות

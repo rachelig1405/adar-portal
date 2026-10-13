@@ -19,6 +19,20 @@ export default function ScanLoading({ user, onClose, }) {
   const [manualOrder, setManualOrder] = useState("");
   const [lastScan, setLastScan] = useState(null);
   const [message, setMessage] = useState("");
+  const [
+  finishPreviewOpen,
+  setFinishPreviewOpen
+ ] = useState(false);
+
+const [
+  finishPreviewOrders,
+  setFinishPreviewOrders
+ ] = useState([]);
+
+const [
+  finishPreviewLoading,
+  setFinishPreviewLoading
+] = useState(false);
 
   const [summary, setSummary] = useState({
     expected: 0,
@@ -244,6 +258,45 @@ export default function ScanLoading({ user, onClose, }) {
 
   } finally {
     setFinishing(false);
+  }
+}
+ async function openFinishPreview() {
+  if (finishPreviewLoading) {
+    return;
+  }
+
+  setFinishPreviewLoading(true);
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/loading/finish-preview`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "שגיאה בטעינת סיכום ההעמסה"
+      );
+    }
+
+    setFinishPreviewOrders(
+      data.orders || []
+    );
+
+    setFinishPreviewOpen(true);
+
+  } catch (error) {
+    console.error(error);
+
+    setMessage(
+      error.message ||
+      "לא ניתן לקבל את סיכום ההעמסה"
+    );
+
+  } finally {
+    setFinishPreviewLoading(false);
   }
 }
   // =====================================================
@@ -882,7 +935,7 @@ async function startCamera() {
         <button
         type="button"
         className="scan-loading__finish-button"
-        onClick={finishLoading}
+        onClick={openFinishPreview}
         disabled={
             finishing ||
             loadingFinished
@@ -894,6 +947,125 @@ async function startCamera() {
             ? "✓ ההעמסה הסתיימה"
             : "🏁 סיום העמסה"}
         </button>
+        {finishPreviewOpen && (
+  <div className="finish-preview-backdrop">
+
+    <div className="finish-preview-window">
+
+      <div className="finish-preview-header">
+
+        <div>
+          <h2>סיכום העמסה</h2>
+
+          <p>
+            כל ההזמנות שנסרקו בהעמסה
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            setFinishPreviewOpen(false)
+          }
+        >
+          ✕
+        </button>
+
+      </div>
+
+
+      <div className="finish-preview-table">
+
+        <div className="finish-preview-row finish-preview-title-row">
+          <div>הזמנה</div>
+          <div>בצפי</div>
+          <div>הועמסו</div>
+          <div>חריגות</div>
+        </div>
+
+
+        {finishPreviewOrders.map(
+          (order) => (
+
+            <div
+              key={order.order_id}
+              className={
+                `finish-preview-row ${
+                  order.has_exception
+                    ? "finish-preview-row--error"
+                    : "finish-preview-row--ok"
+                }`
+              }
+            >
+
+              <div>
+                <strong>
+                  {order.order_number}
+                </strong>
+
+                {order.customer && (
+                  <small>
+                    {Array.isArray(
+                      order.customer
+                    )
+                      ? order.customer.join(", ")
+                      : order.customer}
+                  </small>
+                )}
+              </div>
+
+              <div>
+                {order.expected}
+              </div>
+
+              <div>
+                {order.loaded}
+              </div>
+
+              <div>
+                {order.has_exception
+                  ? order.exceptions.join(
+                      " | "
+                    )
+                  : "תקין"}
+              </div>
+
+            </div>
+          )
+        )}
+
+      </div>
+
+
+      <div className="finish-preview-actions">
+
+        <button
+          type="button"
+          className="finish-preview-cancel"
+          onClick={() =>
+            setFinishPreviewOpen(false)
+          }
+        >
+          חזרה לסריקות
+        </button>
+
+        <button
+          type="button"
+          className="finish-preview-confirm"
+          onClick={async () => {
+            setFinishPreviewOpen(false);
+            await finishLoading();
+          }}
+        >
+          ✓ אשר סיום העמסה
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
         </div>
     </div>
     </div>

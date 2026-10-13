@@ -10,6 +10,7 @@ from fastapi import Query
 from fastapi.responses import FileResponse
 import shutil
 import tempfile
+
 import zipfile
 from fastapi import BackgroundTasks
 from pathlib import Path
@@ -28,7 +29,7 @@ from Scans import (
 )
 
 from FinishLoading import (FinishLoadingRequest,
-    finish_loading)
+    finish_loading,get_loading_finish_preview)
 #הגדרת נתיב לדיסק
 import uuid
 import traceback
@@ -1024,7 +1025,9 @@ def finish_loading_api(
     request: FinishLoadingRequest
 ):
     return finish_loading(request)
-    
+@app.get("/api/loading/finish-preview")
+def loading_finish_preview():
+    return get_loading_finish_preview()    
 # ==========================================
 # API חדש - יצירת מדבקות MR ו-ST החדשות
 # ==========================================

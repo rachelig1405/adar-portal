@@ -354,13 +354,14 @@ def create_loading_scan(
 def get_loading_summary():
     # כל ההזמנות שנמצאות בצפי
     orders = get_all_airtable_records(
-        AIRTABLE_ORDERS_TABLE,
-        filter_formula= f'AND('
-        f'{{בצפי}}=1,'
-        f'{{קו הפצה}}="סוסנא"'
-        f')'
+    AIRTABLE_ORDERS_TABLE,
+    filter_formula=(
+        'AND('
+        '{בצפי}=1,'
+        '{קו הפצה}="סוסנא"'
+        ')'
     )
-
+)
     total_expected = 0
     total_loaded = 0
 

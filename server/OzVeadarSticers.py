@@ -735,7 +735,7 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
     Y_html = 25
     barcode_digits = clean_digits(barcode_value)
    
-    name= val(row, COL_NAME),
+    name= val(row, COL_NAME)
     if len(barcode_digits) != 13:
         raise ValueError(
            f"ברקוד לא תקין למק״ט {sku}: {barcode_digits}"

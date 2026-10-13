@@ -58,6 +58,7 @@ export default function ScanLoading({ user }) {
         setSummary(data.summary);
         setOrders(data.orders || []);
       }
+      return data; 
     } catch (error) {
       console.error("Summary error:", error);
     }

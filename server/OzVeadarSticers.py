@@ -40,9 +40,9 @@ REQUIRED_VALUE_COLUMNS = {
 # קובעים רק רוחב. הגובה מחושב אוטומטית בלי עיוות.
 # =========================================================
 
-BARCODE_WIDTH_MR_MM = 68.0
+BARCODE_WIDTH_MR_MM = 55.0
 BARCODE_WIDTH_HTS_MM = 25.0
-BARCODE_WIDTH_ST_MM = 31.0
+BARCODE_WIDTH_ST_MM = 28.0
 
 # =========================================================
 # שלוש תיקיות קבועות שבהן מחפשים תיקייה ישנה בשם המק"ט.
@@ -380,7 +380,7 @@ def barcode_url(barcode_value: str) -> str:
             f"--barcode={barcode_type}",
             f"--data={digits}",
             f"--output={svg_path}",
-            "--height=55",
+            "--height=60",
             "--guarddescent=5",
             "--textgap=1",
             "--quietzones",
@@ -549,11 +549,11 @@ html, body {
 
 .reference-logo {
     position: absolute;
-    top: 12mm;
+    top: 9mm;
     left: 50%;
     transform: translateX(-50%);
-    width: 58mm;
-    height: 55mm;
+    width: 62mm;
+    height: 57mm;
     object-fit: contain;
 }
 

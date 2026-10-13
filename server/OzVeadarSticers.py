@@ -101,11 +101,11 @@ def validate_product_row(row, excel_row_number: int) -> list[str]:
             f"(הערך שהתקבל: {barcode_original})"
         )
 
-    elif len(barcode_digits) != 13:
+    elif len(barcode_digits) not in (12, 13):
         errors.append(
-            f"מק״ט {row_identifier}: הברקוד חייב להכיל בדיוק 13 ספרות "
-            f"(התקבלו {len(barcode_digits)} ספרות: {barcode_digits})"
-        )
+        f"מק״ט {row_identifier}: הברקוד חייב להכיל 12 או 13 ספרות "
+        f"(התקבלו {len(barcode_digits)} ספרות: {barcode_digits})"
+    )
 
     return errors
 def write_validation_report(

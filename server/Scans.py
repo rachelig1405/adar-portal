@@ -180,7 +180,7 @@ def create_loading_scan(
             ),
             "requires_confirmation": True,
         }
-        if (
+    if (
         line!="סוסנא"
     
 ):

@@ -254,10 +254,10 @@ def create_loading_scan(
         scan_fields["סוג החריגה"] = "לא בצפי"
 
     elif is_overage:
-        scan_fields["סוג חריגה"] = "מעל הצפי"
+        scan_fields["סוג החריגה"] = "מעל הצפי"
 
     if is_overage:
-        scan_fields["סוג חריגה"] = (
+        scan_fields["סוג החריגה"] = (
             "מעל הצפי"
         )
 

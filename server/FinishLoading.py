@@ -194,3 +194,147 @@ def finish_loading(
             "העמסה נסגרה עם חריגות"
         ),
     }
+def get_loading_finish_preview():
+    loading = get_today_open_loading()
+
+    if not loading:
+        raise HTTPException(
+            status_code=404,
+            detail="לא נמצאה העמסה פתוחה להיום"
+        )
+
+    loading_id = loading["id"]
+
+    # כל הסריקות - כרגע אפשר לסנן בפייתון
+    scans = get_all_airtable_records(
+        AIRTABLE_LOADING_SCANS_TABLE
+    )
+
+    loading_scans = []
+
+    for scan in scans:
+        fields = scan.get("fields", {})
+
+        loadings = fields.get("העמסות", []) or []
+
+        if loading_id in loadings:
+            loading_scans.append(scan)
+
+    # קיבוץ לפי הזמנה
+    grouped = {}
+
+    for scan in loading_scans:
+        fields = scan.get("fields", {})
+
+        order_links = fields.get("הזמנה", []) or []
+
+        if not order_links:
+            continue
+
+        order_id = order_links[0]
+
+        if order_id not in grouped:
+            grouped[order_id] = {
+                "loaded": 0,
+                "exceptions": set(),
+            }
+
+        grouped[order_id]["loaded"] += 1
+
+        exception_kind = (
+            fields.get("סוג החריגה")
+            or ""
+        )
+
+        if exception_kind:
+            grouped[order_id][
+                "exceptions"
+            ].add(exception_kind)
+
+    result = []
+
+    for order_id, data in grouped.items():
+
+        url = (
+            f"https://api.airtable.com/v0/"
+            f"{AIRTABLE_BASE_ID}/"
+            f"{AIRTABLE_ORDERS_TABLE}/"
+            f"{order_id}"
+        )
+
+        response = requests.get(
+            url,
+            headers=airtable_headers(),
+            timeout=30,
+        )
+
+        if response.status_code != 200:
+            continue
+
+        order_record = response.json()
+
+        fields = order_record.get(
+            "fields",
+            {}
+        )
+
+        expected = (
+            fields.get(
+                "כמות משטחים",
+                0
+            )
+            or 0
+        )
+
+        loaded = data["loaded"]
+
+        exceptions = list(
+            data["exceptions"]
+        )
+
+        # פער בכמות
+        difference = loaded - expected
+
+        if difference < 0:
+            exceptions.append(
+                f"חסר {abs(difference)}"
+            )
+
+        elif difference > 0:
+            exceptions.append(
+                f"עודף {difference}"
+            )
+
+        result.append({
+            "order_id": order_id,
+
+            "order_number": (
+                fields.get(
+                    "מספר הזמנה",
+                    ""
+                )
+            ),
+
+            "customer": (
+                fields.get(
+                    "שם לקוח",
+                    ""
+                )
+                or ""
+            ),
+
+            "expected": expected,
+
+            "loaded": loaded,
+
+            "exceptions": exceptions,
+
+            "has_exception":
+                len(exceptions) > 0,
+        })
+
+    return {
+        "success": True,
+        "loading_id": loading_id,
+        "orders": result,
+    }

@@ -142,12 +142,8 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
   }
 
   function handleAction(item) {
-    if (item.key === "stickers" && user.role !== "admin") {
-      alert("הפעולה מותרת למנהל המערכת בלבד");
-      return;
-   
-    }
-     if (item.key === "timeClock") {
+    
+   if (item.key === "timeClock") {
     handleTimeClockAction();
     return;
   }

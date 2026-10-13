@@ -147,14 +147,21 @@ def create_loading_scan(
     in_forecast = (
     order_fields.get("בצפי", 0)
     or 0
+)  line= (
+    order_fields.get("קו הפצה", 0)
+    or 0
 )
+
+
 
     is_not_in_forecast = (
         int(in_forecast) != 1
     )
+    
     if (
     is_not_in_forecast
     and not scan.confirm_not_in_forecast
+    
 ):
         return {
             "success": False,
@@ -173,6 +180,28 @@ def create_loading_scan(
             ),
             "requires_confirmation": True,
         }
+        if (
+        line!="סוסנא"
+    
+):
+        return {
+            "success": False,
+            "code": "NOT_IN_FORECAST",
+            "message": (
+                "משטח זה לא מופיע "
+                "בקו הפצה סוסנא"
+            ),
+            "order_number": scan.order_number,
+            "customer": (
+                order_fields.get(
+                    "שם לקוח",
+                    ""
+                )
+                or ""
+            ),
+            "requires_confirmation": True,
+        }
+
 
     # --------------------------------
     # 3. הצפי שהבודק הזין

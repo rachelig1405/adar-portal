@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from DB import (
     airtable_headers,
     get_all_airtable_records,
+    update_order_workflow
 )
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 AIRTABLE_LOADINGS_TABLE = os.getenv(
@@ -149,7 +150,7 @@ def create_loading_scan(
     order_fields.get("בצפי", 0)
     or 0
 )  
-    line= order_fields.get("קו הפצה", 0)
+    line= order_fields.get("קו הפצה", "")
     
 
 
@@ -203,8 +204,26 @@ def create_loading_scan(
                 ),
                 "requires_confirmation": True,
         }
-
-
+    #בדיקה אם ההזמנה עברה בדיקה
+    status=order_fields.get("סטטוס", "")
+    if(status!="בבדיקה"):
+        return{
+            "success": False,
+                "code": "NOT_CHECKED",
+                "message": (
+                    "אין להעמיס הזמנה שלא נבדקה "
+                
+                ),
+                "order_number": scan.order_number,
+                "customer": (
+                    order_fields.get(
+                        "שם לקוח",
+                        ""
+                    )
+                    or ""
+                ),
+                "requires_confirmation": True,
+        }
     # --------------------------------
     # 3. הצפי שהבודק הזין
     # --------------------------------
@@ -334,6 +353,9 @@ def create_loading_scan(
         expected - loaded_after,
         0
     )
+    if remaining==0:
+        update_order_workflow(order_id=order_id,status="הועמס")
+
 
     return {
         "success": True,

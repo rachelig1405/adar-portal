@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { BrowserMultiFormatReader } from "@zxing/browser";
-
+import "../data/"
 import {
   BarcodeFormat,
   DecodeHintType
@@ -668,7 +668,27 @@ async function startCamera() {
   // =====================================================
 
   return (
-    <div className="scan-loading-overlay">
+    <div className="modal-backdrop">
+    <div className="form-window scan-loading-window">
+
+      <div className="form-header">
+        <div>
+          <div className="frame-kicker">
+            ADAR Portal
+          </div>
+
+          <strong>
+            העמסה בסריקה
+          </strong>
+        </div>
+
+        <button
+          type="button"
+          onClick={onClose}
+        >
+          חזרה
+        </button>
+      </div>
         <div className="scan-loading">
             <button
                 type="button"
@@ -875,6 +895,7 @@ async function startCamera() {
             : "🏁 סיום העמסה"}
         </button>
         </div>
+    </div>
     </div>
   );
 }

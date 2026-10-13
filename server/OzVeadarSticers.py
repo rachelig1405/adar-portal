@@ -740,7 +740,7 @@ html, body {
     font-size: 3.5mm;
     line-height: 1.15;
     white-space: nowrap;
-
+}
 
 
 .description {

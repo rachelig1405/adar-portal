@@ -752,7 +752,7 @@ html, body {
     overflow: hidden;
     text-overflow: ellipsis;
     margin-top: .3mm;
-    line-height:1.5;
+    line-height:1.2;
 }
 
 .barcode {

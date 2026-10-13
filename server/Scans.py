@@ -147,10 +147,10 @@ def create_loading_scan(
     in_forecast = (
     order_fields.get("בצפי", 0)
     or 0
-)  line= (
-    order_fields.get("קו הפצה", 0)
-    or 0
-)
+)  
+    line= order_fields.get("קו הפצה", 0)
+    
+
 
 
 

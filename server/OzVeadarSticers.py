@@ -25,7 +25,7 @@ COL_PHOTO = "PHOTO"
 COL_NAME="NAME"
                # נתיב תמונת מוצר במחשב
 
-LOGO_PATH = Path(__file__).parent / "לוג"
+LOGO_PATH = Path(__file__).parent/ "ozveadar.jpeg"
 
 # העמודות שחייב להיות בהן ערך בכל שורת מוצר
 REQUIRED_VALUE_COLUMNS = {
@@ -340,8 +340,16 @@ def local_file_to_data_uri(path_value: str) -> str:
 
     data = base64.b64encode(path.read_bytes()).decode("ascii")
     return f"data:image/{ext};base64,{data}"
+def font_to_data_uri(filename):
+    path = Path(__file__).resolve().parent / "Fonts" / filename
+
+    if not path.is_file():
+        raise FileNotFoundError(f"קובץ הגופן לא נמצא: {path}")
+
+    encoded = base64.b64encode(path.read_bytes()).decode("ascii")
+    return f"data:font/ttf;base64,{encoded}"
 def get_logo_data_uri():
-    logo_path = Path(__file__).parent / "לוגו.jpeg"
+    logo_path = Path(__file__).parent / "ozveadar.jpeg"
     return local_file_to_data_uri(str(logo_path))
 def barcode_url(barcode_value: str) -> str:
     """
@@ -372,7 +380,7 @@ def barcode_url(barcode_value: str) -> str:
             f"--barcode={barcode_type}",
             f"--data={digits}",
             f"--output={svg_path}",
-            "--height=50",
+            "--height=55",
             "--guarddescent=5",
             "--textgap=1",
             "--quietzones",
@@ -504,6 +512,17 @@ CARTON_HTML = """
     size: 200mm 200mm;
     margin: 0;
 }
+@font-face {
+    font-family: "GuttmanDrogolin";
+    src: url("{{ font_drog_normal }}") format("truetype");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "GuttmanDrogolin";
+    src: url("{{ font_drog_bold }}") format("truetype");
+    font-weight: 700;
+}
 
 * {
     box-sizing: border-box;
@@ -541,6 +560,8 @@ html, body {
 /* תיאור המוצר */
 
 .description {
+    font-family: "FbMatritsaNarrow", sans-serif;
+    font-weight: 500;
     position: absolute;
     top: 78mm;
     right: 18mm;
@@ -557,6 +578,8 @@ html, body {
 /* מק"ט בצד ימין */
 
 .sku {
+    font-family: "FbMatritsaNarrow", sans-serif;
+    font-weight: 500;
     position: absolute;
     top: 137mm;
     right: 18mm;
@@ -579,12 +602,16 @@ html, body {
 }
 
 .mini-sku {
+    font-family: "GuttmanDrogolin", serif;
+    font-weight: 400;
     font-size: 3.5mm;
     line-height: 1.15;
     white-space: nowrap;
 }
 
 .mini-name {
+    font-family: "GuttmanDrogolin", serif;
+    font-weight: 400;
     font-size: 2.8mm;
     line-height: 1.15;
     direction: rtl;
@@ -604,6 +631,8 @@ html, body {
 }
 /* כמות - מתחת למק"ט בצד ימין */
 .quantity {
+    font-family: "FbMatritsaNarrow", sans-serif;
+    font-weight: 500;
     position: absolute;
     top: 163mm;
     right: 18mm;
@@ -679,6 +708,17 @@ WARNING_HTML = """
     margin: 0;
 }
 
+@font-face {
+    font-family: "GuttmanDrogolin";
+    src: url("{{ font_drog_normal }}") format("truetype");
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: "GuttmanDrogolin";
+    src: url("{{ font_drog_bold }}") format("truetype");
+    font-weight: 700;
+}
 * { box-sizing: border-box; }
 
 html, body {
@@ -698,13 +738,17 @@ html, body {
 }
 
 .sku {
-    font-size: calc({{height_warning}}mm * .064);
+    font-family: "GuttmanDrogolin", serif;
+    font-weight: 400;
+    font-size: 5.74pt;
     white-space: nowrap;
 }
 
 .description {
+    font-family: "GuttmanDrogolin", serif;
+    font-weight: 400;
     direction: rtl;
-    font-size: calc({{height_warning}}mm * .051);
+    font-size: 3.93pt;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -782,6 +826,8 @@ async def render_templates(row, product_dir: Path, browser, photo_data: str = ""
         "barcode_width_mr": BARCODE_WIDTH_MR_MM,
         
         "barcode_width_st": BARCODE_WIDTH_ST_MM,
+        "font_drog_normal": font_to_data_uri("DROGM.TTF"),
+        "font_drog_bold": font_to_data_uri("DROGB.TTF"),
        
     }
     

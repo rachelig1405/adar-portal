@@ -670,6 +670,13 @@ async function startCamera() {
   return (
     <div className="scan-loading-overlay">
         <div className="scan-loading">
+            <button
+                type="button"
+                className="scan-loading__close"
+                onClick={onClose}
+                >
+                ✕
+            </button>
         <h1>
             העמסה בסריקה
         </h1>

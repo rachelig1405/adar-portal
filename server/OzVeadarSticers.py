@@ -822,8 +822,15 @@ async def process_excel(
 
     old_folder_errors = []
 
-    df = pd.read_excel(excel_path)
-    df.columns = [str(column) for column in df.columns]
+    df = pd.read_excel(excel_path, dtype=str)
+
+    df.columns = [
+        str(column)
+        .replace("\ufeff", "")
+        .replace("\xa0", " ")
+        .strip()
+        for column in df.columns
+ ]
 
     required_columns = [
         COL_SKU, COL_BARCODE,

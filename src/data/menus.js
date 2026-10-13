@@ -98,13 +98,7 @@ const other=[
 
   {key:"stickers",title:"יצירת סטיקרים צעצועים",subtitle:"", icon: "📄",color:"pink"},
   {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
-  {
-  key: "generalChat",
-  title: "צ׳אט עובדים",
-  subtitle: "התכתבות כללית בין עובדי החברה",
-  icon: "💬",
-  color:"yellow"
-},
+
 
  
 ];

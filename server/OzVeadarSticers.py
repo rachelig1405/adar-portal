@@ -602,7 +602,17 @@ html, body {
     height: auto;
     margin: 0 auto;
 }
-
+/* כמות - מתחת למק"ט בצד ימין */
+.quantity {
+    position: absolute;
+    top: 163mm;
+    right: 18mm;
+    width: 82mm;
+    text-align: right;
+    direction: rtl;
+    font-size: 10mm;
+    white-space: nowrap;
+}
 </style>
 </head>
 
@@ -625,6 +635,9 @@ html, body {
     <!-- מק"ט -->
     <div class="sku">
         מק״ט - {{ sku }}
+    </div>
+    <div class="quantity">
+         כמות: {{ pcs }}
     </div>
 
     <!-- ברקוד -->

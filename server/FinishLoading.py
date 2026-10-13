@@ -210,6 +210,9 @@ def get_loading_finish_preview():
         AIRTABLE_LOADING_SCANS_TABLE
     )
 
+
+    
+
     loading_scans = []
 
     for scan in scans:

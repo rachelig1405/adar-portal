@@ -737,7 +737,7 @@ html, body {
 .sku {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
-    font-size: 3.5mm;
+    font-size: 2.5mm;
     line-height: 1.15;
     white-space: nowrap;
 }
@@ -747,7 +747,7 @@ html, body {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
     direction: rtl;
-    font-size: 2.8mm;
+    font-size: 1.8mm;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -380,7 +380,7 @@ def barcode_url(barcode_value: str) -> str:
             f"--barcode={barcode_type}",
             f"--data={digits}",
             f"--output={svg_path}",
-            "--height=60",
+            "--height=63",
             "--guarddescent=5",
             "--textgap=1",
             "--quietzones",
@@ -602,7 +602,7 @@ html, body {
 .mini-sku {
     font-family: "GuttmanDrogolin", serif;
     font-weight: 400;
-    font-size: 3.5mm;
+    font-size: 3.7mm;
     line-height: 1.15;
     white-space: nowrap;
 }

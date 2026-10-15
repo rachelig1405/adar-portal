@@ -354,14 +354,39 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                     ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
                     ],)
             if action==2:
-                    if user_id:
-                            records = [
+                two_minutes_ago = (
+                datetime.now(timezone.utc)
+                - timedelta(minutes=2)
+                    )
+
+                cutoff = two_minutes_ago.isoformat()
+                records = get_all_airtable_records(
+                AIRTABLE_ORDERS_TABLE,
+                filter_formula= 'AND('
+                f'{{סטטוס}}="{status}",'
+                f'IS_BEFORE('
+                f'{{שעת התחלה}},'
+                f'DATETIME_PARSE("{cutoff}")'
+                f')'
+                ')' ,   
+                sort= [ ("עדיפות", "desc"),("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
+                    ],)
+                if user_id:
+                    records = [
                             record
                             for record in records
                             if user_id in (
                                 record.get("fields", {}).get("עובדים") or []
                             )
                         ]
+                else:
+                     records = get_all_airtable_records(
+                AIRTABLE_ORDERS_TABLE,
+                filter_formula= 
+                f'{{סטטוס}}="{status}"',
+                  
+                sort= [ ("עדיפות", "desc"),("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
+                    ],)
     
                     
 

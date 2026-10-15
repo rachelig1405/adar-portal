@@ -1033,7 +1033,7 @@ async function startCamera() {
     </span>
 
     <strong className="loading-finish-card-value">
-      {completedOrdersCount}
+      {summary.loaded}
     </strong>
   </div>
 

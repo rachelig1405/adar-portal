@@ -377,33 +377,77 @@ def create_loading_scan(
         "exception": is_overage,
     }
 def get_loading_summary():
-    # כל ההזמנות שנמצאות בצפי
-    orders = get_all_airtable_records(
-    AIRTABLE_ORDERS_TABLE,
-    filter_formula=(
-        'AND('
-        '{בצפי}=1,'
-        '{קו הפצה}="סוסנא"'
-        ')'
+    now = datetime.now(
+        ZoneInfo("Asia/Jerusalem")
     )
-)
+
+    today = now.date().isoformat()
+
+    # ==========================================
+    # 1. כל ההזמנות שנמצאות בצפי + קו סוסנא
+    # ==========================================
+
+    orders = get_all_airtable_records(
+        AIRTABLE_ORDERS_TABLE,
+        filter_formula=(
+            'AND('
+            '{בצפי}=1,'
+            '{קו הפצה}="סוסנא"'
+            ')'
+        )
+    )
+
+    # ==========================================
+    # 2. כל הסריקות שבוצעו היום
+    # ==========================================
+
+    scans_today = get_all_airtable_records(
+        AIRTABLE_LOADING_SCANS_TABLE,
+        filter_formula=(
+            'IS_SAME('
+            '{תאריך ושעה},'
+            f'DATETIME_PARSE("{today}"),'
+            '"day"'
+            ')'
+        )
+    )
+
+    # כל רשומת סריקה = משטח אחד שהועמס
+    total_loaded = len(scans_today)
+
+    # ==========================================
+    # 3. חישוב הצפי והנותר
+    # ==========================================
+
     total_expected = 0
-    total_loaded = 0
+    total_remaining = 0
 
     order_list = []
 
     for record in orders:
-        fields = record.get("fields", {})
+        fields = record.get(
+            "fields",
+            {}
+        )
 
         expected = (
-            fields.get("כמות משטחים", 0)
+            fields.get(
+                "כמות משטחים",
+                0
+            )
             or 0
         )
 
         loaded = (
-            fields.get("משטחים שהועמסו", 0)
+            fields.get(
+                "משטחים שהועמסו",
+                0
+            )
             or 0
         )
+
+        expected = int(expected)
+        loaded = int(loaded)
 
         remaining = max(
             expected - loaded,
@@ -411,38 +455,60 @@ def get_loading_summary():
         )
 
         total_expected += expected
-        total_loaded += loaded
+
+        # חשוב:
+        # הנותר מחושב לכל הזמנה שבצפי
+        # ולא לפי כלל הסריקות
+        total_remaining += remaining
 
         order_list.append({
             "order_id": record["id"],
+
             "order_number": (
-                fields.get("מספר הזמנה", "")
+                fields.get(
+                    "מספר הזמנה",
+                    ""
+                )
             ),
+
             "customer": (
-                fields.get("שם לקוח", "")
+                fields.get(
+                    "שם לקוח",
+                    ""
+                )
                 or ""
             ),
+
             "expected": expected,
+
             "loaded": loaded,
+
             "remaining": remaining,
+
             "complete": (
-                loaded == expected
+                loaded >= expected
                 and expected > 0
             ),
-            "over": loaded > expected,
+
+            "over": (
+                loaded > expected
+            ),
         })
 
-    total_remaining = max(
-     total_loaded,
-        0
-    )
+    # ==========================================
+    # 4. תשובה
+    # ==========================================
 
     return {
         "success": True,
 
         "summary": {
             "expected": total_expected,
+
+            # כל הסריקות היום
             "loaded": total_loaded,
+
+            # רק מה שעדיין חסר להזמנות שבצפי
             "remaining": total_remaining,
         },
 

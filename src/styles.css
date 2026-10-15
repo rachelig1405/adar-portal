@@ -1973,3 +1973,208 @@
   color: white;
 }
 }
+.finish-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+
+  background: rgba(15, 23, 42, 0.55);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.finish-preview-window {
+  width: min(1000px, 96vw);
+  max-height: 90vh;
+
+  background: #ffffff;
+  border-radius: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+  direction: rtl;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.finish-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.finish-preview-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.finish-preview-header p {
+  margin: 5px 0 0;
+  color: #6b7280;
+}
+
+.finish-preview-header button {
+  width: 44px;
+  height: 44px;
+
+  border: none;
+  border-radius: 50%;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+
+/* אזור הטבלה */
+
+.finish-preview-table {
+  overflow-y: auto;
+  padding: 15px;
+  flex: 1;
+}
+
+
+/* כל שורה */
+
+.finish-preview-row {
+  display: grid;
+
+  grid-template-columns:
+    2fr
+    1fr
+    1fr
+    2fr;
+
+  gap: 12px;
+
+  align-items: center;
+
+  padding: 14px 16px;
+  margin-bottom: 8px;
+
+  border-radius: 12px;
+
+  font-size: 18px;
+}
+
+
+/* שורת כותרת */
+
+.finish-preview-title-row {
+  background: #111827;
+  color: #ffffff;
+
+  font-weight: 800;
+
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+
+/* תקין */
+
+.finish-preview-row--ok {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+}
+
+
+/* חריגה */
+
+.finish-preview-row--error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+
+/* שם לקוח */
+
+.finish-preview-row small {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: 14px;
+  color: #6b7280;
+}
+
+
+/* כפתורים */
+
+.finish-preview-actions {
+  display: flex;
+  gap: 12px;
+
+  padding: 18px 24px;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.finish-preview-actions button {
+  flex: 1;
+
+  min-height: 58px;
+
+  border: none;
+  border-radius: 12px;
+
+  font-size: 19px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.finish-preview-cancel {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.finish-preview-confirm {
+  background: #111827;
+  color: #ffffff;
+}
+
+
+/* טאבלט */
+
+@media (max-width: 700px) {
+  .finish-preview-backdrop {
+    padding: 8px;
+  }
+
+  .finish-preview-window {
+    width: 98vw;
+    max-height: 96vh;
+  }
+
+  .finish-preview-row {
+    grid-template-columns:
+      1.6fr
+      0.7fr
+      0.7fr
+      1.6fr;
+
+    gap: 6px;
+
+    padding: 11px 8px;
+
+    font-size: 15px;
+  }
+
+  .finish-preview-actions {
+    padding: 12px;
+  }
+}

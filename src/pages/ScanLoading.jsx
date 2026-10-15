@@ -47,6 +47,46 @@ const [
   const [orders, setOrders] = useState([]);
   const [finishing, setFinishing] = useState(false);
   const [loadingFinished, setLoadingFinished] = useState(false);
+  // ==========================================
+// נתוני סיכום סיום העמסה
+// ==========================================
+
+// הזמנות שהושלמו לגמרי
+const completedOrdersCount = orders.filter((order) => {
+  const expected = Number(order.expected || 0);
+  const loaded = Number(order.loaded || 0);
+
+  return expected > 0 && loaded >= expected;
+}).length;
+
+
+// הזמנות שעדיין חסר להעמיס
+const remainingOrdersCount = orders.filter((order) => {
+  const expected = Number(order.expected || 0);
+  const loaded = Number(order.loaded || 0);
+
+  return loaded < expected;
+}).length;
+
+
+// האם קיימת לפחות חריגה אחת בהעמסה
+const hasLoadingExceptions =
+  finishPreviewOrders.some(
+    (order) => order.has_exception
+  );
+
+
+// סטטוס כללי של ההעמסה
+let loadingStatusText = "העמסה תקינה";
+let loadingStatusClass = "ok";
+
+if (hasLoadingExceptions) {
+  loadingStatusText = "יש חריגות בהעמסה";
+  loadingStatusClass = "error";
+} else if (remainingOrdersCount > 0) {
+  loadingStatusText = "נותרו הזמנות להעמסה";
+  loadingStatusClass = "warning";
+}
 
   useEffect(() => {
     loadSummary();
@@ -972,6 +1012,37 @@ async function startCamera() {
         </button>
 
       </div>
+      <div className="loading-finish-overview">
+
+  <div className="loading-finish-card">
+    <span className="loading-finish-card-label">
+      הזמנות שהועמסו
+    </span>
+
+    <strong className="loading-finish-card-value">
+      {completedOrdersCount}
+    </strong>
+  </div>
+
+
+  <div className="loading-finish-card">
+    <span className="loading-finish-card-label">
+      נשאר להעמיס
+    </span>
+
+    <strong className="loading-finish-card-value">
+      {remainingOrdersCount}
+    </strong>
+  </div>
+
+
+  <div
+    className={`loading-finish-status ${loadingStatusClass}`}
+  >
+    {loadingStatusText}
+  </div>
+
+</div>
 
 
       <div className="finish-preview-table">

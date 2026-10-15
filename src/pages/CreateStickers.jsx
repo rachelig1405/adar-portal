@@ -177,7 +177,7 @@ export default function CreateProductPdfs() {
       <h2 style={{ marginTop: 0 }}>
         יצירת תיקי מוצר וקובצי PDF
       </h2>
-
+     
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "22px" }}>
           <label
@@ -187,7 +187,7 @@ export default function CreateProductPdfs() {
               marginBottom: "8px",
             }}
           >
-            קובץ Excel
+            קובץ Excel המכיל את העמודות: ITEM NUMBER, STICKER ITEM NO, OUTER, CBM, BARCODE, PHOTO, סוג סטיקר, יצרן, גיל שימוש, מידה X, מידה Y בטריות, מספר תעודה, כמות במארז (אופציונלי) 
           </label>
 
           <input

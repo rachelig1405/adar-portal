@@ -1,7 +1,7 @@
 import os
 import requests
 from fastapi import FastAPI, HTTPException
-from datetime import datetime, timedelta, timezone,date
+from datetime import datetime, date, timedelta, timezone
 
 from urllib.parse import quote
 from zoneinfo import ZoneInfo

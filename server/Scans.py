@@ -433,7 +433,7 @@ def get_loading_summary():
         })
 
     total_remaining = max(
-        total_expected - total_loaded,
+     total_loaded,
         0
     )
 

@@ -61,12 +61,25 @@ const completedOrdersCount = orders.filter((order) => {
 
 
 // הזמנות שעדיין חסר להעמיס
-const remainingOrdersCount = orders.filter((order) => {
-  const expected = Number(order.expected || 0);
-  const loaded = Number(order.loaded || 0);
+const remainingOrdersCount = orders.reduce(
+  (total, order) => {
+    const expected = Number(
+      order.expected || 0
+    );
 
-  return loaded < expected;
-}).length;
+    const loaded = Number(
+      order.loaded || 0
+    );
+
+    const remaining = Math.max(
+      expected - loaded,
+      0
+    );
+
+    return total + remaining;
+  },
+  0
+);
 
 
 // האם קיימת לפחות חריגה אחת בהעמסה

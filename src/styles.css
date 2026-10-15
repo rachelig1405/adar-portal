@@ -2273,4 +2273,77 @@
     grid-column: 1 / -1;
   }
 }
+.loading-finish-overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 14px;
+
+  padding: 18px 16px;
+  margin-bottom: 10px;
+
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loading-finish-card {
+  background: #f8fafc;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+
+  padding: 14px;
+
+  text-align: center;
+}
+
+.loading-finish-card-label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  font-size: 14px;
+  color: #64748b;
+}
+
+.loading-finish-card-value {
+  display: block;
+
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.loading-finish-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 70px;
+
+  padding: 14px;
+
+  border-radius: 14px;
+
+  text-align: center;
+
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.loading-finish-status.ok {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+}
+
+.loading-finish-status.warning {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+}
+
+.loading-finish-status.error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
 }

@@ -1029,7 +1029,7 @@ async function startCamera() {
 
   <div className="loading-finish-card">
     <span className="loading-finish-card-label">
-      הזמנות שהועמסו
+      משטחים שהועמסו
     </span>
 
     <strong className="loading-finish-card-value">

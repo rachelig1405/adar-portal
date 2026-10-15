@@ -2177,6 +2177,7 @@
   .finish-preview-actions {
     padding: 12px;
   }
+  }
   .loading-finish-overview {
   display: grid;
   grid-template-columns: 1fr 1fr 1.4fr;
@@ -2345,5 +2346,4 @@
   background: #fee2e2;
   border: 1px solid #fca5a5;
   color: #991b1b;
-}
 }

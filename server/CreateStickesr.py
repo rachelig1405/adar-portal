@@ -16,7 +16,7 @@ from playwright.async_api import async_playwright
 # =========================
 # שמות עמודות באקסל
 # =========================
-COL_SKU = " ITEM  NUMBER"          # מק"ט / קוד פנימי
+COL_SKU = "ITEM NUMBER"          # מק"ט / קוד פנימי
 COL_ITEM_NO = "STICKER ITEM NO"    # ITEM NO
 COL_PCS = "OUTER"                  # PCS
 COL_CBM = "CBM"                    # CBM

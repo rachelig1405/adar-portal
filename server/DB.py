@@ -376,8 +376,8 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                                 record.get("fields", {}).get("עובדים") or []
                             )
                         ]
-                else:
-                     records = get_all_airtable_records(
+            else:
+                records = get_all_airtable_records(
                 AIRTABLE_ORDERS_TABLE,
                 filter_formula= 
                 f'{{סטטוס}}="{status}"',

@@ -372,27 +372,61 @@ async function startInvoiceCamera() {
             return;
           }
 
-          const barcodeValue =
-          result.getText()?.trim();
+         const barcodeValue =
+  result.getText()?.trim();
 
-        if (!barcodeValue) {
-          return;
+if (!barcodeValue || barcodeValue.length < 7) {
+  return;
+}
+
+invoiceScanInProgressRef.current = true;
+
+// 7 הספרות הראשונות
+const invoiceNumber =
+  barcodeValue.slice(0, 7);
+
+setInvoince(invoiceNumber);
+
+
+// 1. עוצרים את ZXing
+try {
+  controlsFromCallback?.stop();
+} catch (error) {
+  console.error(
+    "Error stopping ZXing:",
+    error
+  );
+}
+
+
+// 2. עוצרים פיזית את המצלמה
+try {
+  const stream =
+    invoiceVideoRef.current?.srcObject;
+
+  if (stream) {
+    stream
+      .getTracks()
+      .forEach((track) => {
+        track.stop();
+      });
+
+        invoiceVideoRef.current.srcObject = null;
         }
+      } catch (error) {
+        console.error(
+          "Error stopping camera stream:",
+          error
+        );
+      }
 
-        const invoiceNumber =
-          barcodeValue.slice(0, 7);
 
-        setInvoince(invoiceNumber);
+      // 3. מנקים את ה-controls
+      invoiceControlsRef.current = null;
 
-          invoiceScanInProgressRef.current =
-            true;
 
-          
-          try {
-            controlsFromCallback?.stop();
-          } catch {}
-
-          stopInvoiceCamera();
+  // 4. סוגרים את חלון המצלמה
+        setInvoiceCameraOpen(false);
         }
       );
 

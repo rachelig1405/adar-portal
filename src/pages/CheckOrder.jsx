@@ -324,6 +324,31 @@ async function startInvoiceCamera() {
         "Invoice video element not available"
       );
     }
+    const track =
+  videoElement.srcObject
+    ?.getVideoTracks?.()[0];
+
+if (track) {
+  const settings =
+    track.getSettings?.() || {};
+
+  const capabilities =
+    track.getCapabilities?.() || {};
+
+  alert(
+    "SETTINGS:\n" +
+    JSON.stringify(
+      settings,
+      null,
+      2
+    ) +
+    "\n\nCAPABILITIES:\n" +
+    JSON.stringify(
+      capabilities,
+      null,
+      2
+    )
+  );}
 
     const hints = new Map();
 

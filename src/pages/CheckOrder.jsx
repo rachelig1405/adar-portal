@@ -372,18 +372,22 @@ async function startInvoiceCamera() {
             return;
           }
 
-          const invoiceNumber =
-            result.getText()?.trim();
+          const barcodeValue =
+          result.getText()?.trim();
 
-          if (!invoiceNumber) {
-            return;
-          }
+        if (!barcodeValue) {
+          return;
+        }
+
+        const invoiceNumber =
+          barcodeValue.slice(0, 7);
+
+        setInvoince(invoiceNumber);
 
           invoiceScanInProgressRef.current =
             true;
 
-          setInvoince(invoiceNumber);
-
+          
           try {
             controlsFromCallback?.stop();
           } catch {}

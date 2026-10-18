@@ -225,6 +225,7 @@ async function improveCamera(videoElement) {
     const stream = videoElement?.srcObject;
 
     if (!stream) {
+      console.log("No camera stream");
       return;
     }
 
@@ -232,14 +233,21 @@ async function improveCamera(videoElement) {
       stream.getVideoTracks()[0];
 
     if (!track) {
+      console.log("No video track");
       return;
     }
 
     const capabilities =
       track.getCapabilities?.() || {};
 
+    console.log(
+      "Invoice camera capabilities:",
+      capabilities
+    );
+
     const advanced = [];
 
+    // פוקוס רציף
     if (
       capabilities.focusMode &&
       capabilities.focusMode.includes(
@@ -251,15 +259,41 @@ async function improveCamera(videoElement) {
       });
     }
 
+    // זום כמו בסריקת המשטחים
+    if (
+      capabilities.zoom &&
+      typeof capabilities.zoom.min ===
+        "number"
+    ) {
+      const min =
+        capabilities.zoom.min;
+
+      const max =
+        capabilities.zoom.max;
+
+      const targetZoom = Math.min(
+        Math.max(1.5, min),
+        max
+      );
+
+      advanced.push({
+        zoom: targetZoom,
+      });
+    }
+
     if (advanced.length > 0) {
       await track.applyConstraints({
         advanced,
       });
     }
 
+    console.log(
+      "Invoice camera enhancements applied"
+    );
+
   } catch (error) {
     console.error(
-      "Camera enhancement error:",
+      "Invoice camera enhancement error:",
       error
     );
   }
@@ -315,21 +349,25 @@ async function startInvoiceCamera() {
         {
           audio: false,
 
-        video: {
-          facingMode: {
-            ideal: "environment",
-          },
+          video: {
+      facingMode: {
+        ideal: "environment",
+      },
 
-          width: {
-            ideal: 1920,
-            min: 1280,
-          },
+      width: {
+        ideal: 1920,
+      },
 
-          height: {
-            ideal: 1080,
-            min: 720,
-          },
-  }
+      height: {
+        ideal: 1080,
+      },
+
+      advanced: [
+        {
+          focusMode: "continuous",
+        },
+      ],
+},
         },
 
         videoElement,

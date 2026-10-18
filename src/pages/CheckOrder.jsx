@@ -315,19 +315,21 @@ async function startInvoiceCamera() {
         {
           audio: false,
 
-          video: {
-            facingMode: {
-              ideal: "environment",
-            },
-
-            width: {
-              ideal: 1920,
-            },
-
-            height: {
-              ideal: 1080,
-            },
+        video: {
+          facingMode: {
+            ideal: "environment",
           },
+
+          width: {
+            ideal: 1920,
+            min: 1280,
+          },
+
+          height: {
+            ideal: 1080,
+            min: 720,
+          },
+  }
         },
 
         videoElement,

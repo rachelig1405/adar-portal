@@ -324,31 +324,6 @@ async function startInvoiceCamera() {
         "Invoice video element not available"
       );
     }
-    const track =
-  videoElement.srcObject
-    ?.getVideoTracks?.()[0];
-
-if (track) {
-  const settings =
-    track.getSettings?.() || {};
-
-  const capabilities =
-    track.getCapabilities?.() || {};
-
-  alert(
-    "SETTINGS:\n" +
-    JSON.stringify(
-      settings,
-      null,
-      2
-    ) +
-    "\n\nCAPABILITIES:\n" +
-    JSON.stringify(
-      capabilities,
-      null,
-      2
-    )
-  );}
 
     const hints = new Map();
 
@@ -446,7 +421,40 @@ if (track) {
       );
 
     invoiceControlsRef.current = controls;
-    await improveCamera(videoElement);
+
+await improveCamera(videoElement);
+
+
+// ==============================
+// בדיקת המצלמה שנפתחה בפועל
+// ==============================
+
+const cameraTrack =
+  videoElement.srcObject
+    ?.getVideoTracks?.()[0];
+
+if (cameraTrack) {
+  const settings =
+    cameraTrack.getSettings?.() || {};
+
+  const capabilities =
+    cameraTrack.getCapabilities?.() || {};
+
+  alert(
+    "SETTINGS:\n" +
+    JSON.stringify(
+      settings,
+      null,
+      2
+    ) +
+    "\n\nCAPABILITIES:\n" +
+    JSON.stringify(
+      capabilities,
+      null,
+      2
+    )
+  );
+}
 
   } catch (error) {
     console.error(

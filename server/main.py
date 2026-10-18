@@ -25,7 +25,8 @@ from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequ
 from Scans import (
     ScanRequest,
     create_loading_scan,
-    get_loading_summary
+    get_loading_summary,
+    get_today_open_loading
 )
 
 from FinishLoading import (FinishLoadingRequest,
@@ -1153,3 +1154,94 @@ def download_create_pdfs_new_zip(
         filename="product_pdfs_new.zip",
         background=background_tasks,
     )
+##חיפוש העמסה פתוחה
+@app.get("/api/loading/current")
+def current_loading():
+    loading = get_today_open_loading()
+
+    if not loading:
+        return {
+            "success": True,
+            "open": False,
+        }
+
+    fields = loading.get(
+        "fields",
+        {}
+    )
+
+    return {
+        "success": True,
+        "open": True,
+        "loading_id": loading["id"],
+        "truck_number": fields.get(
+            "מספר משאית",
+            ""
+        ),
+    }
+    class StartLoadingRequest(BaseModel):
+    worker_id: str
+    truck_number: str
+    @app.post("/api/loading/start")
+def start_loading(
+    request: StartLoadingRequest
+):
+    existing = get_today_open_loading()
+
+    # כבר קיימת העמסה פתוחה
+    if existing:
+        return {
+            "success": True,
+            "already_open": True,
+            "loading_id": existing["id"],
+        }
+
+    truck_number = (
+        request.truck_number
+        or ""
+    ).strip()
+
+    if not truck_number:
+        raise HTTPException(
+            status_code=400,
+            detail="יש להזין מספר משאית",
+        )
+
+    now = datetime.now(
+        ZoneInfo("Asia/Jerusalem")
+    )
+
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/"
+        f"{AIRTABLE_LOADINGS_TABLE}"
+    )
+
+    payload = {
+        "fields": {
+            "זמן": now.isoformat(),
+            "סטטוס": "פתוחה",
+            "מספר משאית": truck_number,
+
+            # אם קיים אצלך שדה כזה:
+            "נפתח על ידי": [
+                request.worker_id
+            ],
+        }
+    }
+
+    response = requests.post(
+        url,
+        headers=airtable_headers(),
+        json=payload,
+    )
+
+    response.raise_for_status()
+
+    loading = response.json()
+
+    return {
+        "success": True,
+        "loading_id": loading["id"],
+        "truck_number": truck_number,
+    }

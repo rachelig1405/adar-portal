@@ -59,7 +59,25 @@ const completedOrdersCount = orders.filter((order) => {
   return expected > 0 && loaded >= expected;
 }).length;
 
+const [
+  startLoadingOpen,
+  setStartLoadingOpen
+] = useState(false);
 
+const [
+  truckNumber,
+  setTruckNumber
+] = useState("");
+
+const [
+  startingLoading,
+  setStartingLoading
+] = useState(false);
+
+const [
+  checkingLoading,
+  setCheckingLoading
+] = useState(true);
 // הזמנות שעדיין חסר להעמיס
 const remainingOrdersCount = orders.reduce(
   (total, order) => {
@@ -103,6 +121,7 @@ if (hasLoadingExceptions) {
 
   useEffect(() => {
     loadSummary();
+    checkCurrentLoading();
 
     return () => {
       stopCamera();
@@ -112,7 +131,109 @@ if (hasLoadingExceptions) {
   // =====================================================
   // סיכום ההעמסה
   // =====================================================
+//בדיקה אם קיימת העמסה פתוחה 
+async function checkCurrentLoading() {
+  setCheckingLoading(true);
 
+  try {
+    const response = await fetch(
+      `${API_URL}/api/loading/current`
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "לא ניתן לבדוק את מצב ההעמסה"
+      );
+    }
+
+    if (data.open) {
+      setStartLoadingOpen(false);
+    } else {
+      setStartLoadingOpen(true);
+    }
+
+  } catch (error) {
+    console.error(
+      "Check loading error:",
+      error
+    );
+
+    setMessage(
+      "לא ניתן לבדוק אם קיימת העמסה פתוחה"
+    );
+
+  } finally {
+    setCheckingLoading(false);
+  }
+}
+//פתיחת העמסה
+async function confirmStartLoading() {
+  const value = truckNumber.trim();
+
+  if (!value) {
+    setMessage(
+      "יש להזין מספר משאית"
+    );
+    return;
+  }
+
+  if (startingLoading) {
+    return;
+  }
+
+  setStartingLoading(true);
+  setMessage("");
+
+  try {
+    const response = await fetch(
+      `${API_URL}/api/loading/start`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          worker_id: user.id,
+          truck_number: value,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+        "לא ניתן לפתוח העמסה"
+      );
+    }
+
+    setStartLoadingOpen(false);
+    setTruckNumber("");
+
+    await loadSummary();
+
+  } catch (error) {
+    console.error(
+      "Start loading error:",
+      error
+    );
+
+    setMessage(
+      error.message ||
+      "לא ניתן לפתוח את ההעמסה"
+    );
+
+  } finally {
+    setStartingLoading(false);
+  }
+}
   async function loadSummary() {
     try {
       const response = await fetch(
@@ -806,6 +927,73 @@ async function startCamera() {
         <h1>
             העמסה בסריקה
         </h1>
+        {startLoadingOpen && (
+  <div className="start-loading-backdrop">
+
+    <div className="start-loading-window">
+
+      <div className="start-loading-header">
+
+        <div>
+          <div className="frame-kicker">
+            ADAR Portal
+          </div>
+
+          <h2>
+            פתיחת העמסה
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          onClick={() =>
+            setStartLoadingOpen(false)
+          }
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div className="start-loading-body">
+
+        <label>
+          מספר משאית
+        </label>
+
+        <input
+          type="text"
+          value={truckNumber}
+          onChange={(e) =>
+            setTruckNumber(
+              e.target.value
+            )
+          }
+          placeholder="הקלד מספר משאית"
+          autoFocus
+        />
+
+        <button
+          type="button"
+          className="start-loading-confirm"
+          onClick={
+            confirmStartLoading
+          }
+          disabled={
+            startingLoading
+          }
+        >
+          {startingLoading
+            ? "פותח העמסה..."
+            : "🚚 פתח העמסה"}
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
         {/* סיכום */}
 

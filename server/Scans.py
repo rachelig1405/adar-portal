@@ -126,9 +126,15 @@ def create_loading_scan(
     # 1. מציאת / יצירת העמסה של היום
     # --------------------------------
 
-    loading_record = (
-        get_or_create_today_loading()
-    )
+   loading =
+    get_today_open_loading()
+
+    if not loading:
+        return {
+            "success": False,
+            "code": "NO_OPEN_LOADING",
+            "message": "לא קיימת העמסה פתוחה",
+        }
 
     loading_id = loading_record["id"]
 
@@ -514,3 +520,29 @@ def get_loading_summary():
 
         "orders": order_list,
     }
+    //פונקציה שמחפשת העמסה
+    def get_today_open_loading():
+    now = datetime.now(
+        ZoneInfo("Asia/Jerusalem")
+    )
+
+    today = now.date().isoformat()
+
+    records = get_all_airtable_records(
+        AIRTABLE_LOADINGS_TABLE,
+        filter_formula=(
+            'AND('
+                'IS_SAME('
+                    '{זמן},'
+                    f'DATETIME_PARSE("{today}"),'
+                    '"day"'
+                '),'
+                '{סטטוס}="פתוחה"'
+            ')'
+        ),
+    )
+
+    if not records:
+        return None
+
+    return records[0]

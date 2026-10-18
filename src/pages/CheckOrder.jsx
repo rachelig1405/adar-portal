@@ -708,15 +708,15 @@ async function startInvoiceCamera() {
 
       <div
         style={{
-          position: "absolute",
-          left: "10%",
-          right: "10%",
-          top: "40%",
-          height: "20%",
-          border: "3px solid white",
-          borderRadius: "10px",
-          pointerEvents: "none",
-        }}
+    position: "absolute",
+    left: "5%",
+    right: "5%",
+    top: "42%",
+    height: "16%",
+    border: "3px solid white",
+    borderRadius: "10px",
+    pointerEvents: "none",
+}}
       />
     </div>
 

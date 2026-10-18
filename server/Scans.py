@@ -33,6 +33,31 @@ class ScanRequest(BaseModel):
     confirm_not_in_forecast: bool = False
     confirm_not_in_line: bool = False
 #פונקציה למציאת או יצירת העמסה
+def get_today_open_loading():
+    now = datetime.now(
+        ZoneInfo("Asia/Jerusalem")
+    )
+
+    today = now.date().isoformat()
+
+    records = get_all_airtable_records(
+        AIRTABLE_LOADINGS_TABLE,
+        filter_formula=(
+            'AND('
+                'IS_SAME('
+                    '{זמן},'
+                    f'DATETIME_PARSE("{today}"),'
+                    '"day"'
+                '),'
+                '{סטטוס}="פתוחה"'
+            ')'
+        ),
+    )
+
+    if not records:
+        return None
+
+    return records[0]
 def get_or_create_today_loading():
     now = datetime.now(
         ZoneInfo("Asia/Jerusalem")
@@ -520,28 +545,3 @@ def get_loading_summary():
         "orders": order_list,
     }
 
-def get_today_open_loading():
-    now = datetime.now(
-        ZoneInfo("Asia/Jerusalem")
-    )
-
-    today = now.date().isoformat()
-
-    records = get_all_airtable_records(
-        AIRTABLE_LOADINGS_TABLE,
-        filter_formula=(
-            'AND('
-                'IS_SAME('
-                    '{זמן},'
-                    f'DATETIME_PARSE("{today}"),'
-                    '"day"'
-                '),'
-                '{סטטוס}="פתוחה"'
-            ')'
-        ),
-    )
-
-    if not records:
-        return None
-
-    return records[0]

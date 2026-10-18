@@ -1181,6 +1181,7 @@ def current_loading():
     }
 class StartLoadingRequest(BaseModel):
       worker_id: str
+      
       truck_number: str
 @app.post("/api/loading/start")
 def start_loading(

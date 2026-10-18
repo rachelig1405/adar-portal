@@ -222,10 +222,10 @@ function stopInvoiceCamera() {
 
 async function improveCamera(videoElement) {
   try {
-    const stream = videoElement?.srcObject;
+    const stream =
+      videoElement?.srcObject;
 
     if (!stream) {
-      console.log("No camera stream");
       return;
     }
 
@@ -233,7 +233,6 @@ async function improveCamera(videoElement) {
       stream.getVideoTracks()[0];
 
     if (!track) {
-      console.log("No video track");
       return;
     }
 
@@ -247,7 +246,6 @@ async function improveCamera(videoElement) {
 
     const advanced = [];
 
-    // פוקוס רציף
     if (
       capabilities.focusMode &&
       capabilities.focusMode.includes(
@@ -259,37 +257,11 @@ async function improveCamera(videoElement) {
       });
     }
 
-    // זום כמו בסריקת המשטחים
-    if (
-      capabilities.zoom &&
-      typeof capabilities.zoom.min ===
-        "number"
-    ) {
-      const min =
-        capabilities.zoom.min;
-
-      const max =
-        capabilities.zoom.max;
-
-      const targetZoom = Math.min(
-        Math.max(1.5, min),
-        max
-      );
-
-      advanced.push({
-        zoom: targetZoom,
-      });
-    }
-
     if (advanced.length > 0) {
       await track.applyConstraints({
         advanced,
       });
     }
-
-    console.log(
-      "Invoice camera enhancements applied"
-    );
 
   } catch (error) {
     console.error(
@@ -421,40 +393,7 @@ async function startInvoiceCamera() {
       );
 
     invoiceControlsRef.current = controls;
-
-await improveCamera(videoElement);
-
-
-// ==============================
-// בדיקת המצלמה שנפתחה בפועל
-// ==============================
-
-const cameraTrack =
-  videoElement.srcObject
-    ?.getVideoTracks?.()[0];
-
-if (cameraTrack) {
-  const settings =
-    cameraTrack.getSettings?.() || {};
-
-  const capabilities =
-    cameraTrack.getCapabilities?.() || {};
-
-  alert(
-    "SETTINGS:\n" +
-    JSON.stringify(
-      settings,
-      null,
-      2
-    ) +
-    "\n\nCAPABILITIES:\n" +
-    JSON.stringify(
-      capabilities,
-      null,
-      2
-    )
-  );
-}
+    await improveCamera(videoElement);
 
   } catch (error) {
     console.error(

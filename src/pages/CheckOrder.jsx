@@ -371,13 +371,28 @@ async function startInvoiceCamera() {
         videoElement,
 
         (
-          result,
-          error,
-          controlsFromCallback
-        ) => {
-          if (!result) {
-            return;
-          }
+  result,
+  error,
+  controlsFromCallback
+) => {
+
+  if (!result) {
+    if (error) {
+      console.log(
+        "EAN13 decode error:",
+        error.name,
+        error.message
+      );
+    }
+
+    return;
+  }
+
+  console.log(
+    "EAN13 FOUND:",
+    result.getText(),
+    result.getBarcodeFormat()
+  );
 
           if (
             invoiceScanInProgressRef.current

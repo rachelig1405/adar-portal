@@ -220,36 +220,25 @@ function stopInvoiceCamera() {
   setInvoiceCameraOpen(false);
 }
 
- async function improveCamera(videoElement) {
+async function improveCamera(videoElement) {
   try {
     const stream = videoElement?.srcObject;
 
     if (!stream) {
-      console.log("No camera stream");
       return;
     }
 
-    const track = stream
-      .getVideoTracks()[0];
+    const track =
+      stream.getVideoTracks()[0];
 
     if (!track) {
-      console.log("No video track");
       return;
     }
 
     const capabilities =
       track.getCapabilities?.() || {};
 
-    console.log(
-      "Camera capabilities:",
-      capabilities
-    );
-
     const advanced = [];
-
-    // =========================
-    // פוקוס רציף
-    // =========================
 
     if (
       capabilities.focusMode &&
@@ -262,41 +251,11 @@ function stopInvoiceCamera() {
       });
     }
 
-    // =========================
-    // זום
-    // =========================
-
-    if (
-      capabilities.zoom &&
-      typeof capabilities.zoom.min ===
-        "number"
-    ) {
-      const min =
-        capabilities.zoom.min;
-
-      const max =
-        capabilities.zoom.max;
-
-      // זום מתון כדי לא לפגוע בחדות
-      const targetZoom = Math.min(
-        Math.max(1.5, min),
-        max
-      );
-
-      advanced.push({
-        zoom: targetZoom,
-      });
-    }
-
     if (advanced.length > 0) {
       await track.applyConstraints({
         advanced,
       });
     }
-
-    console.log(
-      "Camera enhancements applied"
-    );
 
   } catch (error) {
     console.error(

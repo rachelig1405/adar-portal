@@ -126,8 +126,7 @@ def create_loading_scan(
     # 1. מציאת / יצירת העמסה של היום
     # --------------------------------
 
-   loading =
-    get_today_open_loading()
+   loading = get_today_open_loading()
 
     if not loading:
         return {
@@ -136,7 +135,7 @@ def create_loading_scan(
             "message": "לא קיימת העמסה פתוחה",
         }
 
-    loading_id = loading_record["id"]
+    loading_id = loading["id"]
 
     # --------------------------------
     # 2. מציאת ההזמנה

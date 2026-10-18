@@ -537,6 +537,7 @@ async function startInvoiceCamera() {
                 onChange={(event) => setNotes(event.target.value)}
             />
             <label>מספר חשבונית</label>
+            <h4>יש לסרוק את ברקוד החשבונית</h4>
 
 {!invoiceCameraOpen && (
   <>

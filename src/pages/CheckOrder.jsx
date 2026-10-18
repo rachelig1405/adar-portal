@@ -253,10 +253,9 @@ async function startInvoiceCamera() {
     hints.set(
       DecodeHintType.POSSIBLE_FORMATS,
       [
-        BarcodeFormat.CODE_128,
+       
         BarcodeFormat.EAN_13,
-        BarcodeFormat.EAN_8,
-        BarcodeFormat.QR_CODE,
+       
       ]
     );
 

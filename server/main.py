@@ -49,7 +49,7 @@ AIRTABLE_ATTENDANCE_TABLE=os.getenv("AIRTABLE_ATTENDANCE_TABLE")
 AIRTABLE_LOADINGS_TABLE = os.getenv(
     "AIRTABLE_LOADINGS_TABLE"
 )
-from DB import get_customers
+from DB import get_customers,airtable_headers
 from DB import create_customer
 from DB import get_table_records
 from DB import get_employees,get_record_by_id

@@ -520,7 +520,7 @@ def get_loading_summary():
         "orders": order_list,
     }
     //פונקציה שמחפשת העמסה
-    def get_today_open_loading():
+def get_today_open_loading():
     now = datetime.now(
         ZoneInfo("Asia/Jerusalem")
     )

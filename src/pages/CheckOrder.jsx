@@ -1,4 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from "react";
+
+import {
+  BrowserMultiFormatReader
+} from "@zxing/browser";
+
+import {
+  BarcodeFormat,
+  DecodeHintType
+} from "@zxing/library";
 import OrderBarcode from "./OrderBarcode";
 import { API_URL } from "../config";
 
@@ -6,9 +20,19 @@ export default function CheckOrder({ onClose }) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
-    const [invoice, setInvoince] = useState("");
+  const [invoice, setInvoince] = useState("");
 
   const [orderSearch, setOrderSearch] = useState("");
+  const invoiceVideoRef = useRef(null);
+  const invoiceControlsRef = useRef(null);
+
+  const [
+    invoiceCameraOpen,
+    setInvoiceCameraOpen
+  ] = useState(false);
+
+  const invoiceScanInProgressRef =
+  useRef(false);
  
 
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -172,6 +196,162 @@ export default function CheckOrder({ onClose }) {
       setEmployeeActiveIndex(-1);
     }
   }
+  function stopInvoiceCamera() {
+  try {
+    invoiceControlsRef.current?.stop();
+
+    if (
+      invoiceVideoRef.current?.srcObject
+    ) {
+      const tracks =
+        invoiceVideoRef.current
+          .srcObject
+          .getTracks();
+
+      tracks.forEach(
+        (track) => track.stop()
+      );
+
+      invoiceVideoRef.current.srcObject =
+        null;
+    }
+  } catch (error) {
+    console.error(
+      "Invoice camera stop error:",
+      error
+    );
+  }
+  async function startInvoiceCamera() {
+  if (invoiceCameraOpen) {
+    return;
+  }
+
+  setError("");
+
+  invoiceScanInProgressRef.current =
+    false;
+
+  try {
+    setInvoiceCameraOpen(true);
+
+    // מחכים ש-React יצור את ה-video
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+    const videoElement =
+      invoiceVideoRef.current;
+
+    if (!videoElement) {
+      throw new Error(
+        "Invoice video element not available"
+      );
+    }
+
+    const hints = new Map();
+
+    hints.set(
+      DecodeHintType.POSSIBLE_FORMATS,
+      [
+        BarcodeFormat.CODE_128,
+        BarcodeFormat.EAN_13,
+        BarcodeFormat.EAN_8,
+        BarcodeFormat.QR_CODE,
+      ]
+    );
+
+    hints.set(
+      DecodeHintType.TRY_HARDER,
+      true
+    );
+
+    const reader =
+      new BrowserMultiFormatReader(
+        hints
+      );
+
+    const controls =
+      await reader.decodeFromConstraints(
+        {
+          audio: false,
+
+          video: {
+            facingMode: {
+              ideal: "environment",
+            },
+
+            width: {
+              ideal: 1920,
+            },
+
+            height: {
+              ideal: 1080,
+            },
+          },
+        },
+
+        videoElement,
+
+        async (
+          result,
+          error,
+          controlsFromCallback
+        ) => {
+          if (!result) {
+            return;
+          }
+
+          if (
+            invoiceScanInProgressRef.current
+          ) {
+            return;
+          }
+
+          const invoiceNumber =
+            result.getText()?.trim();
+
+          if (!invoiceNumber) {
+            return;
+          }
+
+          invoiceScanInProgressRef.current =
+            true;
+
+          // מכניס את המספר שנקרא
+          // לשדה החשבונית
+          setInvoince(invoiceNumber);
+
+          try {
+            controlsFromCallback?.stop();
+          } catch {}
+
+          stopInvoiceCamera();
+        }
+      );
+
+    invoiceControlsRef.current =
+      controls;
+
+  } catch (error) {
+    console.error(
+      "Invoice scan error:",
+      error
+    );
+
+    stopInvoiceCamera();
+
+    setError(
+      "לא ניתן לפתוח את המצלמה לסריקת החשבונית"
+    );
+  }
+}
+
+  invoiceControlsRef.current = null;
+
+  setInvoiceCameraOpen(false);
+}
 
   async function submit(event) {
     event.preventDefault();
@@ -368,15 +548,107 @@ export default function CheckOrder({ onClose }) {
                 value={notes}
                 onChange={(event) => setNotes(event.target.value)}
             />
-              <label>מספר חשבונית</label>
-            <input
-                type="text"
-               
-                
-                value={invoice}
-                onChange={(event) => setInvoince(event.target.value)}
-            />
-          
+            <label>מספר חשבונית</label>
+
+{!invoiceCameraOpen && (
+  <>
+    <button
+      type="button"
+      onClick={startInvoiceCamera}
+      style={{
+        width: "100%",
+        minHeight: "58px",
+        fontSize: "20px",
+        fontWeight: "bold",
+        cursor: "pointer",
+      }}
+    >
+      📷 סרוק חשבונית
+    </button>
+
+    {invoice && (
+      <div
+        style={{
+          marginTop: "12px",
+          padding: "14px",
+          borderRadius: "10px",
+          background: "#dcfce7",
+          fontSize: "20px",
+          fontWeight: "bold",
+          textAlign: "center",
+        }}
+      >
+        מספר חשבונית: {invoice}
+
+        <button
+          type="button"
+          onClick={() => {
+            setInvoince("");
+            startInvoiceCamera();
+          }}
+          style={{
+            marginRight: "15px",
+          }}
+        >
+          סרוק מחדש
+        </button>
+      </div>
+    )}
+  </>
+)}
+          {invoiceCameraOpen && (
+  <div
+    style={{
+      marginTop: "15px",
+    }}
+  >
+    <div
+      style={{
+        position: "relative",
+        overflow: "hidden",
+        borderRadius: "14px",
+        background: "#000",
+      }}
+    >
+      <video
+        ref={invoiceVideoRef}
+        autoPlay
+        playsInline
+        muted
+        style={{
+          width: "100%",
+          display: "block",
+        }}
+      />
+
+      <div
+        style={{
+          position: "absolute",
+          left: "10%",
+          right: "10%",
+          top: "40%",
+          height: "20%",
+          border: "3px solid white",
+          borderRadius: "10px",
+          pointerEvents: "none",
+        }}
+      />
+    </div>
+
+    <button
+      type="button"
+      onClick={stopInvoiceCamera}
+      style={{
+        width: "100%",
+        marginTop: "10px",
+        padding: "14px",
+        fontSize: "18px",
+      }}
+    >
+      ביטול
+    </button>
+  </div>
+)}
 
 
           <button

@@ -328,18 +328,16 @@ async function startInvoiceCamera() {
     const hints = new Map();
 
     hints.set(
-      DecodeHintType.POSSIBLE_FORMATS,
-      [
-       
-        BarcodeFormat.EAN_13,
-       
-      ]
-    );
+  DecodeHintType.POSSIBLE_FORMATS,
+  [
+    BarcodeFormat.EAN_13
+  ]
+);
 
-    hints.set(
-      DecodeHintType.TRY_HARDER,
-      true
-    );
+  hints.set(
+    DecodeHintType.TRY_HARDER,
+    true
+);
 
     const reader =
       new BrowserMultiFormatReader(hints);

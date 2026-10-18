@@ -123,10 +123,10 @@ def create_loading_scan(
     )
 
     # --------------------------------
-    # 1. מציאת / יצירת העמסה של היום
+    # 1. מציאת העמסה של היום
     # --------------------------------
 
-   loading = get_today_open_loading()
+    loading = get_today_open_loading()
 
     if not loading:
         return {
@@ -519,7 +519,7 @@ def get_loading_summary():
 
         "orders": order_list,
     }
-    //פונקציה שמחפשת העמסה
+
 def get_today_open_loading():
     now = datetime.now(
         ZoneInfo("Asia/Jerusalem")

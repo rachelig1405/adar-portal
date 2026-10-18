@@ -196,45 +196,43 @@ export default function CheckOrder({ onClose }) {
       setEmployeeActiveIndex(-1);
     }
   }
-  function stopInvoiceCamera() {
+function stopInvoiceCamera() {
   try {
     invoiceControlsRef.current?.stop();
 
-    if (
-      invoiceVideoRef.current?.srcObject
-    ) {
+    if (invoiceVideoRef.current?.srcObject) {
       const tracks =
-        invoiceVideoRef.current
-          .srcObject
-          .getTracks();
+        invoiceVideoRef.current.srcObject.getTracks();
 
-      tracks.forEach(
-        (track) => track.stop()
-      );
+      tracks.forEach((track) => track.stop());
 
-      invoiceVideoRef.current.srcObject =
-        null;
+      invoiceVideoRef.current.srcObject = null;
     }
+
   } catch (error) {
     console.error(
       "Invoice camera stop error:",
       error
     );
   }
-  async function startInvoiceCamera() {
+
+  invoiceControlsRef.current = null;
+  setInvoiceCameraOpen(false);
+}
+
+
+async function startInvoiceCamera() {
   if (invoiceCameraOpen) {
     return;
   }
 
   setError("");
 
-  invoiceScanInProgressRef.current =
-    false;
+  invoiceScanInProgressRef.current = false;
 
   try {
     setInvoiceCameraOpen(true);
 
-    // מחכים ש-React יצור את ה-video
     await new Promise((resolve) => {
       requestAnimationFrame(() => {
         requestAnimationFrame(resolve);
@@ -268,9 +266,7 @@ export default function CheckOrder({ onClose }) {
     );
 
     const reader =
-      new BrowserMultiFormatReader(
-        hints
-      );
+      new BrowserMultiFormatReader(hints);
 
     const controls =
       await reader.decodeFromConstraints(
@@ -294,7 +290,7 @@ export default function CheckOrder({ onClose }) {
 
         videoElement,
 
-        async (
+        (
           result,
           error,
           controlsFromCallback
@@ -319,8 +315,6 @@ export default function CheckOrder({ onClose }) {
           invoiceScanInProgressRef.current =
             true;
 
-          // מכניס את המספר שנקרא
-          // לשדה החשבונית
           setInvoince(invoiceNumber);
 
           try {
@@ -331,8 +325,7 @@ export default function CheckOrder({ onClose }) {
         }
       );
 
-    invoiceControlsRef.current =
-      controls;
+    invoiceControlsRef.current = controls;
 
   } catch (error) {
     console.error(
@@ -346,11 +339,6 @@ export default function CheckOrder({ onClose }) {
       "לא ניתן לפתוח את המצלמה לסריקת החשבונית"
     );
   }
-}
-
-  invoiceControlsRef.current = null;
-
-  setInvoiceCameraOpen(false);
 }
 
   async function submit(event) {

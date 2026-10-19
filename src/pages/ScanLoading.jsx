@@ -1214,13 +1214,7 @@ async function startCamera() {
 
         {!cameraInvoiceOpen && (
             <button
-            style={{
-        width: "100%",
-        minHeight: "58px",
-        fontSize: "20px",
-        fontWeight: "bold",
-        cursor: "pointer",
-      }}
+            className="scan-loading__scan-button"
             onClick={startInvoiceCamera}
             disabled={loading}
             >
@@ -1285,8 +1279,9 @@ async function startCamera() {
             {message}
             </div>
         )}
+        <br></br>
 
-        {/* כפתור סריקה */}
+        {/* משטח כפתור סריקה */}
 
         {!cameraOpen && (
             <button

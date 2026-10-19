@@ -611,25 +611,28 @@ async function startInvoiceCamera() {
 
     const controls =
       await reader.decodeFromConstraints(
-        {
+          {
           audio: false,
 
           video: {
-            facingMode: {
-                ideal: "environment",
-            },
-            width: {
-                ideal: 1920,
-            },
-            height: {
-                ideal: 1080,
-            },
-            advanced: [
-            {
-            focusMode: "continuous",
-            },
-  ],
+      facingMode: {
+        ideal: "environment",
+      },
+
+      width: {
+        ideal: 1920,
+      },
+
+      height: {
+        ideal: 1080,
+      },
+
+      advanced: [
+        {
+          focusMode: "continuous",
         },
+      ],
+},
         },
 
         videoElement,

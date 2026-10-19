@@ -702,7 +702,7 @@ async function startInvoiceCamera() {
           }
 
           const tempInvoiceNumber =
-            result.getText()?.trim();
+            result.getText()?.trim().slice(0, 7);;
 
           if (!tempInvoiceNumber) {
             return;

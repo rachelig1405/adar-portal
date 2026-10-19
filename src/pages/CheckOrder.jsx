@@ -744,6 +744,14 @@ try {
     </button>
   </div>
 )}
+    <label>מספר חשבונית - ידני</label>
+            <input
+                type="text"
+               
+                
+                value={invoice}
+                onChange={(event) => setInvoince(event.target.value)}
+            />
 
 
           <button

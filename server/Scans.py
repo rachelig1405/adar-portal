@@ -331,7 +331,7 @@ def create_loading_scan(
         "העמסות": [loading_id],
 
         "יש חריגה": has_exception,
-        "מספר חשבונית": [scan.invoice_number]
+        "מספר חשבונית": scan.invoice_number
     }
     if is_not_in_forecast:
         scan_fields["סוג החריגה"] = "לא בצפי"

@@ -1264,23 +1264,7 @@ async function startCamera() {
         )}
         <br></br>
 
-        {/* הודעה */}
-
-        {message && (
-            <div
-            style={{
-                marginTop: 25,
-                padding: 18,
-                fontSize: 23,
-                fontWeight: "bold",
-                borderRadius: 12,
-                background: "#eee",
-            }}
-            >
-            {message}
-            </div>
-        )}
-        <br></br>
+     
 
         {/* משטח כפתור סריקה */}
 

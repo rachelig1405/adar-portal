@@ -478,7 +478,56 @@ async function confirmStartLoading() {
   // =====================================================
   // פתיחת מצלמה לסריקה אחת בלבד
   // =====================================================
+async function improveInvoiceCamera(videoElement) {
+  try {
+    const stream =
+      videoElement?.srcObject;
 
+    if (!stream) {
+      return;
+    }
+
+    const track =
+      stream.getVideoTracks()[0];
+
+    if (!track) {
+      return;
+    }
+
+    const capabilities =
+      track.getCapabilities?.() || {};
+
+    console.log(
+      "Invoice camera capabilities:",
+      capabilities
+    );
+
+    const advanced = [];
+
+    if (
+      capabilities.focusMode &&
+      capabilities.focusMode.includes(
+        "continuous"
+      )
+    ) {
+      advanced.push({
+        focusMode: "continuous",
+      });
+    }
+
+    if (advanced.length > 0) {
+      await track.applyConstraints({
+        advanced,
+      });
+    }
+
+  } catch (error) {
+    console.error(
+      "Invoice camera enhancement error:",
+      error
+    );
+  }
+}
   async function improveCamera(videoElement) {
   try {
     const stream = videoElement?.srcObject;
@@ -673,7 +722,7 @@ async function startInvoiceCamera() {
       );
 
     controlsRef.current = controls;
-    await improveCamera(
+    await improveInvoiceCamera(
     videoElement
     );
 

@@ -1262,6 +1262,7 @@ async function startCamera() {
             </button>
             </div>
         )}
+        <br></br>
 
         {/* הודעה */}
 

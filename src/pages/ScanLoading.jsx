@@ -1214,7 +1214,13 @@ async function startCamera() {
 
         {!cameraInvoiceOpen && (
             <button
-            className="scan-loading__scan-button"
+            style={{
+        width: "100%",
+        minHeight: "58px",
+        fontSize: "20px",
+        fontWeight: "bold",
+        cursor: "pointer",
+      }}
             onClick={startInvoiceCamera}
             disabled={loading}
             >

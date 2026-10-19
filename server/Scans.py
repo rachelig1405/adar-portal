@@ -28,6 +28,7 @@ AIRTABLE_ORDERS_TABLE = os.getenv(
 class ScanRequest(BaseModel):
     order_number: str
     worker_id: str
+    invoice_number: str | None = None
     notes: str | None = None
     confirm_overage: bool = False
     confirm_not_in_forecast: bool = False
@@ -330,6 +331,7 @@ def create_loading_scan(
         "העמסות": [loading_id],
 
         "יש חריגה": has_exception,
+        "מספר חשבונית": [scan.invoice_number]
     }
     if is_not_in_forecast:
         scan_fields["סוג החריגה"] = "לא בצפי"

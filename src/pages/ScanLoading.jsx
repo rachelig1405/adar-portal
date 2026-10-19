@@ -14,6 +14,8 @@ export default function ScanLoading({ user, onClose, }) {
   const scanInProgressRef = useRef(false);
 
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [invoiceNumber, setinvoiceNumber] = useState("");
+  const [cameraInvoiceOpen, setCameraInvoiceOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [manualOrder, setManualOrder] = useState("");
@@ -562,6 +564,130 @@ async function confirmStartLoading() {
     );
   }
 }
+async function startInvoiceCamera() {
+  if (loading || cameraOpen) {
+    return;
+  }
+
+  setMessage("");
+  setLastScan(null);
+  scanInProgressRef.current = false;
+
+  try {
+    // קודם מציגים את אזור המצלמה
+    setCameraOpen(true);
+
+    // מחכים ש-React באמת יצור את <video>
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(resolve);
+      });
+    });
+
+    const videoElement = videoRef.current;
+
+    if (!videoElement) {
+      throw new Error(
+        "Video element not available"
+      );
+    }
+
+    const hints = new Map();
+
+    hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+        BarcodeFormat.CODE_EAN13
+    ]
+    );
+
+    hints.set(
+    DecodeHintType.TRY_HARDER,
+    true
+);
+
+    const reader =
+        new BrowserMultiFormatReader(hints);
+
+    const controls =
+      await reader.decodeFromConstraints(
+        {
+          audio: false,
+
+          video: {
+            facingMode: {
+                ideal: "environment",
+            },
+            width: {
+                ideal: 1920,
+            },
+            height: {
+                ideal: 1080,
+            },
+            advanced: [
+            {
+            focusMode: "continuous",
+            },
+  ],
+        },
+        },
+
+        videoElement,
+
+        async (
+          result,
+          error,
+          controlsFromCallback
+        ) => {
+          if (!result) {
+            return;
+          }
+
+          if (
+            scanInProgressRef.current
+          ) {
+            return;
+          }
+
+          const tempInvoiceNumber =
+            result.getText()?.trim();
+
+          if (!tempInvoiceNumber) {
+            return;
+          }
+          setinvoiceNumber(tempInvoiceNumber);
+
+          scanInProgressRef.current = true;
+
+          try {
+            controlsFromCallback?.stop();
+          } catch {}
+
+          stopCamera();
+
+         
+        }
+      );
+
+    controlsRef.current = controls;
+    await improveCamera(
+    videoElement
+    );
+
+  } catch (error) {
+    console.error(
+      "Camera error:",
+      error
+    );
+
+    stopCamera();
+
+    setMessage(
+      "לא ניתן לפתוח את המצלמה"
+    );
+  }
+}
+
 async function startCamera() {
   if (loading || cameraOpen) {
     return;
@@ -708,6 +834,7 @@ async function startCamera() {
 
         body: JSON.stringify({
           order_number: orderNumber,
+          invoice_number: invoiceNumber,
 
           // חייב להיות Record ID של העובד ב-Airtable
           worker_id: user.id,
@@ -1030,6 +1157,76 @@ async function startCamera() {
     </div>
 
     </div>
+        
+        {/* כפתור סריקה */}
+
+        {!cameraInvoiceOpen && (
+            <button
+            className="scan-loading__scan-button"
+            onClick={startCamera}
+            disabled={loading}
+            >
+            {loading
+                ? "מעבד סריקה..."
+                : "📷 סרוק חשבונית"}
+            </button>
+        )}
+
+        {/* מצלמה */}
+
+        {cameraInvoiceOpen && (
+            <div
+            style={{
+                marginTop: 20,
+            }}
+            >
+            <div
+                className="scan-loading__camera"
+            >
+                <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="scan-loading__video"
+                />
+
+                {/* מסגרת לכיוון הברקוד */}
+                <div className="scan-loading__target" />
+
+                
+            </div>
+
+            <button
+                onClick={stopCamera}
+                style={{
+                width: "100%",
+                marginTop: 10,
+                fontSize: 22,
+                padding: 15,
+                }}
+            >
+                ביטול
+            </button>
+            </div>
+        )}
+
+        {/* הודעה */}
+
+        {message && (
+            <div
+            style={{
+                marginTop: 25,
+                padding: 18,
+                fontSize: 23,
+                fontWeight: "bold",
+                borderRadius: 12,
+                background: "#eee",
+            }}
+            >
+            {message}
+            </div>
+        )}
 
         {/* כפתור סריקה */}
 

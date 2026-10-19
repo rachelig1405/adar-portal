@@ -643,14 +643,14 @@ async function startInvoiceCamera() {
 
     const hints = new Map();
 
-    hints.set(
-    DecodeHintType.POSSIBLE_FORMATS,
-    [
-        BarcodeFormat.CODE_EAN13
-    ]
-    );
+      hints.set(
+  DecodeHintType.POSSIBLE_FORMATS,
+  [
+    BarcodeFormat.EAN_13
+  ]
+);
 
-    hints.set(
+  hints.set(
     DecodeHintType.TRY_HARDER,
     true
 );

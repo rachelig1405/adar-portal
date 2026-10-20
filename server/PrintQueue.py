@@ -9,6 +9,9 @@ from DB import airtable_headers
 AIRTABLE_BASE_ID = os.getenv(
     "AIRTABLE_BASE_ID"
 )
+AIRTABLE_ORDERS_TABLE = os.getenv(
+    "AIRTABLE_ORDERS_TABLE"
+)
 
 AIRTABLE_PRINT_QUEUE_TABLE = os.getenv(
     "AIRTABLE_PRINT_QUEUE_TABLE"

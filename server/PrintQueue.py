@@ -22,7 +22,7 @@ def find_next_order():
                     ],)
     zpl=create_order_label_zpl(records[0])
     create_print_job(
-    order_id=records[0].get("id")
+    order_id=records[0].get("id"),
     zpl=zpl
 )
 

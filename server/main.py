@@ -57,6 +57,11 @@ from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
 from OrdersStickers import create_today_orders_zpl
+from PrintQueue import (
+    get_next_print_job,
+    delete_print_job,
+    mark_print_job_error,
+)
 
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
@@ -1250,4 +1255,49 @@ def start_loading(
         "success": True,
         "loading_id": loading["id"],
         "truck_number": truck_number,
+    }
+#אנפוינט למציאת עבודת ההדפסה הבאה
+class PrintErrorRequest(BaseModel):
+    error: str
+
+
+@app.get("/api/print-jobs/next")
+def next_print_job():
+    job = get_next_print_job()
+
+    return {
+        "success": True,
+        "job": job,
+    }
+
+
+@app.delete(
+    "/api/print-jobs/{record_id}"
+)
+def complete_print_job(
+    record_id: str
+):
+    delete_print_job(
+        record_id
+    )
+
+    return {
+        "success": True
+    }
+
+
+@app.patch(
+    "/api/print-jobs/{record_id}/error"
+)
+def print_job_error(
+    record_id: str,
+    request: PrintErrorRequest
+):
+    mark_print_job_error(
+        record_id,
+        request.error
+    )
+
+    return {
+        "success": True
     }

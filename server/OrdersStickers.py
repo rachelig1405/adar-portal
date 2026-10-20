@@ -79,19 +79,28 @@ def create_order_label_zpl(order: dict) -> str:
     customer_name = clean_zpl_value(
         fields.get("שם לקוח")
     )
-    estimate_amount= math.ceil(
-    float(
-        fields.get(
-            "כמות משטחים משוערכת",
-            0
-        ) or 0
-    )
-)*4
-    
+    raw_value = float(
+    fields.get(
+        "כמות משטחים משוערכת",
+        0
+    ) or 0
+)
 
-    address = clean_zpl_value(
-        fields.get("כתובת")
-    )
+# מניעת בעיות דיוק של float
+    raw_value = round(raw_value, 6)
+
+    whole = math.floor(raw_value)
+    fraction = raw_value - whole
+
+    if fraction <= 0.2:
+        estimate_amount = whole*4
+    else:
+        estimate_amount = (whole + 1)*4
+        
+
+        address = clean_zpl_value(
+            fields.get("כתובת")
+        )
 
     city = clean_zpl_value(
         fields.get("עיר")

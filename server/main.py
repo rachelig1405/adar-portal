@@ -10,7 +10,7 @@ from fastapi import Query
 from fastapi.responses import FileResponse
 import shutil
 import tempfile
-
+from PrintQueue import find_next_order
 import zipfile
 from fastapi import BackgroundTasks
 from pathlib import Path
@@ -153,6 +153,8 @@ def end_picking(data: PickingEnd):
         invoice=data.invoice,
          break_minutes=data.break_minutes
     )
+    find_next_order()
+
 
     return {
         "success": True,

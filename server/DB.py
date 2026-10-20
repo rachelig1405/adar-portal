@@ -353,24 +353,67 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                 
                     ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
                     ],)
-            if action==2:
-               
+            if action == 2:
+
+                # הזמן של לפני 2 דקות לפי השרת
+                two_minutes_ago = (
+                    datetime.now(timezone.utc)
+                    - timedelta(minutes=2)
+                )
+
+                cutoff = two_minutes_ago.strftime(
+                    "%Y-%m-%dT%H:%M:%SZ"
+                )
+
+                formula = (
+                    'AND('
+                        f'{{סטטוס}}="{status}",'
+                        '{שעת התחלה}!="",'
+                        'DATETIME_DIFF('
+                            f'DATETIME_PARSE("{cutoff}"),'
+                            '{שעת התחלה},'
+                            '"seconds"'
+                        ')>=0'
+                    ')'
+                )
+
+                print("STATUS:", status)
+                print("CUTOFF:", cutoff)
+                print("FORMULA:", formula)
+
                 records = get_all_airtable_records(
-                AIRTABLE_ORDERS_TABLE,
-                filter_formula= 'AND('
-    f'{{סטטוס}}="{status}",'
-    'DATETIME_DIFF(NOW(), {שעת התחלה}, "minutes") >= 2'
-    ')' ,   
-                sort= [ ("עדיפות", "desc"),("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
-                    ],)
+                    AIRTABLE_ORDERS_TABLE,
+                    filter_formula=formula,
+                    sort=[
+                        ("עדיפות", "desc"),
+                        ("תאריך אספקה", "asc"),
+                        ("עדיפות קו הפצה", "asc"),
+                        ("שורות ליקוט", "desc"),
+                        ("לקוח", "asc"),
+                    ],
+                )
+
+                print(
+                    "RECORDS BEFORE USER FILTER:",
+                    len(records)
+                )
+
                 if user_id:
                     records = [
+                        record
+                        for record in records
+                        if user_id in (
                             record
-                            for record in records
-                            if user_id in (
-                                record.get("fields", {}).get("עובדים") or []
-                            )
-                        ]
+                            .get("fields", {})
+                            .get("עובדים")
+                            or []
+                        )
+                    ]
+
+                print(
+                    "RECORDS AFTER USER FILTER:",
+                    len(records)
+                )
             else:
                 records = get_all_airtable_records(
                 AIRTABLE_ORDERS_TABLE,

@@ -54,7 +54,7 @@ def create_print_job(
 
     fields = {
         "הזמנה":
-            order_id,
+            [order_id],
 
         "ZPL":
             zpl,

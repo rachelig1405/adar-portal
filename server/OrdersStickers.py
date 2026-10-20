@@ -74,9 +74,19 @@ def create_order_label_zpl(order: dict) -> str:
         fields.get("מספר הזמנה")
     )
 
+
     customer_name = clean_zpl_value(
         fields.get("שם לקוח")
     )
+    estimate_amount= math.ceil(
+    float(
+        fields.get(
+            "כמות משטחים משוערכת",
+            0
+        ) or 0
+    )
+)*4
+    
 
     address = clean_zpl_value(
         fields.get("כתובת")
@@ -122,7 +132,7 @@ def create_order_label_zpl(order: dict) -> str:
 ^PW800
 ^LL560
 
-^PQ4
+^PQ{estimate_amount}
 
 ^FO570,130
 ^A0R,40,40

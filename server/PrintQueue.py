@@ -4,7 +4,7 @@ from DB import get_all_airtable_records
 
 from fastapi import HTTPException
 from DB import airtable_headers
-from OrderStickers import create_order_label_zpl
+from OrdersStickers import create_order_label_zpl
 
 
 AIRTABLE_BASE_ID = os.getenv(

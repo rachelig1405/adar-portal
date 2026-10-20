@@ -98,7 +98,7 @@ def create_order_label_zpl(order: dict) -> str:
         estimate_amount = (whole + 1)*4
         
 
-        address = clean_zpl_value(
+    address = clean_zpl_value(
             fields.get("כתובת")
         )
 

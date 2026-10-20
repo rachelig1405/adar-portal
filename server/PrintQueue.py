@@ -82,3 +82,86 @@ def create_print_job(
         )
 
     return response.json()
+    #שליפת העבודה הבאה
+def get_next_print_job():
+    records = get_all_airtable_records(
+        AIRTABLE_PRINT_QUEUE_TABLE,
+        filter_formula='{סטטוס}="ממתין"',
+    )
+
+    if not records:
+        return None
+
+    record = records[0]
+
+    fields = record.get(
+        "fields",
+        {}
+    )
+
+    return {
+        "id": record["id"],
+
+        "zpl": fields.get(
+            "ZPL",
+            ""
+        ),
+
+        "order": fields.get(
+            "הזמנה",
+            []
+        ),
+    }
+def delete_print_job(
+    record_id: str
+):
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/"
+        f"{AIRTABLE_PRINT_QUEUE_TABLE}/"
+        f"{record_id}"
+    )
+
+    response = requests.delete(
+        url,
+        headers=airtable_headers(),
+        timeout=30,
+    )
+
+    if not response.ok:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
+        )
+
+    return response.json()
+    def mark_print_job_error(
+    record_id: str,
+    error: str
+):
+    url = (
+        f"https://api.airtable.com/v0/"
+        f"{AIRTABLE_BASE_ID}/"
+        f"{AIRTABLE_PRINT_QUEUE_TABLE}/"
+        f"{record_id}"
+    )
+
+    response = requests.patch(
+        url,
+        headers=airtable_headers(),
+        json={
+            "fields": {
+                "סטטוס": "שגיאה",
+                "שגיאה": str(error),
+            }
+        },
+        timeout=30,
+    )
+
+    if not response.ok:
+        raise HTTPException(
+            status_code=response.status_code,
+            detail=response.text,
+        )
+
+    return response.json()

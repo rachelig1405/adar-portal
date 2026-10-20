@@ -1,5 +1,6 @@
 import os
 import requests
+from DB import get_all_airtable_records
 
 from fastapi import HTTPException
 from DB import airtable_headers

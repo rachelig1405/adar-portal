@@ -135,7 +135,7 @@ def delete_print_job(
         )
 
     return response.json()
-    def mark_print_job_error(
+def mark_print_job_error(
     record_id: str,
     error: str
 ):

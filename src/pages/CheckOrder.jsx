@@ -16,7 +16,7 @@ import {
 import OrderBarcode from "./OrderBarcode";
 import { API_URL } from "../config";
 
-export default function CheckOrder({ onClose }) {
+export default function CheckOrder({ onClose ,user}) {
   const [orders, setOrders] = useState([]);
   const [amount, setAmount] = useState("");
    const [notes, setNotes] = useState("");
@@ -472,7 +472,8 @@ try {
             order_id: selectedOrder.id,
             amount: amount==""?null: Number(amount),
             notes: notes==""?null :notes,
-            invoice:invoice==""?null :invoice
+            invoice:invoice==""?null :invoice,
+            employee_id: user.id,
           }),
         }
       );

@@ -27,6 +27,7 @@ class OrderCreate(BaseModel):
 
 class PickingEnd(BaseModel):
     order_id: str
+    employee_id: str|None=None
     amount:float |None=None
     notes: str |None=None
     warehouse_notes: str | None = ""

@@ -173,7 +173,7 @@ def check_order(data: PickingEnd):
         notes=data.notes,
         amount=data.amount,
         invoice=data.invoice,
-       
+       cheked_by=data.employee_id
         
     )
 

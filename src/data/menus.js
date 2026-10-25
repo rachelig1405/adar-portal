@@ -98,6 +98,7 @@ const other=[
 
   {key:"stickers",title:"יצירת סטיקרים צעצועים",subtitle:"", icon: "📄",color:"pink"},
   {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
+  {key:"activeScaenario",title:"הורדת מיילים עוז והדר",subtitle:"", icon: "📩",color:"yellow", url:LINKS.active_scenario}
 
 
  

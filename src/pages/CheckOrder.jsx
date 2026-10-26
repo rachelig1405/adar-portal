@@ -587,7 +587,7 @@ try {
                   <span>הזמנה שנבחרה</span>
                   <strong  style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
                
-                  <strong  style={{ whiteSpace: "pre-line" }}>{selectedOrder.employee}</strong>
+                  <strong  style={{ whiteSpace: "pre-line" }}>מלקט: {selectedOrder.employee}</strong>
                        {selectedOrder.notes && (
                     <div
                         style={{

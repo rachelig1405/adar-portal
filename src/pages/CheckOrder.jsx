@@ -93,7 +93,8 @@ export default function CheckOrder({ onClose ,user}) {
         order.amount,
         order.notes,
         order.order_date,
-        order.same_customer_date
+        order.same_customer_date,
+        order.emloyee
       ]
         .filter(Boolean)
         .join(" ")
@@ -585,6 +586,8 @@ try {
                 <div>
                   <span>הזמנה שנבחרה</span>
                   <strong  style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
+               
+                  <strong  style={{ whiteSpace: "pre-line" }}>{selectedOrder.emloyee}</strong>
                        {selectedOrder.notes && (
                     <div
                         style={{
@@ -596,6 +599,7 @@ try {
                         הערות: {selectedOrder.notes}
                       </div>
                   )}
+
                     {selectedOrder.same_customer_date && (
                     <div
                         style={{

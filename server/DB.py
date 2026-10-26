@@ -473,18 +473,20 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
             fields.get("מספר הזמנה", "")
         )
 
+
         customer_name = fields.get("שם לקוח", "")
         amount= fields.get("כמות משטחים", 0)
         notes=fields.get("הערות למחסן", "")
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)
         order_date=fields.get("תאריך אספקה", "")
-       
+        emloyee=get_employees()[fields.get("עובדים", "")]["name"]
         line=fields.get("קו הפצה", "")
         order_status=fields.get("סטטוס", "")
 
         if(order_status)=="בבדיקה":
             order_status="נבדק"
+       
 
         else:
             if(order_status=="לפני יצור"):

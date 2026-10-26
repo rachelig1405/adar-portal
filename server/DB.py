@@ -480,7 +480,11 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
         picking_lines = fields.get("שורות ליקוט", 0)
         segment = fields.get("סיגמנט", False)
         order_date=fields.get("תאריך אספקה", "")
-        emloyee=get_employees()[fields.get("עובדים", "")]["name"]
+        employee = (
+    get_employees()
+    .get((fields.get("עובדים") or [""])[0], {})
+    .get("name", "")
+)
         line=fields.get("קו הפצה", "")
         order_status=fields.get("סטטוס", "")
 

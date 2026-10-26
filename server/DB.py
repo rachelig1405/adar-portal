@@ -566,6 +566,7 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
             "notes": notes,
             "amount": amount,
             "line":line,
+            "employee": employee,
 
             "picking_lines": picking_lines,
             "segment": segment,

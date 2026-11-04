@@ -172,6 +172,8 @@ export default function NewPicking({ onClose,user }) {
     }
   }
 
+  
+
 
 
   async function submit(event) {

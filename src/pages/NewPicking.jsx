@@ -173,36 +173,6 @@ export default function NewPicking({ onClose,user }) {
   }
 
 
-    if (!filteredEmployees.length) {
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-
-      setEmployeeActiveIndex((current) =>
-        current < filteredEmployees.length - 1 ? current + 1 : 0
-      );
-    
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-
-      setEmployeeActiveIndex((current) =>
-        current > 0 ? current - 1 : filteredEmployees.length - 1
-      );
-    }
-
-    if (event.key === "Enter" && employeeActiveIndex >= 0) {
-      event.preventDefault();
-      chooseEmployee(filteredEmployees[employeeActiveIndex]);
-    }
-
-    if (event.key === "Escape") {
-      setEmployeeSearch("");
-      setEmployeeActiveIndex(-1);
-    }
-  }
 
   async function submit(event) {
     event.preventDefault();

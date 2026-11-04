@@ -480,14 +480,7 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
     (fields.get("עובדים") or [""])[0]
 )
 
-        employee = next(
-        (
-            emp.get("name", "")
-            for emp in get_employees()
-            if emp.get("id") == employee_id
-        ),
-        ""
-        )
+        employee = fields.get("שם עובד", "")
         line=fields.get("קו הפצה", "")
         order_status=fields.get("סטטוס", "")
 

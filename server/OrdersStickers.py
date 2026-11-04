@@ -134,56 +134,54 @@ def create_order_label_zpl(order: dict) -> str:
 
     print(city, len("עיר: " + city),
       right_align_x("עיר: " + city))
+    label_zpl = f"""
+    ^XA
+    ^CI28
+    ^PW800
+    ^LL560
+
+    ^FO570,130
+    ^A0R,40,40
+    ^FD{order_number}^FS
+
+    ^FO650,50
+    ^BY3,2,120
+    ^BCR,120,N,N,N
+    ^FD{order_number}^FS
+
+    ^FO480,{right_align_x('מספר לקוח: ' + customer_number)}
+    ^A0R,34,34
+    ^FDמספר לקוח: {customer_number}^FS
+
+    ^FO410,{right_align_x('שם לקוח: ' + customer_name)}
+    ^A0R,34,34
+    ^FDשם לקוח: {customer_name}^FS
+
+    ^FO340,{right_align_x('כתובת: ' + address)}
+    ^A0R,34,34
+    ^FDכתובת: {address}^FS
+
+    ^FO270,{right_align_x('עיר: ' + city)}
+    ^A0R,34,34
+    ^FDעיר: {city}^FS
+
+    ^FO200,{right_align_x('תאריך אספקה: ' + DeliveryDate)}
+    ^A0R,34,34
+    ^FDתאריך אספקה: {DeliveryDate}^FS
+
+    ^XZ
+    """
+    print(
+    f"PRINT DEBUG: raw={raw_value}, "
+    f"whole={whole}, "
+    f"fraction={fraction}, "
+    f"labels={estimate_amount}"
+)
+
+    return label_zpl * estimate_amount
 
 
-    return f"""
-^XA
-^CI28
-^PW800
-^LL560
 
-^PQ{estimate_amount}
-
-^FO570,130
-^A0R,40,40
-
-^FD{order_number}^FS
-
-^FO650,50
-
-^BY3,2,120
-^BCR,120,N,N,N
-^FD{order_number}^FS
-
-^FO480,{right_align_x('מספר לקוח: ' + customer_number)}
-
-^A0R,34,34
-^FDמספר לקוח: {customer_number}^FS
-
-^FO410,{right_align_x('שם לקוח: ' + customer_name)}
-
-^A0R,34,34
-^FDשם לקוח: {customer_name}^FS
-
-^FO340,{right_align_x('כתובת: ' + address)}
-
-^A0R,34,34
-^FDכתובת: {address}^FS
-
-^FO270,{right_align_x('עיר: ' + city)}
-
-^A0R,34,34
-^FDעיר: {city}^FS
-
-^FO200,{right_align_x('תאריך אספקה: ' + city)}
-
-^A0R,34,34
-^FDתאריך אספקה: {DeliveryDate}^FS
-
-
-
-^XZ
-"""
 def create_today_orders_zpl() -> str:
     records = get_all_airtable_records(table_name=AIRTABLE_ORDERS_TABLE,filter_formula=  "IS_SAME("
         "{יום עבודה בפועל},"

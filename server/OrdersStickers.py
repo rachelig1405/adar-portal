@@ -92,10 +92,10 @@ def create_order_label_zpl(order: dict) -> str:
     whole = math.floor(raw_value)
     fraction = raw_value - whole
 
-    if fraction <= 0.2:
-        estimate_amount = whole*4
+    if fraction <= 0.3:
+        estimate_amount = whole*2
     else:
-        estimate_amount = (whole + 1)*4
+        estimate_amount = (whole + 1)*2
         
 
     address = clean_zpl_value(

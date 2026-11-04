@@ -91,7 +91,8 @@ const admin=[
   title: "העמסה בסריקה",
   subtitle: "",
   icon: "🏁",
-  color:"green"}
+  color:"green"},
+   {key:"activeInvoiceScaenario",title:"הורדת חשבוניות מהמייל",subtitle:"", icon: "📩",color:"yellow", url:LINKS.active_invoices_scenario}
  
 ];
 const other=[

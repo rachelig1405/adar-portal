@@ -55,7 +55,8 @@ const office = [
   title: "עדכון חשבונית",
   subtitle: "",
   icon: "📄",
-  color:"pink"}
+  color:"pink"},
+  {key:"activeInvoiceScaenario",title:"הורדת חשבוניות מהמייל",subtitle:"", icon: "📩",color:"yellow", url:LINKS.active_invoices_scenario}
 ];
 const admin=[
     { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },

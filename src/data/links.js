@@ -10,5 +10,6 @@ export const LINKS = {
   allOrders: "https://airtable.com/appnBhDHcxBBWPi4t/pagYgXdG2sFqV4S5S",
   officeDashboard: "https://airtable.com/appnBhDHcxBBWPi4t/pagl1gG3vr9dPabBT",
   customers: "https://airtable.com/embed/PUT_CUSTOMERS_VIEW",
-  active_scenario:"https://hook.eu1.make.com/zmyuyvialqc7jfofvr60xnfd6w4hf4vm"
+  active_scenario:"https://hook.eu1.make.com/zmyuyvialqc7jfofvr60xnfd6w4hf4vm",
+  active_invoices_scenario:"https://hook.eu1.make.com/wg2bjhkea39gj5hivatvu8pxb8idonn8"
 };

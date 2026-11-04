@@ -347,12 +347,7 @@ def get_orders_filter_by_status(    status: str |None=None,action: int|None=None
                             ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc")
                             ],)
         else:
-            records = get_all_airtable_records(
-            AIRTABLE_ORDERS_TABLE,
-            filter_formula=f'{{סטטוס}}="{status}"',   sort= [ ("עדיפות", "desc"),
-                
-                    ("תאריך אספקה", "asc"),("עדיפות קו הפצה", "asc"),("שורות ליקוט", "desc"),("לקוח","asc"), 
-                    ],)
+            
             if action == 2:
 
                 # הזמן של לפני 2 דקות לפי השרת

@@ -63,7 +63,7 @@ export default function NewPicking({ onClose,user }) {
   async function checkActivePicking() {
     try {
       const response = await fetch(
-        `${API_URL}/api/orders/filter_by_status?status=בליקוט&action=2&user_id=${user.id}`
+        `${API_URL}/api/orders/filter_by_status?status=בליקוט&action=0&user_id=${user.id}`
       );
 
       const data = await response.json();
@@ -171,8 +171,6 @@ export default function NewPicking({ onClose,user }) {
       setOrderActiveIndex(-1);
     }
   }
-
-  
 
 
 

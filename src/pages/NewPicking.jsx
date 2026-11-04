@@ -5,10 +5,9 @@ import OrderBarcode from "./OrderBarcode";
 
 export default function NewPicking({ onClose,user }) {
   const [orders, setOrders] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  
 
   const [orderSearch, setOrderSearch] = useState("");
-  const [employeeSearch, setEmployeeSearch] = useState("");
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -21,56 +20,84 @@ export default function NewPicking({ onClose,user }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      setError("");
+  let cancelled = false;
 
-      try {
-        const [ordersResponse, employeesResponse, activePickingResponse] =
-          await Promise.all([
-            fetch(`${API_URL}/api/orders/filter_by_status?status=לפני יצור&action=0&user_id=${user.id}`),
-            fetch(`${API_URL}/api/employees`),
-            fetch(`${API_URL}/api/orders/filter_by_status?status=בליקוט&action=2&user_id=${user.id}`),
-          ]);
+  async function loadOrders() {
+    setLoading(true);
+    setError("");
 
-       
-        const ordersData = await ordersResponse.json();
-        const employeesData = await employeesResponse.json();
-        const activePickingData =
-          await activePickingResponse.json();
+    try {
+      const response = await fetch(
+        `${API_URL}/api/orders/filter_by_status?status=לפני יצור&action=0&user_id=${user.id}`
+      );
 
-        if (!ordersResponse.ok) {
-          throw new Error(
-            typeof ordersData.detail === "string"
-              ? ordersData.detail
-              : "שגיאה בטעינת ההזמנות"
-          );
-        }
+      const data = await response.json();
 
-    
-
-        setOrders(Array.isArray(ordersData) ? ordersData : []);
-        setEmployees(Array.isArray(employeesData) ? employeesData : []);
-             if (
-        activePickingResponse.ok &&
-        Array.isArray(activePickingData) &&
-        activePickingData.length > 0
-      ) {
-        alert(
-          `יש לך כבר הזמנה בליקוט:\n\n${activePickingData[0].display}`
+      if (!response.ok) {
+        throw new Error(
+          typeof data.detail === "string"
+            ? data.detail
+            : "שגיאה בטעינת ההזמנות"
         );
       }
- 
-      } catch (loadError) {
-        console.error(loadError);
-        setError(loadError.message || "שגיאה בטעינת הנתונים");
-      } finally {
+
+      if (!cancelled) {
+        setOrders(Array.isArray(data) ? data : []);
+      }
+
+    } catch (err) {
+      console.error(err);
+
+      if (!cancelled) {
+        setError(err.message || "שגיאה בטעינת ההזמנות");
+      }
+
+    } finally {
+      if (!cancelled) {
         setLoading(false);
       }
     }
+  }
 
-    loadData();
-  }, []);
+
+  async function checkActivePicking() {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/orders/filter_by_status?status=בליקוט&action=2&user_id=${user.id}`
+      );
+
+      const data = await response.json();
+
+      if (
+        response.ok &&
+        Array.isArray(data) &&
+        data.length > 0
+      ) {
+        alert(
+          `יש לך כבר הזמנה בליקוט:\n\n${data[0].display}`
+        );
+      }
+
+    } catch (err) {
+      console.error(
+        "Error checking active picking:",
+        err
+      );
+    }
+  }
+
+
+  loadOrders();
+
+  // לא מעכב את טעינת המסך
+  checkActivePicking();
+
+
+  return () => {
+    cancelled = true;
+  };
+
+}, [user.id]);
 
   const filteredOrders = useMemo(() => {
     const query = orderSearch.trim().toLowerCase();
@@ -94,17 +121,7 @@ export default function NewPicking({ onClose,user }) {
     return result.slice(0, 30);
   }, [orders, orderSearch]);
 
-  const filteredEmployees = useMemo(() => {
-    const query = employeeSearch.trim().toLowerCase();
-
-    const result = employees.filter((employee) =>
-      String(employee.name || "")
-        .toLowerCase()
-        .includes(query)
-    );
-
-    return result.slice(0, 30);
-  }, [employees, employeeSearch]);
+  
 
   function chooseOrder(order) {
     setSelectedOrder(order);
@@ -112,11 +129,7 @@ export default function NewPicking({ onClose,user }) {
     setOrderActiveIndex(-1);
   }
 
-  function chooseEmployee(employee) {
-    setSelectedEmployee(employee);
-    setEmployeeSearch(employee.name || "");
-    setEmployeeActiveIndex(-1);
-  }
+
 
   function handleOrderKeyDown(event) {
     if (selectedOrder) {
@@ -159,15 +172,6 @@ export default function NewPicking({ onClose,user }) {
     }
   }
 
-  function handleEmployeeKeyDown(event) {
-    if (selectedEmployee) {
-      if (event.key === "Escape") {
-        setSelectedEmployee(null);
-        setEmployeeSearch("");
-      }
-
-      return;
-    }
 
     if (!filteredEmployees.length) {
       return;
@@ -179,7 +183,7 @@ export default function NewPicking({ onClose,user }) {
       setEmployeeActiveIndex((current) =>
         current < filteredEmployees.length - 1 ? current + 1 : 0
       );
-    }
+    
 
     if (event.key === "ArrowUp") {
       event.preventDefault();

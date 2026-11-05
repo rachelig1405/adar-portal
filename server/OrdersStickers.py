@@ -142,13 +142,13 @@ def create_order_label_zpl(order: dict) -> str:
     ^PW800
     ^LL560
 
-    ^FO570,130
-    ^A0R,40,40
+    ^FO550,130
+    ^A0R,65,65
     ^FD{order_number}^FS
 
-    ^FO650,50
-    ^BY3,2,120
-    ^BCR,120,N,N,N
+    ^FO680,35
+    ^BY3,2,200
+    ^BCR,200,N,N,N
     ^FD{order_number}^FS
 
     ^FO480,{right_align_x('מספר לקוח: ' + customer_number)}

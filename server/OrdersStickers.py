@@ -114,8 +114,10 @@ def create_order_label_zpl(order: dict) -> str:
     DeliveryDate= clean_zpl_value(
                     fields.get("תאריך אספקה")
                 )
-    
-    
+    warning=""
+    segment = fields.get("סיגמנט", False)    
+    if segment:
+        warning="סיגמנט!!"
     order_number = clean_airtable_value(order_number)
     customer_number = clean_airtable_value(customer_number)
     customer_name = clean_airtable_value(customer_name)
@@ -168,6 +170,9 @@ def create_order_label_zpl(order: dict) -> str:
     ^FO200,{right_align_x('תאריך אספקה: ' + DeliveryDate)}
     ^A0R,34,34
     ^FDתאריך אספקה: {DeliveryDate}^FS
+    ^FO100,{right_align_x(warning)}
+    ^A0R,40,40
+    ^FD{warning}^FS
 
     ^XZ
     """

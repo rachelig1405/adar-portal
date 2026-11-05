@@ -147,11 +147,11 @@ def create_order_label_zpl(order: dict) -> str:
     ^PW800
     ^LL560
 
-    ^FO550,150
-    ^A0R,65,65
+    ^FO650,500
+    ^A0R,100,100
     ^FD{order_number}^FS
 
-    ^FO660,55
+    ^FO650,55
     ^BY3,2,200
     ^BCR,200,N,N,N
     ^FD{order_number}^FS

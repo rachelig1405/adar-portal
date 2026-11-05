@@ -57,7 +57,7 @@ from DB import get_employees,get_record_by_id
 from DB import get_orders_filter_by_status,update_order_workflow,upload_file_to_airtable,create_order,get_airtable_user,create_chat_message,get_chat_messages,get_all_airtable_records,get_airtable_user_by_id,get_airtable_users_by_role,get_today_attendance,create_attendance_record,update_attendance_clock_out
 from WorkdayAssignment import workday_assignment
 from fastapi.responses import PlainTextResponse
-from OrdersStickers import create_today_orders_zpl
+from OrdersStickers import create_today_orders_zpl,create_order_label_zpl
 from PrintQueue import (
     get_next_print_job,
     delete_print_job,
@@ -722,10 +722,9 @@ def get_order_label(order_number: str):
             detail="הזמנה לא נמצאה",
         )
     order = records[0]
-    return Response(
-        content=create_today_orders_zpl(order),
-        media_type="text/plain",
-    )
+    
+    zpl=create_order_label_zpl(order),
+       
     
 #החזרת התאריכים החסומים
 @app.get("/api/workdays/blocked-dates")

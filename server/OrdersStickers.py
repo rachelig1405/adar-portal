@@ -116,7 +116,12 @@ def create_order_label_zpl(order: dict) -> str:
                 )
     warning=""
     segment = fields.get("סיגמנט", False)    
-    if segment:
+    segment = segment[0] if segment else False
+    is_segment = (
+        segment is True
+        or str(segment).strip().lower() == "true"
+        )
+    if is_segment:
         warning="סיגמנט!!"
     order_number = clean_airtable_value(order_number)
     customer_number = clean_airtable_value(customer_number)
@@ -142,11 +147,11 @@ def create_order_label_zpl(order: dict) -> str:
     ^PW800
     ^LL560
 
-    ^FO550,130
+    ^FO550,150
     ^A0R,65,65
     ^FD{order_number}^FS
 
-    ^FO680,35
+    ^FO660,55
     ^BY3,2,200
     ^BCR,200,N,N,N
     ^FD{order_number}^FS

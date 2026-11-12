@@ -82,8 +82,8 @@ def create_order_label_zpl(order: dict) -> str:
     raw_value = float(
     fields.get(
         "כמות משטחים משוערכת",
-        0
-    ) or 0
+        1
+    ) or 1
 )
 
 # מניעת בעיות דיוק של float

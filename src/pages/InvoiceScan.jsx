@@ -123,7 +123,8 @@ useEffect(() => {
 useEffect(() => {
   if (
     !user?.id ||
-    !draftLoaded
+    !draftLoaded ||
+    rows.length === 0
   ) {
     return;
   }
@@ -131,55 +132,33 @@ useEffect(() => {
   const timer = setTimeout(
     async () => {
       try {
-        console.log(
-          "SAVING DRAFT:",
-          user.id,
-          rows
-        );
-
         const response = await fetch(
           `${API_URL}/api/inventory-scan/draft`,
           {
             method: "PUT",
 
             headers: {
-              "Content-Type":
-                "application/json",
+              "Content-Type": "application/json",
             },
 
             body: JSON.stringify({
               user_id: user.id,
 
               rows: rows.map((row) => ({
-                product_barcode:
-                  row.product_barcode,
-
-                quantity:
-                  Number(row.quantity),
-
-                location:
-                  row.location,
+                product_barcode: row.product_barcode,
+                quantity: Number(row.quantity),
+                location: row.location,
               })),
             }),
           }
         );
 
         if (!response.ok) {
-          const text =
-            await response.text();
-
-          throw new Error(
-            `Draft save failed ${response.status}: ${text}`
-          );
+          const text = await response.text();
+          throw new Error(text);
         }
 
-        const data =
-          await response.json();
-
-        console.log(
-          "DRAFT SAVED:",
-          data
-        );
+        console.log("DRAFT SAVED");
 
       } catch (err) {
         console.error(
@@ -191,9 +170,7 @@ useEffect(() => {
     1000
   );
 
-  return () => {
-    clearTimeout(timer);
-  };
+  return () => clearTimeout(timer);
 
 }, [
   rows,

@@ -226,7 +226,9 @@ def export_inventory_scan(
     headers = [
         "ברקוד",
         "כמות",
-        "מיקום",
+        "שורה",
+        "טור",
+        "קומה"
     ]
 
     ws.append(headers)
@@ -239,11 +241,64 @@ def export_inventory_scan(
         )
 
     for row in payload.rows:
+
+        location = str(row.location).strip()
+
+        # לדוגמה:
+        # MM3-03-10-01
+        parts = location.split("-")
+
+        row_code = ""
+        column_code = ""
+        floor_code = ""
+
+        if len(parts) >= 4:
+            # MM3
+            row_code = parts[0]
+
+            # 03
+            column_code = parts[1]
+
+            # 10 + 01 = 1001
+            floor_code = parts[-2] + parts[-1]
+
+        else:
+            # אם הגיע מיקום בפורמט לא צפוי
+            row_code = location
+
         ws.append([
             str(row.product_barcode),
             row.quantity,
-            str(row.location),
+            row_code,
+            column_code,
+            floor_code,
         ])
+
+        current_row = ws.max_row
+
+        # ברקוד כמחרוזת
+        ws.cell(
+            row=current_row,
+            column=1
+        ).number_format = "@"
+
+        # שורה
+        ws.cell(
+            row=current_row,
+            column=3
+        ).number_format = "@"
+
+        # טור - חשוב כדי ש-03 לא יהפוך ל-3
+        ws.cell(
+            row=current_row,
+            column=4
+        ).number_format = "@"
+
+        # קומה
+        ws.cell(
+            row=current_row,
+            column=5
+        ).number_format = "@"
 
         current_row = ws.max_row
 
@@ -262,13 +317,15 @@ def export_inventory_scan(
 
     ws.column_dimensions["A"].width = 24
     ws.column_dimensions["B"].width = 12
-    ws.column_dimensions["C"].width = 25
+    ws.column_dimensions["C"].width = 15
+    ws.column_dimensions["D"].width = 10
+    ws.column_dimensions["E"].width = 12
 
     ws.freeze_panes = "A2"
 
     ws.auto_filter.ref = (
-        f"A1:C{ws.max_row}"
-    )
+    f"A1:E{ws.max_row}"
+)
 
     output = io.BytesIO()
 

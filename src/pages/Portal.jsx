@@ -23,6 +23,7 @@ import Timelock from "./TimeClock";
 import ScanLoading from "./ScanLoading";
 import CreateOZProductPdfs from "./CreateOZStickers";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
+import InvoiceScan from "./InvoiceScan";
 
 const INTERNAL_COMPONENTS = {
   newOrder: NewOrder,
@@ -36,7 +37,8 @@ const INTERNAL_COMPONENTS = {
   generalChat: GeneralChat,
   UpdateInvoice: UpdateInvoice,
   ScanLoading: ScanLoading,
-  OZstickers: CreateOZProductPdfs
+  OZstickers: CreateOZProductPdfs,
+  InvoiceScan:InvoiceScan
 
   
 

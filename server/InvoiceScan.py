@@ -228,7 +228,8 @@ def export_inventory_scan(
         "כמות",
         "שורה",
         "טור",
-        "קומה"
+        "קומה",
+        "כמות"
     ]
 
     ws.append(headers)
@@ -272,6 +273,7 @@ def export_inventory_scan(
             row_code,
             column_code,
             floor_code,
+            row.quantity,
         ])
 
         current_row = ws.max_row
@@ -319,7 +321,8 @@ def export_inventory_scan(
     ws.column_dimensions["B"].width = 12
     ws.column_dimensions["C"].width = 15
     ws.column_dimensions["D"].width = 10
-    ws.column_dimensions["E"].width = 12
+    ws.column_dimensions["F"].width = 12
+
 
     ws.freeze_panes = "A2"
 

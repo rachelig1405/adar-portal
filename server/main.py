@@ -22,6 +22,7 @@ from Models import OrderCreate
 from Models import PickingStart
 from typing import Optional
 from BrowserDownloader import router as browser_downloader_router
+from InvoiceScan import router as inventory_scan_router
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
 from Scans import (
     ScanRequest,
@@ -74,6 +75,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.include_router(browser_downloader_router)
+app.include_router(
+    inventory_scan_router
+)
 
 app.add_middleware(
     CORSMiddleware,

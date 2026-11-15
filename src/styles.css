@@ -1492,6 +1492,7 @@
     background 0.15s ease;
 }
 
+
 .scan-loading__scan-button:hover {
   background: #1d4ed8;
 }
@@ -2462,4 +2463,159 @@
   font-weight: 800;
 
   cursor: pointer;
+}
+.inventory-scan-window {
+  width: min(900px, 95vw);
+  max-height: 94vh;
+  overflow-y: auto;
+}
+
+.inventory-scan-form {
+  padding: 20px;
+}
+
+.inventory-field {
+  margin-bottom: 16px;
+}
+
+.inventory-field label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.inventory-field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid #d9e2ef;
+  border-radius: 12px;
+  font-size: 18px;
+  box-sizing: border-box;
+}
+
+.inventory-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.inventory-input-row input {
+  flex: 1;
+}
+
+.scan-button {
+  min-width: 110px;
+  border: 0;
+  border-radius: 12px;
+  background: #348be0;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.keep-location {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 12px 0 18px;
+}
+
+.inventory-summary {
+  padding: 12px 20px;
+  font-size: 17px;
+}
+
+.inventory-table-wrapper {
+  overflow-x: auto;
+  padding: 0 20px;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.inventory-table th {
+  background: #f2f6fa;
+}
+
+.inventory-table input {
+  width: 90px;
+  padding: 6px;
+}
+
+.inventory-delete {
+  border: 0;
+  background: #ffe5e5;
+  color: #bd1f1f;
+  padding: 7px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.inventory-empty {
+  padding: 25px !important;
+  color: #777;
+}
+
+.inventory-finish {
+  width: calc(100% - 40px);
+  margin: 20px;
+  min-height: 55px;
+  border: 0;
+  border-radius: 14px;
+  background: #2eae60;
+  color: white;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.inventory-finish:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.scanner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.scanner-box {
+  width: min(600px, 92vw);
+  background: white;
+  border-radius: 18px;
+  padding: 15px;
+  text-align: center;
+}
+
+.scanner-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.scanner-box video {
+  width: 100%;
+  max-height: 65vh;
+  background: black;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.scanner-box button {
+  margin-top: 12px;
+  padding: 10px 25px;
 }

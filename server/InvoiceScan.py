@@ -83,7 +83,7 @@ def save_inventory_draft(
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'FIND("{user_id}", ARRAYJOIN({{Employee Record ID}})),'
+            f'FIND("{payload.user_id}", ARRAYJOIN({{Employee Record ID}})),'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )

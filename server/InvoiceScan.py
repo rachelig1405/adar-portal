@@ -11,6 +11,11 @@ from openpyxl.styles import Font, Alignment
 import json
 import os
 import requests
+from DB import (
+    get_all_airtable_records,
+    AIRTABLE_BASE_ID,
+    AIRTABLE_API_KEY,
+)
 
 AIRTABLE_INVOICE_DRAFTS_TABLE = os.getenv(
     "AIRTABLE_INVOICE_DRAFTS_TABLE"

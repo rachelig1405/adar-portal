@@ -998,15 +998,47 @@ useEffect(() => {
         );
 
       if (clearAfterDownload) {
-        setRows([]);
-        setProductBarcode("");
-        setLocationBarcode("");
-        setQuantity("1");
 
-        localStorage.removeItem(
-          STORAGE_KEY
-        );
+  try {
+    const deleteResponse = await fetch(
+      `${API_URL}/api/inventory-scan/draft?user_id=${user.id}`,
+      {
+        method: "DELETE",
       }
+    );
+
+    if (!deleteResponse.ok) {
+      const text = await deleteResponse.text();
+
+      throw new Error(
+        `Delete draft failed ${deleteResponse.status}: ${text}`
+      );
+    }
+
+    console.log("DRAFT DELETED");
+
+  } catch (err) {
+    console.error(
+      "Could not delete server draft:",
+      err
+    );
+
+    setError(
+      "הקובץ ירד, אבל הטיוטה לא נמחקה מהשרת"
+    );
+
+    return;
+  }
+
+  setRows([]);
+  setProductBarcode("");
+  setLocationBarcode("");
+  setQuantity("1");
+
+  localStorage.removeItem(
+    STORAGE_KEY
+  );
+}
     } catch (err) {
       console.error(err);
 

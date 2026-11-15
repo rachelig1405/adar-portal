@@ -19,6 +19,7 @@ export default function InvoiceScan({ onClose ,  user}) {
   const [productBarcode, setProductBarcode] = useState("");
   const [locationBarcode, setLocationBarcode] = useState("");
   const [quantity, setQuantity] = useState("1");
+  const [draftLoaded, setDraftLoaded] = useState(false);
 
   const [keepLocation, setKeepLocation] = useState(true);
 
@@ -35,8 +36,7 @@ export default function InvoiceScan({ onClose ,  user}) {
   // -----------------------------------------
   // טעינת סריקות שנשמרו בדפדפן
   // -----------------------------------------
-
- useEffect(() => {
+useEffect(() => {
   async function loadDraft() {
     try {
       const response = await fetch(
@@ -44,37 +44,44 @@ export default function InvoiceScan({ onClose ,  user}) {
       );
 
       if (!response.ok) {
-        throw new Error("Server draft failed");
+        throw new Error(
+          `Draft load failed: ${response.status}`
+        );
       }
 
       const data = await response.json();
 
-      if (Array.isArray(data.rows) && data.rows.length > 0) {
-        // הטיוטה מהשרת קובעת
+      if (
+        Array.isArray(data.rows) &&
+        data.rows.length > 0
+      ) {
         setRows(data.rows);
-        return;
-      }
-
-      // אין טיוטה בשרת - מנסים גיבוי מקומי
-      const saved = localStorage.getItem(STORAGE_KEY);
-
-      if (saved) {
-        const parsed = JSON.parse(saved);
-
-        if (Array.isArray(parsed)) {
-          setRows(parsed);
-        }
-      }
-
-    } catch (err) {
-      console.error("Could not load server draft:", err);
-
-      // השרת לא זמין - ננסה localStorage
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
+      } else {
+        const saved =
+          localStorage.getItem(STORAGE_KEY);
 
         if (saved) {
-          const parsed = JSON.parse(saved);
+          const parsed =
+            JSON.parse(saved);
+
+          if (Array.isArray(parsed)) {
+            setRows(parsed);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(
+        "Could not load server draft:",
+        err
+      );
+
+      try {
+        const saved =
+          localStorage.getItem(STORAGE_KEY);
+
+        if (saved) {
+          const parsed =
+            JSON.parse(saved);
 
           if (Array.isArray(parsed)) {
             setRows(parsed);
@@ -86,6 +93,8 @@ export default function InvoiceScan({ onClose ,  user}) {
           localErr
         );
       }
+    } finally {
+      setDraftLoaded(true);
     }
   }
 
@@ -93,6 +102,7 @@ export default function InvoiceScan({ onClose ,  user}) {
     loadDraft();
   }
 }, [user?.id]);
+ 
   /*useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -111,14 +121,23 @@ export default function InvoiceScan({ onClose ,  user}) {
 */
 //שמירה אוטומטית בשרת
 useEffect(() => {
-  if (!user?.id) {
+  if (
+    !user?.id ||
+    !draftLoaded
+  ) {
     return;
   }
 
   const timer = setTimeout(
     async () => {
       try {
-        await fetch(
+        console.log(
+          "SAVING DRAFT:",
+          user.id,
+          rows
+        );
+
+        const response = await fetch(
           `${API_URL}/api/inventory-scan/draft`,
           {
             method: "PUT",
@@ -130,6 +149,7 @@ useEffect(() => {
 
             body: JSON.stringify({
               user_id: user.id,
+
               rows: rows.map((row) => ({
                 product_barcode:
                   row.product_barcode,
@@ -143,6 +163,24 @@ useEffect(() => {
             }),
           }
         );
+
+        if (!response.ok) {
+          const text =
+            await response.text();
+
+          throw new Error(
+            `Draft save failed ${response.status}: ${text}`
+          );
+        }
+
+        const data =
+          await response.json();
+
+        console.log(
+          "DRAFT SAVED:",
+          data
+        );
+
       } catch (err) {
         console.error(
           "Could not save draft:",
@@ -156,7 +194,12 @@ useEffect(() => {
   return () => {
     clearTimeout(timer);
   };
-}, [rows, user?.id]);
+
+}, [
+  rows,
+  user?.id,
+  draftLoaded
+]);
   // -----------------------------------------
   // שמירה אוטומטית בדפדפן
   // -----------------------------------------

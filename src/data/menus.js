@@ -71,9 +71,9 @@ const admin=[
   },
    { key:"startPicking", title:"תחילת ליקוט", subtitle:"פתיחת תהליך ליקוט להזמנה", icon:"🟢", color:"green", url:LINKS.startPicking },
   { key:"endPicking", title:"סיום ליקוט", subtitle:"עדכון סיום ליקוט", icon:"✅", color:"blue", url:LINKS.endPicking },
-  {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"green", url:LINKS.check},
+  {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"yellow", url:LINKS.check},
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
-  {key:"stickers",title:"יצירת סטיקרים",subtitle:"", icon: "📄",color:"yellow"},
+  {key:"stickers",title:"יצירת סטיקרים צעצועים",subtitle:"", icon: "🧸",color:"green"},
   {key:"OZstickers",title:"יצירת סטיקרים לעוז והדר",subtitle:"", icon: "📖",color:"blue"},
   {
   key: "generalChat",
@@ -92,7 +92,8 @@ const admin=[
   subtitle: "",
   icon: "🏁",
   color:"green"},
-   {key:"activeInvoiceScaenario",title:"הורדת חשבוניות מהמייל",subtitle:"", icon: "📩",color:"yellow", url:LINKS.active_invoices_scenario}
+   {key:"activeInvoiceScaenario",title:"הורדת חשבוניות מהמייל",subtitle:"", icon: "📩",color:"blue", url:LINKS.active_invoices_scenario},
+   {key:"InvoiceScan",title:"יצירת חשבונית בסריקה",subtitle:"", icon: "📄",color:"yellow"}
  
 ];
 const other=[

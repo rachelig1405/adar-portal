@@ -217,13 +217,13 @@ def export_inventory_scan(
     wb = Workbook()
 
     ws = wb.active
-    ws.title = "סריקות מלאי"
+    ws.title = "חשבונית בסריקה"
 
     # גיליון מימין לשמאל
     ws.sheet_view.rightToLeft = True
 
     headers = [
-        "מספר ברקוד מוצר",
+        "ברקוד",
         "כמות",
         "מיקום",
     ]

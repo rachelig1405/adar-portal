@@ -174,6 +174,7 @@ def delete_inventory_draft(
     user_id: str
 ):
 
+
     records = get_all_airtable_records(
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(

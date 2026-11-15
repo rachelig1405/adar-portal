@@ -38,7 +38,7 @@ def get_inventory_draft(user_id: str):
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'{{משתמש}}="{user_id}",'
+            f'{{עובד}}="{user_id}",'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )
@@ -78,7 +78,7 @@ def save_inventory_draft(
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'{{משתמש}}="{payload.user_id}",'
+            f'{{עובד}}="{payload.user_id}",'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )
@@ -102,7 +102,7 @@ def save_inventory_draft(
     )
 
     fields = {
-        "משתמש": payload.user_id,
+        "עובד": [payload.user_id],
         "נתונים": rows_json,
         "סטטוס": "טיוטה"
     }

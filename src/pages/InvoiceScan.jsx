@@ -981,7 +981,7 @@ useEffect(() => {
       link.href = url;
 
       link.download =
-        `סריקות_מלאי_${new Date()
+        `חשבונית בסריקה ללא ליקוט${new Date()
           .toISOString()
           .slice(0, 10)}.xlsx`;
 

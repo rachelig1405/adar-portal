@@ -259,10 +259,10 @@ const reader = new BrowserMultiFormatReader(hints);
                   ideal: "environment",
                 },
                 width: {
-                  ideal: 1920,
+                  ideal: 1280,
                 },
                 height: {
-                  ideal: 1080,
+                  ideal: 720,
                 },
               },
               audio: false,

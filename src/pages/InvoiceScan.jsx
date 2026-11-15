@@ -3,7 +3,10 @@ import {
   BrowserCodeReader,
   BrowserMultiFormatReader,
 } from "@zxing/browser";
-
+import {
+  BarcodeFormat,
+  DecodeHintType,
+} from "@zxing/library";
 import { API_URL } from "../config";
 
 const STORAGE_KEY = "adar_inventory_scan_rows_v1";
@@ -223,7 +226,26 @@ useEffect(() => {
 
     let cancelled = false;
 
-    const reader = new BrowserMultiFormatReader();
+    const hints = new Map();
+
+if (cameraTarget === "product") {
+  hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+      BarcodeFormat.EAN_13,
+    ]
+  );
+} else {
+  hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+      BarcodeFormat.CODE_128,
+      BarcodeFormat.QR_CODE,
+    ]
+  );
+}
+
+const reader = new BrowserMultiFormatReader(hints);
 
     async function startScanner() {
       try {

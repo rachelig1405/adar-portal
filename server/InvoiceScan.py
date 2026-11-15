@@ -43,7 +43,7 @@ def get_inventory_draft(user_id: str):
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'{{עובד}}="{user_id}",'
+             f'FIND("{user_id}", ARRAYJOIN({{עובד}})),'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )
@@ -83,7 +83,7 @@ def save_inventory_draft(
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'{{עובד}}="{payload.user_id}",'
+            f'FIND("{user_id}", ARRAYJOIN({{עובד}})),'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )
@@ -178,7 +178,7 @@ def delete_inventory_draft(
         AIRTABLE_INVOICE_DRAFTS_TABLE,
         filter_formula=(
             f'AND('
-            f'{{משתמש}}="{user_id}",'
+            f'FIND("{user_id}", ARRAYJOIN({{עובד}})),'
             f'{{סטטוס}}="טיוטה"'
             f')'
         )

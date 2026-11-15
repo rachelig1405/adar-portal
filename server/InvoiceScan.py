@@ -14,7 +14,7 @@ import requests
 from DB import (
     get_all_airtable_records,
     AIRTABLE_BASE_ID,
-    AIRTABLE_API_KEY,
+    AIRTABLE_TOKEN,
 )
 
 AIRTABLE_INVOICE_DRAFTS_TABLE = os.getenv(
@@ -124,7 +124,7 @@ def save_inventory_draft(
 
             headers={
                 "Authorization":
-                    f"Bearer {AIRTABLE_API_KEY}",
+                    f"Bearer {AIRTABLE_TOKEN}",
 
                 "Content-Type":
                     "application/json",
@@ -146,7 +146,7 @@ def save_inventory_draft(
 
             headers={
                 "Authorization":
-                    f"Bearer {AIRTABLE_API_KEY}",
+                    f"Bearer {AIRTABLE_TOKEN}",
 
                 "Content-Type":
                     "application/json",
@@ -194,7 +194,7 @@ def delete_inventory_draft(
 
             headers={
                 "Authorization":
-                    f"Bearer {AIRTABLE_API_KEY}"
+                    f"Bearer {AIRTABLE_TOKEN}"
             },
 
             timeout=20,

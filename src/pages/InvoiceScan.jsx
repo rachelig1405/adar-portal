@@ -162,262 +162,195 @@ useEffect(() => {
   // -----------------------------------------
 
   useEffect(() => {
-  if (!cameraOpen || !cameraTarget) {
-    return;
-  }
-
-  let cancelled = false;
-
-  let reader;
-
-  if (cameraTarget === "product") {
-    const hints = new Map();
-
-    hints.set(
-      DecodeHintType.POSSIBLE_FORMATS,
-      [
-        BarcodeFormat.EAN_13,
-
-        // חשוב:
-        // חלק מברקודי EAN13 שמתחילים ב-0
-        // יכולים להיות מזוהים כ-UPC-A
-        BarcodeFormat.UPC_A,
-      ]
-    );
-
-    hints.set(
-      DecodeHintType.TRY_HARDER,
-      true
-    );
-
-    reader =
-      new BrowserMultiFormatOneDReader(
-        hints
-      );
-
-  } else {
-    const hints = new Map();
-
-    hints.set(
-      DecodeHintType.POSSIBLE_FORMATS,
-      [
-        BarcodeFormat.CODE_128,
-        BarcodeFormat.QR_CODE,
-      ]
-    );
-
-    reader =
-      new BrowserMultiFormatReader(
-        hints
-      );
-  }
-
-  async function startScanner() {
     try {
-      scanLockedRef.current = false;
-
-      const controls =
-        await reader.decodeFromConstraints(
-          {
-            video: {
-              facingMode: {
-                ideal: "environment",
-              },
-
-              width: {
-                ideal: 1920,
-              },
-
-              height: {
-                ideal: 1080,
-              },
-
-              frameRate: {
-                ideal: 30,
-                max: 60,
-              },
-            },
-
-            audio: false,
-          },
-
-          videoRef.current,
-
-          (result, error, controls) => {
-            if (
-              cancelled ||
-              !result ||
-              scanLockedRef.current
-            ) {
-              return;
-            }
-
-            let value =
-              result
-                .getText()
-                ?.trim();
-
-            if (!value) {
-              return;
-            }
-
-            const format =
-              result.getBarcodeFormat();
-
-            console.log(
-              "BARCODE DETECTED:",
-              value,
-              "FORMAT:",
-              BarcodeFormat[format]
-            );
-
-            // -------------------------
-            // ברקוד מוצר
-            // -------------------------
-
-            if (
-              cameraTarget === "product"
-            ) {
-              // לפעמים EAN13 שמתחיל ב-0
-              // מוחזר כ-UPC-A של 12 ספרות
-
-              if (
-                format ===
-                  BarcodeFormat.UPC_A &&
-                /^\d{12}$/.test(value)
-              ) {
-                value = "0" + value;
-              }
-
-              if (
-                format !==
-                  BarcodeFormat.EAN_13 &&
-                format !==
-                  BarcodeFormat.UPC_A
-              ) {
-                return;
-              }
-
-              if (
-                !isValidEAN13(value)
-              ) {
-                console.log(
-                  "INVALID EAN13:",
-                  value
-                );
-
-                return;
-              }
-            }
-
-            scanLockedRef.current = true;
-
-            if (
-              cameraTarget === "product"
-            ) {
-              setProductBarcode(value);
-            }
-
-            if (
-              cameraTarget === "location"
-            ) {
-              setLocationBarcode(value);
-            }
-
-            try {
-              navigator.vibrate?.(150);
-            } catch {}
-
-            try {
-              controls.stop();
-            } catch {}
-
-            setTimeout(() => {
-              stopCamera();
-            }, 150);
-          }
-        );
-
-      controlsRef.current =
-        controls;
-
-      // -------------------------
-      // Autofocus
-      // -------------------------
-
-      try {
-        const stream =
-          videoRef.current
-            ?.srcObject;
-
-        const track =
-          stream
-            ?.getVideoTracks?.()[0];
-
-        if (
-          track &&
-          track.getCapabilities
-        ) {
-          const capabilities =
-            track.getCapabilities();
-
-          console.log(
-            "CAMERA CAPABILITIES:",
-            capabilities
-          );
-
-          if (
-            capabilities.focusMode &&
-            capabilities.focusMode.includes(
-              "continuous"
-            )
-          ) {
-            await track.applyConstraints({
-              advanced: [
-                {
-                  focusMode:
-                    "continuous",
-                },
-              ],
-            });
-
-            console.log(
-              "CONTINUOUS FOCUS ENABLED"
-            );
-          }
-        }
-      } catch (focusError) {
-        console.log(
-          "FOCUS NOT AVAILABLE:",
-          focusError
-        );
-      }
-
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(rows)
+      );
     } catch (err) {
-      console.error(
-        "Camera error:",
-        err
-      );
-
-      setError(
-        "לא ניתן לפתוח את המצלמה"
-      );
-
-      stopCamera();
+      console.error("Could not save scans:", err);
     }
-  }
+  }, [rows]);
 
-  startScanner();
+  // -----------------------------------------
+  // סגירת מצלמה
+  // -----------------------------------------
 
-  return () => {
-    cancelled = true;
-
+  function stopCamera() {
     try {
       controlsRef.current?.stop();
-    } catch {}
-  };
+    } catch (err) {
+      console.error(err);
+    }
 
-}, [cameraOpen, cameraTarget]);
+    controlsRef.current = null;
+
+    try {
+      BrowserCodeReader.releaseAllStreams?.();
+    } catch (err) {
+      console.error(err);
+    }
+
+    if (videoRef.current) {
+      const stream = videoRef.current.srcObject;
+
+      if (stream) {
+        stream
+          .getTracks()
+          .forEach((track) => track.stop());
+      }
+
+      try {
+        videoRef.current.pause();
+      } catch {}
+
+      videoRef.current.srcObject = null;
+      videoRef.current.removeAttribute("src");
+
+      try {
+        videoRef.current.load();
+      } catch {}
+    }
+
+    scanLockedRef.current = false;
+    setCameraOpen(false);
+    setCameraTarget(null);
+  }
+
+  function isValidEAN13(code) {
+  if (!/^\d{13}$/.test(code)) {
+    return false;
+  }
+
+  const digits = code.split("").map(Number);
+
+  let sum = 0;
+
+  for (let i = 0; i < 12; i++) {
+    sum += digits[i] * (i % 2 === 0 ? 1 : 3);
+  }
+
+  const checkDigit = (10 - (sum % 10)) % 10;
+
+  return checkDigit === digits[12];
+}
+  // -----------------------------------------
+  // הפעלת מצלמה
+  // -----------------------------------------
+
+  useEffect(() => {
+    if (!cameraOpen || !cameraTarget) {
+      return;
+    }
+
+    let cancelled = false;
+   const hints = new Map();
+
+if (cameraTarget === "product") {
+  hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+      BarcodeFormat.EAN_13,
+      BarcodeFormat.UPC_A,
+    ]
+  );
+} else {
+  hints.set(
+    DecodeHintType.POSSIBLE_FORMATS,
+    [
+      BarcodeFormat.CODE_128,
+      BarcodeFormat.QR_CODE,
+    ]
+  );
+}
+
+const reader = new BrowserMultiFormatReader(hints);
+
+    async function startScanner() {
+      try {
+        scanLockedRef.current = false;
+
+        const controls =
+          await reader.decodeFromConstraints(
+            {
+              video: {
+                facingMode: {
+                  ideal: "environment",
+                },
+                width: {
+                  ideal: 1920,
+                },
+                height: {
+                  ideal: 1080,
+                },
+              },
+              audio: false,
+            },
+            videoRef.current,
+            (result, error, controls) => {
+              if (
+                cancelled ||
+                !result ||
+                scanLockedRef.current
+              ) {
+                return;
+              }
+
+              const value =
+                result.getText()?.trim();
+
+              if (!value) {
+                return;
+              }
+
+              scanLockedRef.current = true;
+
+              if (cameraTarget === "product") {
+                setProductBarcode(value);
+              }
+
+              if (cameraTarget === "location") {
+                setLocationBarcode(value);
+              }
+
+              try {
+                navigator.vibrate?.(100);
+              } catch {}
+
+              try {
+                controls.stop();
+              } catch {}
+
+              setTimeout(() => {
+                stopCamera();
+              }, 100);
+            }
+          );
+
+        if (!cancelled) {
+          controlsRef.current = controls;
+        }
+      } catch (err) {
+        console.error("Camera error:", err);
+
+        setError(
+          "לא ניתן לפתוח את המצלמה"
+        );
+
+        stopCamera();
+      }
+    }
+
+    startScanner();
+
+    return () => {
+      cancelled = true;
+
+      try {
+        controlsRef.current?.stop();
+      } catch {}
+    };
+  }, [cameraOpen, cameraTarget]);
 
   function openProductScanner() {
     setError("");

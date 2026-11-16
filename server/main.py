@@ -30,7 +30,9 @@ from Scans import (
     get_loading_summary,
     get_today_open_loading
 )
-
+from DailyAreaScan import (
+    router as daily_area_scan_router
+)
 from FinishLoading import (FinishLoadingRequest,
     finish_loading,get_loading_finish_preview)
 #הגדרת נתיב לדיסק
@@ -83,6 +85,9 @@ app.include_router(
 )
 app.include_router(
     forecast_orders_router
+)
+app.include_router(
+    daily_area_scan_router
 )
 
 app.add_middleware(

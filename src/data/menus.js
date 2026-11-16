@@ -2,9 +2,9 @@ import { LINKS } from "./links";
 const warehouse = [
   { key:"startPicking", title:"תחילת ליקוט", subtitle:"פתיחת תהליך ליקוט להזמנה", icon:"🟢", color:"green", url:LINKS.startPicking },
   { key:"endPicking", title:"סיום ליקוט", subtitle:"עדכון סיום ליקוט", icon:"✅", color:"blue", url:LINKS.endPicking },
-  {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"green", url:LINKS.check},
+  {key:"check", title:"בדיקת הזמנה", subtitle:"עדכון בדיקת הזמנה", icon:"✅", color:"yellow", url:LINKS.check},
   { key:"loading", title:"העמסה", subtitle:"עדכון העמסת הזמנה", icon:"🚚", color:"pink", url:LINKS.loading },
-  { key:"orders", title:"כל ההזמנות", subtitle:"תצוגת הזמנות מהמערכת", icon:"📦", color:"yellow", url:LINKS.allOrders },
+  { key:"orders", title:"כל ההזמנות", subtitle:"תצוגת הזמנות מהמערכת", icon:"📦", color:"green", url:LINKS.allOrders },
   
   {key:"OrderStickers",title: "הדפסת מדבקות",subtitle:"",icon: "📰",color:"blue"},
   {
@@ -23,19 +23,24 @@ const warehouse = [
   title: "עדכון כניסה ויציאה",
   subtitle: "",
   icon: "✅",
-  color:"blue"},
+  color:"green"},
   {key: "ScanLoading",
   title: "העמסה בסריקה",
   subtitle: "",
   icon: "🏁",
-  color:"green"},
+  color:"blue"},
   
  {key: "ForecastOrders",
   title: "תצוגת הזמנות בצפי",
   subtitle: "",
   icon: "📦",
+  color:"yellow"},
+  {key: "DailyAreaScan",
+  title: "פתיחת יום",
+  subtitle: "",
+  icon: "🖼️",
   color:"pink"}
-
+  
 ];
 const office = [
   { key:"newCustomer", title:"לקוח חדש", subtitle:"פתיחת לקוח חדש", icon:"👤", color:"green", url:LINKS.newCustomer },

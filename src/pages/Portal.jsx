@@ -25,6 +25,7 @@ import CreateOZProductPdfs from "./CreateOZStickers";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
 import InvoiceScan from "./InvoiceScan";
 import ForecastOrders from "./ForecastOrders";
+import DailyAreaScan from "./DailyAreaScan";
 
 const INTERNAL_COMPONENTS = {
   ForecastOrders:ForecastOrders,
@@ -40,7 +41,8 @@ const INTERNAL_COMPONENTS = {
   UpdateInvoice: UpdateInvoice,
   ScanLoading: ScanLoading,
   OZstickers: CreateOZProductPdfs,
-  InvoiceScan:InvoiceScan
+  InvoiceScan:InvoiceScan,
+  DailyAreaScan:DailyAreaScan
 
   
 

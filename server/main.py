@@ -64,6 +64,9 @@ from PrintQueue import (
     delete_print_job,
     mark_print_job_error,
 )
+from ForecastOrders import (
+    router as forecast_orders_router
+)
 
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
@@ -77,6 +80,9 @@ app = FastAPI()
 app.include_router(browser_downloader_router)
 app.include_router(
     inventory_scan_router
+)
+app.include_router(
+    forecast_orders_router
 )
 
 app.add_middleware(

@@ -2619,3 +2619,135 @@
   margin-top: 12px;
   padding: 10px 25px;
 }
+.forecast-orders-window {
+  width: min(1100px, 96vw);
+  max-height: 94vh;
+  overflow-y: auto;
+}
+
+.forecast-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 22px;
+}
+
+.forecast-main-stat {
+  display: flex;
+  flex-direction: column;
+  background: #eef6ff;
+  padding: 18px 28px;
+  border-radius: 16px;
+}
+
+.forecast-main-stat span {
+  font-weight: 700;
+}
+
+.forecast-main-stat strong {
+  font-size: 38px;
+  color: #287bd1;
+}
+
+.forecast-date-area {
+  position: relative;
+}
+
+.forecast-date-button {
+  border: 0;
+  background: #348be0;
+  color: white;
+  border-radius: 12px;
+  padding: 14px 22px;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.forecast-hidden-date {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.forecast-summary-row {
+  display: flex;
+  gap: 15px;
+  padding: 0 22px 20px;
+}
+
+.forecast-summary-row > div {
+  background: #f5f7fa;
+  border-radius: 12px;
+  padding: 12px 22px;
+  display: flex;
+  gap: 12px;
+}
+
+.forecast-summary-row strong {
+  color: #287bd1;
+}
+
+.forecast-table-wrapper {
+  padding: 0 20px 25px;
+  overflow-x: auto;
+}
+
+.forecast-table {
+  width: 100%;
+  border-collapse: collapse;
+  direction: rtl;
+}
+
+.forecast-table th {
+  background: #edf3f9;
+  padding: 13px;
+  text-align: center;
+}
+
+.forecast-table td {
+  padding: 13px;
+  text-align: center;
+  border-bottom: 1px solid #e1e6eb;
+}
+
+.forecast-order-number {
+  font-weight: 800;
+  color: #287bd1;
+}
+
+.forecast-status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  background: #eee;
+}
+
+.forecast-empty {
+  padding: 35px !important;
+  color: #777;
+}
+
+@media (max-width: 700px) {
+
+  .forecast-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .forecast-main-stat {
+    text-align: center;
+  }
+
+  .forecast-date-button {
+    width: 100%;
+  }
+
+  .forecast-summary-row {
+    flex-direction: column;
+  }
+}

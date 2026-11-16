@@ -28,8 +28,13 @@ const warehouse = [
   title: "העמסה בסריקה",
   subtitle: "",
   icon: "🏁",
-  color:"green"}
- 
+  color:"green"},
+  
+ {key: "ForecastOrders",
+  title: "תצוגת הזמנות בצפי",
+  subtitle: "",
+  icon: "📦",
+  color:"pink"}
 
 ];
 const office = [

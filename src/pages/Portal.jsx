@@ -24,8 +24,10 @@ import ScanLoading from "./ScanLoading";
 import CreateOZProductPdfs from "./CreateOZStickers";
 import AttendanceStatusBadge from "./AttendanceStatusBadge";
 import InvoiceScan from "./InvoiceScan";
+import ForecastOrders from "./ForecastOrders";
 
 const INTERNAL_COMPONENTS = {
+  ForecastOrders:ForecastOrders,
   newOrder: NewOrder,
   startPicking: NewPicking,
   endPicking: EndPicking,

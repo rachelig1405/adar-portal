@@ -212,10 +212,12 @@ async def import_orders_excel(
     data_rows = rows[1:] 
     cardboard=0
     picking_rows=0
+    picking_rows_cardboard=0
     existing_records = get_all_airtable_records(
     AIRTABLE_ORDERS_TABLE,
     fields=["מספר הזמנה"]
 )
+    
 
  # קריאה אחת בלבד ל-Airtable
     existing_records = get_all_airtable_records(
@@ -249,6 +251,10 @@ async def import_orders_excel(
         next_order_number = None
         cardboard = cardboard + normalize_number(get_value(row, "כמות מארזים"))
         picking_rows=picking_rows+1
+        if cardboard>4:
+            picking_rows_cardboard=picking_rows_cardboard+cardboard/4
+        else:
+            picking_rows_cardboard=picking_rows_cardboard+1
 
     # האם קיימת שורה הבאה?
         if i + 1 < len(data_rows):
@@ -369,6 +375,7 @@ async def import_orders_excel(
                         delivery_notes=delivery_notes,
                         warehouse_notes=warehouse_notes,
                         cardboard=cardboard
+                        picking_rows_cardboard=picking_rows_cardboard
                 )
 
 

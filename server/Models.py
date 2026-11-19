@@ -24,6 +24,7 @@ class OrderCreate(BaseModel):
     delivery_notes: str | None = ""
     warehouse_notes:str | None = ""
     cardboard:int | None = None
+    picking_rows_cardboard: float | None=None
 
 class PickingEnd(BaseModel):
     order_id: str

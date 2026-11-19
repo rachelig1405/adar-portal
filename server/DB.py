@@ -172,7 +172,7 @@ def create_order(order: OrderCreate):
     if order.line is not None:
         fields["קו הפצה"] = order.line
 
-    if order.picking_rows_cardboard is not None
+    if order.picking_rows_cardboard is not None:
         fields["שורות ליקוט לפי ארגזים"]=picking_rows_cardboard
 
     if order.delivery_notes:

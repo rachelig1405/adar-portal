@@ -256,7 +256,7 @@ async def import_orders_excel(
         else:
             picking_rows_cardboard=picking_rows_cardboard+1
 
-    # האם קיימת שורה הבאה?
+    # האם קיימת שורה הבאה?\
         if i + 1 < len(data_rows):
             next_row = data_rows[i + 1]
 
@@ -406,6 +406,7 @@ async def import_orders_excel(
                 })
             cardboard=0
             picking_rows=0
+            picking_rows_cardboard=0
 
 
     return {

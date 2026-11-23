@@ -249,10 +249,15 @@ async def import_orders_excel(
             get_value(row, "הזמנה")
         )
         next_order_number = None
-        cardboard = cardboard + normalize_number(get_value(row, "כמות מארזים"))
+        # כמות הארגזים בשורה הנוכחית
+        row_cardboard = normalize_number(
+        get_value(row, "כמות מארזים")
+        )
+
+        cardboard = cardboard + row_cardboard
         picking_rows=picking_rows+1
-        if cardboard>4:
-            picking_rows_cardboard=picking_rows_cardboard+cardboard/4
+        if row_cardboard>4:
+            picking_rows_cardboard=picking_rows_cardboard+row_cardboard/4
         else:
             picking_rows_cardboard=picking_rows_cardboard+1
 

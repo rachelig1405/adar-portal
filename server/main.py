@@ -96,7 +96,7 @@ app.include_router(
 app.include_router(nutstore_router)
 app.include_router(
     missing_report_router,
-    dependencies=[Depends(require_authorized_user)]
+   
 )
 app.add_middleware(
     CORSMiddleware,

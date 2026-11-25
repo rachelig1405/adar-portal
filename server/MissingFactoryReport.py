@@ -119,8 +119,33 @@ def _extract_rows(workbook):
                            hard_soft=_find_col(h, HEADER_ALIASES["hard_soft"]))
             header_idx = i
             break
+    
     if header_idx is None:
-        raise ValueError("לא נמצאו הכותרות הדרושות. יש לוודא שהעמודה 'עמדה' קיימת ושמות העמודות תואמים")
+        required = [
+            "FACTORY ITEM NO",
+            "Factory",
+            "CONFIRM FILE",
+            "COVER",
+            "PORZAZ",
+        ]
+
+        found_headers = set()
+
+        for row in values[:80]:
+            for cell in row:
+                if cell is not None:
+                    found_headers.add(_key(cell))
+
+        missing_headers = [
+            name for name in required
+            if _key(name) not in found_headers
+        ]
+
+        raise ValueError(
+            "לא נמצאו כל הכותרות באותה שורה. "
+            f"כותרות שלא זוהו בכלל: {missing_headers}. "
+            "יש לבדוק אם הכותרות מפוזרות בין מספר שורות."
+        )
 
     records = []
     factory_counts = Counter()

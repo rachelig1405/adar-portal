@@ -35,7 +35,7 @@ MISSING_RULE = "empty"  # 'empty' or 'not_confirm'
 MISSING_COLUMNS = ("CONFIRM FILE", "COVER", "PORZAZ")
 HEADER_ALIASES = {
     "item": ("FACTORY ITEM NO", "ITEM NUMBER"),
-    "factory": ("עמדה",),
+    "factory": ("Factory",),
     "description": ("DESCRIPTION", "ITEM DESCRIPTION", "PRODUCT NAME", "תיאור"),
     "hard_soft": ("HARD/SOFT", "HARD SOFT"),
 }

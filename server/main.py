@@ -24,6 +24,7 @@ from typing import Optional
 from BrowserDownloader import router as browser_downloader_router
 from InvoiceScan import router as inventory_scan_router
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
+from NutstoreExcel import router as nutstore_router
 from Scans import (
     ScanRequest,
     create_loading_scan,
@@ -89,6 +90,7 @@ app.include_router(
 app.include_router(
     daily_area_scan_router
 )
+app.include_router(nutstore_router)
 
 app.add_middleware(
     CORSMiddleware,

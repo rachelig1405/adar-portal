@@ -26,7 +26,7 @@ import AttendanceStatusBadge from "./AttendanceStatusBadge";
 import InvoiceScan from "./InvoiceScan";
 import ForecastOrders from "./ForecastOrders";
 import DailyAreaScan from "./DailyAreaScan";
-
+import ExportMissingFactoryReport from "./ExportMissingFactoryReport";
 const INTERNAL_COMPONENTS = {
   ForecastOrders:ForecastOrders,
   newOrder: NewOrder,
@@ -42,7 +42,8 @@ const INTERNAL_COMPONENTS = {
   ScanLoading: ScanLoading,
   OZstickers: CreateOZProductPdfs,
   InvoiceScan:InvoiceScan,
-  DailyAreaScan:DailyAreaScan
+  DailyAreaScan:DailyAreaScan,
+  ExportMissingFactoryReport:ExportMissingFactoryReport
 
   
 
@@ -157,6 +158,10 @@ export default function Portal({ user, onLogout ,onSwitchUser}) {
   }
 
     const isInternalPage = Boolean(INTERNAL_COMPONENTS[item.key]);
+    console.log("CLICKED KEY:", JSON.stringify(item.key));
+    console.log("AVAILABLE KEYS:", Object.keys(INTERNAL_COMPONENTS));
+    console.log("COMPONENT FOUND:", Boolean(INTERNAL_COMPONENTS[item.key]));
+
 
     if (isInternalPage) {
       setActiveAction(item.key);

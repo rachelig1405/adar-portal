@@ -1,386 +1,92 @@
-import { useEffect, useMemo, useState } from "react";
-import OrderBarcode from "./OrderBarcode";
+import { useState } from "react";
 import { API_URL } from "../config";
-export default function EndPicking({ onClose,user}) {
-  const [orders, setOrders] = useState([]);
-  const [amount, setAmount] = useState("");
-   const [notes, setNotes] = useState("");
-  const [breakMinutes, setBreakMinutes] = useState("");
-   
 
-  const [orderSearch, setOrderSearch] = useState("");
- 
-
-  const [selectedOrder, setSelectedOrder] = useState(null);
-
-
-
-  const [orderActiveIndex, setOrderActiveIndex] = useState(-1);
-
-
-  const [loading, setLoading] = useState(true);
+// Place this file alongside EndPicking.jsx, using the same relative API_URL import.
+// The server endpoint must enforce the portal's normal authentication and report permissions.
+export default function ExportMissingFactoryReport({ onClose }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const params = new URLSearchParams({
-  status: "בליקוט",
-  action: 2,
-  user_id: user.id,
-});
 
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      setError("");
-
-      try {
-        const [ordersResponse] = await Promise.all([
-          fetch(`${API_URL}/api/orders/filter_by_status?${params}`),
-         
-        ]);
-
-        const ordersData = await ordersResponse.json();
-     
-
-        if (!ordersResponse.ok) {
-          throw new Error(
-            typeof ordersData.detail === "string"
-              ? ordersData.detail
-              : "שגיאה בטעינת ההזמנות"
-          );
-        }
-
-      
-        setOrders(Array.isArray(ordersData) ? ordersData : []);
-     
-      } catch (loadError) {
-        console.error(loadError);
-        setError(loadError.message || "שגיאה בטעינת הנתונים");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  const filteredOrders = useMemo(() => {
-    const query = orderSearch.trim().toLowerCase();
-
-    const result = orders.filter((order) => {
-      const searchableText = [
-        order.order_number,
-        order.customer_name,
-        order.display,
-        order.notes
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      return !query || searchableText.includes(query);
-    });
-
-    return result.slice(0, 30);
-  }, [orders, orderSearch]);
-
-
-
-  function chooseOrder(order) {
-    setSelectedOrder(order);
-    setOrderSearch(order.display || order.order_number || "");
-    setOrderActiveIndex(-1);
-  }
-
-
-
-  function handleOrderKeyDown(event) {
-    if (selectedOrder) {
-      if (event.key === "Escape") {
-        setSelectedOrder(null);
-        setOrderSearch("");
-      }
-
-      return;
-    }
-
-    if (!filteredOrders.length) {
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-
-      setOrderActiveIndex((current) =>
-        current < filteredOrders.length - 1 ? current + 1 : 0
-      );
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-
-      setOrderActiveIndex((current) =>
-        current > 0 ? current - 1 : filteredOrders.length - 1
-      );
-    }
-
-    if (event.key === "Enter" && orderActiveIndex >= 0) {
-      event.preventDefault();
-      chooseOrder(filteredOrders[orderActiveIndex]);
-    }
-
-    if (event.key === "Escape") {
-      setOrderSearch("");
-      setOrderActiveIndex(-1);
-    }
-  }
-
-  function handleEmployeeKeyDown(event) {
-    if (selectedEmployee) {
-      if (event.key === "Escape") {
-        setSelectedEmployee(null);
-        setEmployeeSearch("");
-      }
-
-      return;
-    }
-
-    if (!filteredEmployees.length) {
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-
-      setEmployeeActiveIndex((current) =>
-        current < filteredEmployees.length - 1 ? current + 1 : 0
-      );
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-
-      setEmployeeActiveIndex((current) =>
-        current > 0 ? current - 1 : filteredEmployees.length - 1
-      );
-    }
-
-    if (event.key === "Enter" && employeeActiveIndex >= 0) {
-      event.preventDefault();
-      chooseEmployee(filteredEmployees[employeeActiveIndex]);
-    }
-
-    if (event.key === "Escape") {
-      setEmployeeSearch("");
-      setEmployeeActiveIndex(-1);
-    }
-  }
-
-  async function submit(event) {
+  async function downloadReport(event) {
     event.preventDefault();
-
-    if (!selectedOrder?.id) {
-      setError("חובה לבחור הזמנה");
-      return;
-    }
-
-    
+    if (saving) return;
 
     setSaving(true);
     setError("");
 
     try {
       const response = await fetch(
-        `${API_URL}/api/orders/end-picking`,
+        `${API_URL}/api/reports/missing-factory-excel`,
         {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            order_id: selectedOrder.id,
-            amount: amount==""?null: Number(amount),
-            notes: notes==""?null :notes,
-            break_minutes:
-              breakMinutes === ""
-                ? null
-                : Number(breakMinutes),
-                    
-          }),
+          method: "GET",
+          credentials: "include",
+          cache: "no-store",
         }
       );
 
-      const responseData = await response.json();
-
       if (!response.ok) {
-        let message = "שגיאה בסיום הליקוט";
-
-        if (typeof responseData.detail === "string") {
-          message = responseData.detail;
-        } else if (responseData.detail) {
-          message = JSON.stringify(responseData.detail, null, 2);
+        let message = "שגיאה בהפקת דוח החוסרים";
+        try {
+          const data = await response.json();
+          if (typeof data.detail === "string") message = data.detail;
+        } catch {
+          message = `שגיאה בהפקת הדוח (${response.status})`;
         }
-
         throw new Error(message);
       }
 
-      alert("סיום הליקוט נשמרה בהצלחה");
-      onClose();
-    } catch (submitError) {
-      console.error(submitError);
-      setError(submitError.message || "שגיאה בסיום הליקוט");
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get("content-disposition") || "";
+      const match = contentDisposition.match(/filename\s*=\s*"?([^";]+)"?/i);
+      const filename = match?.[1] || "Missing_Factory_Orders.xlsx";
+
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+    } catch (downloadError) {
+      console.error(downloadError);
+      setError(downloadError.message || "לא ניתן להוריד את הדוח");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <div className="modal-backdrop">
+    <div className="modal-backdrop" dir="rtl">
       <div className="form-window picking-window">
         <div className="form-header">
           <div>
             <div className="frame-kicker">ADAR Portal</div>
-            <strong>סיום ליקוט</strong>
+            <strong>דוח חוסרים לפי מפעלים</strong>
           </div>
-
-          <button type="button" onClick={onClose}>
+          <button type="button" onClick={onClose} disabled={saving}>
             חזרה
           </button>
         </div>
 
-        <form className="order-form" onSubmit={submit}>
-          {loading && (
+        <form className="order-form" onSubmit={downloadReport}>
+          <div className="picker-section">
+            <label>ייצוא דוח חוסרים</label>
             <div className="form-message">
-              טוען הזמנות ועובדים...
+              הפקת קובץ Excel חדש עם כל הפריטים החסרים, כולל גיליון סיכום
+              וגיליון נפרד לכל מפעל.
+              <div>הקובץ המקורי ב־Nutstore לא ישתנה.</div>
             </div>
-          )}
+          </div>
 
           {error && (
-            <div className="form-error">
+            <div className="form-error" role="alert">
               {error}
             </div>
           )}
 
-          <div className="picker-section">
-            <label>הזמנה</label>
-
-            <input
-              type="text"
-              placeholder="הקלד מספר הזמנה או שם לקוח..."
-              value={orderSearch}
-              disabled={loading}
-              autoComplete="off"
-              onKeyDown={handleOrderKeyDown}
-              onChange={(event) => {
-                setOrderSearch(event.target.value);
-                setSelectedOrder(null);
-                setOrderActiveIndex(-1);
-              }}
-            />
-
-            {!selectedOrder && !loading && (
-              <div className="picker-results">
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order, index) => (
-                    <button
-                      type="button"
-                      key={order.id}
-                      className={`picker-row ${
-                        orderActiveIndex === index ? "active" : ""
-                      }`}
-                      onMouseEnter={() => setOrderActiveIndex(index)}
-                      onClick={() => chooseOrder(order)}
-                    >
-                      <div className="picker-main">
-                        {order.order_number}
-                      </div>
-
-                      <div className="picker-secondary">
-                        {order.customer_name || "ללא שם לקוח"}
-                      </div>
-                    </button>
-                  ))
-                ) : (
-                  <div className="empty-search">
-                     לא נמצאו הזמנות בליקוט
-                  </div>
-                )}
-              </div>
-            )}
-
-            {selectedOrder && (
-              <div className="selected-record">
-                <div>
-                  <span>הזמנה שנבחרה</span>
-                   <strong style={{ whiteSpace: "pre-line" }}>{selectedOrder.display}</strong>
-                        {selectedOrder.notes && (
-                    <div
-                        style={{
-                          color: "red",
-                          fontWeight: "bold",
-                          marginTop: "6px",
-                        }}
-                      >
-                        הערות: {selectedOrder.notes}
-                      </div>
-                  )}
-                
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedOrder(null);
-                    setOrderSearch("");
-                  }}
-                >
-                  שינוי
-                </button>
-              </div>
-            )}
-          </div>
-          <label>כמות</label>
-
-            <input
-                type="number"
-                min="0"
-                step="1"
-                placeholder="הקליד מספר"
-                value={amount}
-                onChange={(event) => setAmount(event.target.value)}
-            />
-              <label>הערות</label>
-            <input
-                type="text"
-               
-                
-                value={notes}
-                onChange={(event) => setNotes(event.target.value)}
-            />
-           
-          <label>האם הייתה הפסקה?</label>
-
-          <select
-            value={breakMinutes}
-            onChange={(event) => setBreakMinutes(event.target.value)}
-          >
-            <option value="">לא הייתה הפסקה</option>
-            <option value="10">10 דקות</option>
-            <option value="15">רבע שעה</option>
-            <option value="30">חצי שעה</option>
-          </select>
-
-
-          <button
-            className="save-button"
-            type="submit"
-            disabled={
-              loading ||
-              saving ||
-              !selectedOrder 
-              
-            }
-          >
-            {saving ? "שומר..." : "סיום ליקוט"}
+          <button className="save-button" type="submit" disabled={saving}>
+            {saving ? "מכין דוח חוסרים..." : "ייצוא דוח חוסרים לאקסל"}
           </button>
         </form>
       </div>

@@ -190,9 +190,8 @@ def read_nutstore_orders(
 
         total += 1
 
-        # כרגע מחזירים עד 100 שורות לבדיקה
-        if len(results) < 100:
-            results.append(item)
+        
+        results.append(item)
 
 
     return {
@@ -200,6 +199,6 @@ def read_nutstore_orders(
         "sheet": SHEET,
         "total_matching_rows": total,
         "returned_rows": len(results),
-        "preview_only": True,
+        "preview_only": False,
         "rows": results,
     }

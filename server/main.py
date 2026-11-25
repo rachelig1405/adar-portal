@@ -94,10 +94,7 @@ app.include_router(
     daily_area_scan_router
 )
 app.include_router(nutstore_router)
-app.include_router(
-    missing_report_router,
-   
-)
+#app.include_router(missing_report_router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

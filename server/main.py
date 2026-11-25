@@ -15,6 +15,7 @@ from PrintQueue import find_next_order
 import zipfile
 from fastapi import BackgroundTasks
 from pathlib import Path
+
 env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=env_path)
 from CreateStickesr import process_excel

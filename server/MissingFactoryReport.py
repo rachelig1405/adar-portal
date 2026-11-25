@@ -35,7 +35,7 @@ MISSING_RULE = "empty"  # 'empty' or 'not_confirm'
 MISSING_COLUMNS = ("CONFIRM FILE", "COVER", "PORZAZ")
 HEADER_ALIASES = {
     "item": ("FACTORY ITEM NO", "ITEM NUMBER"),
-    "factory": ("Factory",),
+    "factory": ("SUPPLIER NAME",),
     "description": ("DESCRIPTION", "ITEM DESCRIPTION", "PRODUCT NAME", "תיאור"),
     "hard_soft": ("HARD/SOFT", "HARD SOFT"),
 }
@@ -123,7 +123,7 @@ def _extract_rows(workbook):
     if header_idx is None:
         required = [
             "FACTORY ITEM NO",
-            "Factory",
+            "SUPPLIER NAME",
             "CONFIRM FILE",
             "COVER",
             "PORZAZ",

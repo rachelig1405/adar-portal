@@ -16,4 +16,5 @@ setuptools
 openai
 PyMuPDF
 Pillow
-XlsxWriter==3.2.9
+XlsxWriter==3.3.4
+

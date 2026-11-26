@@ -154,29 +154,47 @@ export default function ContainerUnloading({ onClose, user }) {
                 </select>
                 {form.warehouseChoice === 'אחר' && <input required maxLength={100} value={form.customWarehouse} onChange={e => update("customWarehouse", e.target.value)} placeholder="מספר או שם מחסן אחר" />}
 
-                <div className="picker-section">
-                <label>📷 צילום מכולה (חובה)</label>
+                
+<div className="picker-section">
+  <label>📷 צילום מכולה (חובה)</label>
 
-                <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    capture="environment"
-                    required
-                    onChange={(e) =>
-                    setStartPhotoFile(e.target.files?.[0] || null)
-                    }
-                />
+  <div className="unloading-photo-actions">
+    <label className="unloading-photo-button">
+      📷 פתח מצלמה
+      <input
+        type="file"
+        accept="image/*"
+        capture="environment"
+        hidden
+        onChange={(e) => {
+          setStartPhotoFile(e.target.files?.[0] || null);
+        }}
+      />
+        </label>
 
-                {startPhotoFile ? (
-                    <div className="form-message">
-                    ✅ נבחרה תמונה: {startPhotoFile.name}
-                    </div>
-                ) : (
-                    <div className="form-error">
-                    חובה לצלם או להעלות תמונה לפני תחילת הפריקה
-                    </div>
-                )}
-            </div>
+        <label className="unloading-photo-button">
+        📁 בחר תמונה מהמכשיר
+        <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            hidden
+            onChange={(e) => {
+            setStartPhotoFile(e.target.files?.[0] || null);
+            }}
+        />
+        </label>
+    </div>
+
+    {startPhotoFile ? (
+        <div className="form-message">
+        ✅ נבחרה תמונה: {startPhotoFile.name}
+        </div>
+    ) : (
+        <div className="form-error">
+        </div>
+    )}
+    </div>
+
 
               </div>
               <button type="submit" className="save-button" disabled={!valid}>{saving ? 'שומר...' : 'אישור תחילת פריקה'}</button>

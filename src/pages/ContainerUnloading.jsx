@@ -156,34 +156,34 @@ export default function ContainerUnloading({ onClose, user }) {
 
                 
 <div className="picker-section">
-  <label>📷 צילום מכולה (חובה)</label>
+  <label>📷 צילום מכולה </label>
 
-  <div className="unloading-photo-actions">
-    <label className="unloading-photo-button">
-      📷 פתח מצלמה
-      <input
-        type="file"
-        accept="image/*"
-        capture="environment"
-        hidden
-        onChange={(e) => {
-          setStartPhotoFile(e.target.files?.[0] || null);
-        }}
-      />
-        </label>
+  
+<div className="unloading-photo-actions">
+  <label className="unloading-photo-button">
+    <span>📷 פתח מצלמה</span>
+    <input
+      type="file"
+      accept="image/*"
+      capture="environment"
+      onChange={(e) =>
+        setStartPhotoFile(e.target.files?.[0] || null)
+      }
+    />
+  </label>
 
-        <label className="unloading-photo-button">
-        📁 בחר תמונה מהמכשיר
-        <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            hidden
-            onChange={(e) => {
-            setStartPhotoFile(e.target.files?.[0] || null);
-            }}
-        />
-        </label>
-    </div>
+  <label className="unloading-photo-button">
+    <span>📁 בחר תמונה מהמכשיר</span>
+    <input
+      type="file"
+      accept="image/*"
+      onChange={(e) =>
+        setStartPhotoFile(e.target.files?.[0] || null)
+      }
+    />
+  </label>
+</div>
+
 
     {startPhotoFile ? (
         <div className="form-message">

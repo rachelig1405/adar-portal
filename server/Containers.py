@@ -43,7 +43,7 @@ class ContainerCreate(BaseModel):
     employee_id: str | None = None
 def conf():
     names = ['AIRTABLE_TOKEN', 'AIRTABLE_BASE_ID', 'AIRTABLE_CONTAINERS_TABLE',
-             'AIRTABLE_SUPPLIERS_TABLE']
+             'AIRTABLE_SUPPLIERS_TABLE','AIRTABLE_WORKERS_TABLE']
     values = {n: os.getenv(n) for n in names}
     if not all(values.values()):
         raise HTTPException(503, 'חסרות הגדרות Airtable בשרת')

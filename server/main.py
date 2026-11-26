@@ -28,6 +28,7 @@ from InvoiceScan import router as inventory_scan_router
 from Models import CustomerCreate, PickingEnd,WorkdayAssignmentRequest,LoginRequest,ChatMessageCreate
 from NutstoreExcel import router as nutstore_router
 from MissingFactoryReport import router as missing_report_router
+from Containers import build_container_unloading_router
 from Scans import (
     ScanRequest,
     create_loading_scan,
@@ -95,6 +96,9 @@ app.include_router(
 )
 app.include_router(nutstore_router)
 app.include_router(missing_report_router)
+app.include_router(
+    build_container_unloading_router()
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[

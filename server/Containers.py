@@ -40,6 +40,7 @@ class ContainerCreate(BaseModel):
     container_record_id: str | None = None
     supplier_record_id: str | None = None
     transport_record_id: str | None = None
+    employee_id: str | None = None
 def conf():
     names = ['AIRTABLE_TOKEN', 'AIRTABLE_BASE_ID', 'AIRTABLE_CONTAINERS_TABLE',
              'AIRTABLE_SUPPLIERS_TABLE']
@@ -88,7 +89,7 @@ def label_of(fields, preferred):
     # Airtable primary field not exposed without knowing its actual name.
     return ''
 
-def build_container_unloading_router(auth_dependency: Callable[..., Any]):
+def build_container_unloading_router():
     """The auth dependency MUST verify a real server-side session/token and return
     an identity with an Airtable worker record ID, e.g. {'worker_record_id':'rec...'}.
     """

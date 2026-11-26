@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { API_URL } from "../config";
 
 // Uses the shared CSS classes from EndPicking.jsx.
-export default function ContainerUnloading({ onClose }) {
+export default function ContainerUnloading({ onClose, user }) {
   const [tab, setTab] = useState(null);
   const [options, setOptions] = useState({ containers: [], suppliers: [], transports: [], photo_containers: [] });
   const [loading, setLoading] = useState(true);
@@ -41,7 +41,13 @@ export default function ContainerUnloading({ onClose }) {
           container_record_id: form.container_record_id,
           supplier_record_id: form.supplier_record_id,
           transport_record_id: form.transport_record_id,
-          driver_name: form.driver_name.trim(), warehouse,
+          driver_name: form.driver_name.trim(), 
+           warehouse:
+            warehouse === "אחר"
+            ? otherWarehouse.trim()
+            : warehouse,
+            employee_id: user.id,
+
         }),
       });
       const body = await response.json();

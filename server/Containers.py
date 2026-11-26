@@ -42,6 +42,7 @@ class ContainerCreate(BaseModel):
     supplier_record_id: str | None = None
     transport_record_id: str | None = None
     employee_id: str | None = None
+    transport_other_name: str | None = None
 def conf():
     names = ['AIRTABLE_TOKEN', 'AIRTABLE_BASE_ID', 'AIRTABLE_CONTAINERS_TABLE',
              'AIRTABLE_SUPPLIERS_TABLE','AIRTABLE_WORKERS_TABLE']
@@ -112,7 +113,10 @@ def build_container_unloading_router():
             'AIRTABLE_SUPPLIERS_TABLE',
             formula="{ספק מכולות}=1"
 )
-        transports = suppliers
+        transports = records(
+        'AIRTABLE_SUPPLIERS_TABLE',
+        formula="{הובלת מכולות}=1"
+)
         return {
             'containers': [
                 {'id':r['id'], 'label':str(r.get('fields', {}).get('מספר מכולה') or '').strip()}
@@ -150,8 +154,11 @@ def build_container_unloading_router():
                 status_code=403,
                 detail="העובד אינו פעיל"
             )
-        for val in (body.container_record_id, body.supplier_record_id, body.transport_record_id):
+        for val in (body.container_record_id, body.supplier_record_id):
             if not record_id(val): raise HTTPException(422, 'מזהה רשומה אינו תקין')
+        if body.transport_record_id != "other":
+            if not record_id(body.transport_record_id):
+                raise HTTPException(422, 'מזהה חברת הובלה אינו תקין')
         truck_number = (body.truck_number or "").strip()
         warehouse = (body.warehouse or "").strip()
         if not warehouse: raise HTTPException(422, 'חובה להזין מחסן')
@@ -170,12 +177,80 @@ def build_container_unloading_router():
             )
         # Verify linked record IDs refer to the intended tables before updating.
         api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.supplier_record_id)
-        api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.transport_record_id)
-        now = datetime.now(ZoneInfo('Asia/Jerusalem')).isoformat()
+        if body.transport_record_id == "other":
+            new_name = (body.transport_other_name or "").strip()
+
+            if not new_name:
+                raise HTTPException(
+                    422,
+                    "חובה להזין שם חברת הובלה חדשה"
+                )
+
+            if len(new_name) > 150:
+                raise HTTPException(
+                    422,
+                    "שם חברת ההובלה ארוך מדי"
+                )
+
+            # בדיקה האם החברה כבר קיימת
+            all_suppliers = records('AIRTABLE_SUPPLIERS_TABLE')
+
+            existing = next(
+                (
+                    r for r in all_suppliers
+                    if str(
+                        r.get("fields", {}).get("שם ספק") or ""
+                    ).strip().casefold() == new_name.casefold()
+                ),
+                None
+            )
+
+            if existing:
+                transport_id = existing["id"]
+
+                # סימון הרשומה הקיימת כחברת הובלת מכולות
+                if not existing.get("fields", {}).get("הובלת מכולות"):
+                    api(
+                        "PATCH",
+                        "AIRTABLE_SUPPLIERS_TABLE",
+                        record=transport_id,
+                        payload={
+                            "fields": {"הובלת מכולות": True}
+                        }
+                    )
+            else:
+                created = api(
+                    "POST",
+                    "AIRTABLE_SUPPLIERS_TABLE",
+                    payload={
+                        "fields": {
+                            "שם ספק": new_name,
+                            "הובלת מכולות": True
+                        }
+                    }
+                )
+
+                transport_id = created["id"]
+
+        else:
+            transport_id = body.transport_record_id
+
+            transport = api(
+                "GET",
+                "AIRTABLE_SUPPLIERS_TABLE",
+                record=transport_id
+            )
+
+            if not transport.get("fields", {}).get("הובלת מכולות"):
+                raise HTTPException(
+                    422,
+                    "החברה שנבחרה אינה מוגדרת להובלת מכולות"
+                )
+                now = datetime.now(ZoneInfo('Asia/Jerusalem')).isoformat()
         updated = api('PATCH', 'AIRTABLE_CONTAINERS_TABLE', record=body.container_record_id,
             payload={'fields': {
                 'ספק': [body.supplier_record_id],
-                'חברת הובלה': [body.transport_record_id],
+                'חברת הובלה': [transport_id],
                 'שם נהג': driver,
                 'מחסן': warehouse,
                 'שעת התחלה': now,

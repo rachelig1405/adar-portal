@@ -13,6 +13,7 @@ export default function ContainerUnloading({ onClose, user }) {
   const [photoContainer, setPhotoContainer] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
   const [startPhotoFile, setStartPhotoFile] = useState(null);
+  const [transportOtherName, setTransportOtherName] = useState("");
 
   async function loadOptions() {
     setLoading(true);
@@ -32,6 +33,10 @@ export default function ContainerUnloading({ onClose, user }) {
   form.container_record_id &&
   form.supplier_record_id &&
   form.transport_record_id &&
+  (
+    form.transport_record_id !== "other" ||
+    transportOtherName.trim()
+  )  &&
   form.driver_name.trim() &&
   warehouse &&
   startPhotoFile &&
@@ -83,6 +88,10 @@ export default function ContainerUnloading({ onClose, user }) {
           container_record_id: form.container_record_id,
           supplier_record_id: form.supplier_record_id,
           transport_record_id: form.transport_record_id,
+          transport_other_name:
+          form.transport_record_id === "other"
+                ? transportOtherName.trim()
+                : null,
           driver_name: form.driver_name.trim(), 
            warehouse:
             warehouse === "אחר"
@@ -173,12 +182,44 @@ export default function ContainerUnloading({ onClose, user }) {
                   {options.suppliers.map(x => <option key={x.id} value={x.id}>{x.label || x.id}</option>)}
                 </select>
               </div>
-              <div className="picker-section"><label>חברת הובלה</label>
-                <select required value={form.transport_record_id} onChange={e => update("transport_record_id", e.target.value)}>
-                  <option value="">בחר חברת הובלה</option>
-                  {options.transports.map(x => <option key={x.id} value={x.id}>{x.label || x.id}</option>)}
-                </select>
-              </div>
+              <div className="picker-section">
+        <label>חברת הובלה</label>
+
+        <select
+            required
+            value={form.transport_record_id}
+            onChange={(e) =>
+            update("transport_record_id", e.target.value)
+            }
+        >
+            <option value="">בחר חברת הובלה</option>
+
+            {options.transports.map((x) => (
+            <option key={x.id} value={x.id}>
+                {x.label || x.id}
+            </option>
+            ))}
+
+            <option value="other">➕ אחר — חברת הובלה חדשה</option>
+        </select>
+
+        {form.transport_record_id === "other" && (
+            <div className="picker-section">
+            <label>שם חברת הובלה חדשה</label>
+
+            <input
+                type="text"
+                required
+                maxLength={150}
+                placeholder="הזן שם חברת הובלה"
+                value={transportOtherName}
+                onChange={(e) =>
+                setTransportOtherName(e.target.value)
+                }
+            />
+            </div>
+        )}
+</div>
               <div className="picker-section"><label>שם נהג</label><input required value={form.driver_name} onChange={e => update("driver_name", e.target.value)} placeholder="שם הנהג" /></div>
               <div className="picker-section"><label>מספר משאית</label><input required value={form.truck} onChange={e => update("truck", e.target.value)} placeholder="מספר משאית" /></div>
               <div className="picker-section"><label>מחסן</label>

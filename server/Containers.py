@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 import requests
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File,Form
 from pydantic import BaseModel, Field,ConfigDict
-
+import json
 AIRTABLE = 'https://api.airtable.com/v0'
 FILE_API = 'https://content.airtable.com/v0'
 ALLOWED_WAREHOUSES = {'100', '200', '300', '600'}

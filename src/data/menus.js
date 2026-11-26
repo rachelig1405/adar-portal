@@ -39,7 +39,13 @@ const warehouse = [
   title: "פתיחת יום",
   subtitle: "",
   icon: "🖼️",
-  color:"pink"}
+  color:"pink"},
+   {key: "ContainerUnloading",
+  title: "פריקת מכולות",
+  subtitle: "",
+  icon: "🚢",
+  color:"green"},
+ 
   
 ];
 const office = [

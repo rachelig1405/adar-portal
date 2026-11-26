@@ -27,6 +27,7 @@ import InvoiceScan from "./InvoiceScan";
 import ForecastOrders from "./ForecastOrders";
 import DailyAreaScan from "./DailyAreaScan";
 import ExportMissingFactoryReport from "./ExportMissingFactoryReportButton";
+import ContainerUnloading from "./ContainerUnloading";
 const INTERNAL_COMPONENTS = {
   ForecastOrders:ForecastOrders,
   newOrder: NewOrder,
@@ -43,8 +44,8 @@ const INTERNAL_COMPONENTS = {
   OZstickers: CreateOZProductPdfs,
   InvoiceScan:InvoiceScan,
   DailyAreaScan:DailyAreaScan,
-  ExportMissingFactoryReport:ExportMissingFactoryReport
-
+  ExportMissingFactoryReport:ExportMissingFactoryReport,
+  ContainerUnloading:ContainerUnloading
   
 
 };

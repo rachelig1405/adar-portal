@@ -14,7 +14,7 @@ from typing import Callable, Any
 from pydantic import BaseModel, Field
 import requests
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,ConfigDict
 
 AIRTABLE = 'https://api.airtable.com/v0'
 FILE_API = 'https://content.airtable.com/v0'
@@ -22,6 +22,7 @@ ALLOWED_WAREHOUSES = {'100', '200', '300', '600'}
 MAX_IMAGE_SIZE = 10 * 1024 * 1024
 
 class ContainerCreate(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     container_number: str | None = Field(default=None, alias="מספר מכולה")
     start_time: datetime | None = Field(default=None, alias="שעת התחלה")
     end_time: datetime | None = Field(default=None, alias="שעת סיום")

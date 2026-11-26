@@ -182,44 +182,70 @@ export default function ContainerUnloading({ onClose, user }) {
                   {options.suppliers.map(x => <option key={x.id} value={x.id}>{x.label || x.id}</option>)}
                 </select>
               </div>
-              <div className="picker-section">
-        <label>חברת הובלה</label>
 
-        <select
-            required
-            value={form.transport_record_id}
-            onChange={(e) =>
-            update("transport_record_id", e.target.value)
-            }
-        >
-            <option value="">בחר חברת הובלה</option>
 
-            {options.transports.map((x) => (
-            <option key={x.id} value={x.id}>
-                {x.label || x.id}
-            </option>
-            ))}
+                <div className="picker-section">
+                <label>חברת הובלה</label>
 
-            <option value="other">➕ אחר — חברת הובלה חדשה</option>
-        </select>
+                <div className="picker-results">
+                    {(options.transports || []).map((company) => (
+                    <button
+                        key={company.id}
+                        type="button"
+                        className={`picker-row ${
+                        form.transport_record_id === company.id
+                            ? "active"
+                            : ""
+                        }`}
+                        onClick={() => {
+                        update("transport_record_id", company.id);
+                        setTransportOtherName("");
+                        }}
+                    >
+                        <span className="picker-secondary">
+                        {company.label || company.id}
+                        </span>
 
-        {form.transport_record_id === "other" && (
-            <div className="picker-section">
-            <label>שם חברת הובלה חדשה</label>
+                        {form.transport_record_id === company.id && "✓"}
+                    </button>
+                    ))}
 
-            <input
-                type="text"
-                required
-                maxLength={150}
-                placeholder="הזן שם חברת הובלה"
-                value={transportOtherName}
-                onChange={(e) =>
-                setTransportOtherName(e.target.value)
-                }
-            />
-            </div>
-        )}
-</div>
+                    <button
+                    type="button"
+                    className={`picker-row ${
+                        form.transport_record_id === "other"
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                        update("transport_record_id", "other")
+                    }
+                    >
+                    <span className="picker-secondary">
+                        ➕ אחר — חברת הובלה חדשה
+                    </span>
+                    </button>
+                </div>
+
+                {form.transport_record_id === "other" && (
+                    <div className="picker-section">
+                    <label>שם חברת הובלה חדשה</label>
+
+                    <input
+                        type="text"
+                        required
+                        maxLength={150}
+                        placeholder="הזן שם חברת הובלה"
+                        value={transportOtherName}
+                        onChange={(e) =>
+                        setTransportOtherName(e.target.value)
+                        }
+                    />
+                    </div>
+                )}
+                </div>
+
+         
               <div className="picker-section"><label>שם נהג</label><input required value={form.driver_name} onChange={e => update("driver_name", e.target.value)} placeholder="שם הנהג" /></div>
               <div className="picker-section"><label>מספר משאית</label><input required value={form.truck} onChange={e => update("truck", e.target.value)} placeholder="מספר משאית" /></div>
               <div className="picker-section"><label>מחסן</label>

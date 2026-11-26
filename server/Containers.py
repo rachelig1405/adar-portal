@@ -158,7 +158,7 @@ def build_container_unloading_router():
             raise HTTPException(409, 'המכולה אינה בסטטוס לפני פריקה')
         # Verify linked record IDs refer to the intended tables before updating.
         api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.supplier_record_id)
-        api('GET', 'AIRTABLE_TRANSPORT_TABLE', record=body.transport_record_id)
+        api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.transport_record_id)
         now = datetime.now(ZoneInfo('Asia/Jerusalem')).isoformat()
         updated = api('PATCH', 'AIRTABLE_CONTAINERS_TABLE', record=body.container_record_id,
             payload={'fields': {

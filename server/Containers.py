@@ -117,6 +117,7 @@ def build_container_unloading_router():
         'AIRTABLE_SUPPLIERS_TABLE',
         formula="{הובלת מכולות}=1"
 )
+        
         return {
             'containers': [
                 {'id':r['id'], 'label':str(r.get('fields', {}).get('מספר מכולה') or '').strip()}
@@ -125,7 +126,7 @@ def build_container_unloading_router():
             ],
             'suppliers': [{'id':r['id'], 'label':label_of(r.get('fields', {}), ['שם ספק', 'ספק', 'Name'])}
                           for r in suppliers],
-            'transports': [{'id':r['id'], 'label':label_of(r.get('fields', {}), ['שם חברת הובלה', 'חברת הובלה', 'Name'])}
+            'transports': [{'id':r['id'], 'label':label_of(r.get('fields', {}), ['שם ספק', 'ספק', 'Name'])}
                            for r in transports],
             'photo_containers': [
                 {'id':r['id'], 'label':str(r.get('fields', {}).get('מספר מכולה') or '').strip()}

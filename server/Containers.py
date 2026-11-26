@@ -170,6 +170,9 @@ def build_container_unloading_router():
             raise HTTPException(409, 'המכולה אינה בסטטוס לפני פריקה')
         # בדיקה שקיים צילום מכולה
         attachments = container.get("fields", {}).get("Attachments") or []
+        now = datetime.now(
+            ZoneInfo("Asia/Jerusalem")
+        ).isoformat()
 
         if not attachments:
             raise HTTPException(

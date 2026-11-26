@@ -258,7 +258,7 @@ def build_container_unloading_router():
                 'שם נהג': driver,
                 'מחסן': warehouse,
                 'שעת התחלה': now,
-                'עובד מתחיל': [wid],
+                'פורק': [wid],
                 'סטטוס': 'בפריקה',
                 'מספר משאית':truck_number
             }})

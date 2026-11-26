@@ -44,6 +44,38 @@ export default function ContainerUnloading({ onClose, user }) {
     if (!valid) return;
     setSaving(true); setError(""); setMessage("");
     try {
+        
+        if (!startPhotoFile) {
+        throw new Error("חובה לצלם או לבחור תמונה");
+        }
+
+        // שלב 1: העלאת התמונה
+        const imageData = new FormData();
+        imageData.append("file", startPhotoFile);
+
+        const photoResponse = await fetch(
+        `${API_URL}/api/container-unloading/${encodeURIComponent(
+            form.container_record_id
+        )}/photo`,
+        {
+            method: "POST",
+            credentials: "include",
+            body: imageData,
+        }
+        );
+
+        const photoResult = await photoResponse.json().catch(() => ({}));
+
+        if (!photoResponse.ok) {
+        throw new Error(
+            typeof photoResult.detail === "string"
+            ? photoResult.detail
+            : "שמירת צילום המכולה נכשלה"
+        );
+        }
+
+// שלב 2: רק אחרי שהתמונה נשמרה, ממשיכים לבקשת start
+
       const response = await fetch(`${API_URL}/api/container-unloading/start`, {
         method: "POST", credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -156,7 +188,7 @@ export default function ContainerUnloading({ onClose, user }) {
 
                 
 <div className="picker-section">
-  <label>📷 צילום מכולה </label>
+  <label> צילום מכולה </label>
 
   
 <div className="unloading-photo-actions">

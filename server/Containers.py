@@ -103,8 +103,8 @@ def build_container_unloading_router():
         return wid
 
     @router.get('/options')
-    def options(user=Depends(auth_dependency)):
-        worker_id(user)
+    def options():
+        
         containers = records('AIRTABLE_CONTAINERS_TABLE',
                              fields=['מספר מכולה', 'סטטוס'])
         suppliers = records('AIRTABLE_SUPPLIERS_TABLE')
@@ -126,8 +126,26 @@ def build_container_unloading_router():
         }
 
     @router.post('/start')
-    def start(body: ContainerCreate, user=Depends(auth_dependency)):
-        wid = worker_id(user)
+    def start(body: ContainerCreate,):
+        wid = (body.employee_id or "").strip()
+
+        if not record_id(wid):
+            raise HTTPException(
+                status_code=422,
+                detail="מזהה העובד אינו תקין"
+            )
+
+        employee = api(
+            "GET",
+            "AIRTABLE_WORKERS_TABLE",
+            record=wid
+        )
+
+        if not employee.get("fields", {}).get("פעיל", False):
+            raise HTTPException(
+                status_code=403,
+                detail="העובד אינו פעיל"
+            )
         for val in (body.container_record_id, body.supplier_record_id, body.transport_record_id):
             if not record_id(val): raise HTTPException(422, 'מזהה רשומה אינו תקין')
         warehouse = (body.warehouse or "").strip()
@@ -154,8 +172,8 @@ def build_container_unloading_router():
         return {'success': True, 'container_record_id': updated['id'], 'warehouse': warehouse, 'started_at': now}
 
     @router.post('/{container_record_id}/photo')
-    async def upload_photo(container_record_id: str, file: UploadFile = File(...), user=Depends(auth_dependency)):
-        worker_id(user)
+    async def upload_photo(container_record_id: str, file: UploadFile = File(...)):
+        
         if not record_id(container_record_id): raise HTTPException(422, 'מזהה מכולה אינו תקין')
         container = api('GET', 'AIRTABLE_CONTAINERS_TABLE', record=container_record_id)
         if str(container.get('fields', {}).get('סטטוס') or '').strip() not in ('בפריקה', 'לפני פריקה'):

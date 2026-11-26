@@ -85,9 +85,31 @@ export default function ContainerUnloading({ onClose, user }) {
         </div>
         <div className="order-form">
           <div className="picker-section" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" onClick={() => { setTab("start"); setError(""); }}>תחילת פריקה</button>
-            <button type="button" onClick={() => { setTab("end"); setError(""); }}>סיום פריקה</button>
-            <button type="button" onClick={() => { setTab("photo"); setError(""); }}>תיעוד וצילום</button>
+            <div className="unloading-tabs">
+            <button
+                type="button"
+                className={`unloading-tab ${activeTab === "start" ? "active" : ""}`}
+                onClick={() => setActiveTab("start")}
+            >
+                📦 תחילת פריקה
+            </button>
+
+            <button
+                type="button"
+                className={`unloading-tab ${activeTab === "end" ? "active" : ""}`}
+                onClick={() => setActiveTab("end")}
+            >
+                ✅ סיום פריקה
+            </button>
+
+            <button
+                type="button"
+                className={`unloading-tab ${activeTab === "photo" ? "active" : ""}`}
+                onClick={() => setActiveTab("photo")}
+            >
+                📷 תיעוד וצילום
+            </button>
+            </div>
           </div>
           {loading && <div className="form-message">טוען נתונים...</div>}
           {error && <div className="form-error" role="alert">{error}</div>}
@@ -96,19 +118,19 @@ export default function ContainerUnloading({ onClose, user }) {
             <form onSubmit={start} className="order-form">
               <div className="picker-section"><label>מספר מכולה (לפני פריקה)</label>
                 <select required value={form.container_record_id} onChange={e => update("container_record_id", e.target.value)}>
-                  <option value="">בחרי מכולה</option>
+                  <option value="">בחר מכולה</option>
                   {options.containers.map(x => <option key={x.id} value={x.id}>{x.label}</option>)}
                 </select>
               </div>
                           <div className="picker-section"><label>ספק</label>
                 <select required value={form.supplier_record_id} onChange={e => update("supplier_record_id", e.target.value)}>
-                  <option value="">בחרי ספק</option>
+                  <option value="">בחר ספק</option>
                   {options.suppliers.map(x => <option key={x.id} value={x.id}>{x.label || x.id}</option>)}
                 </select>
               </div>
               <div className="picker-section"><label>חברת הובלה</label>
                 <select required value={form.transport_record_id} onChange={e => update("transport_record_id", e.target.value)}>
-                  <option value="">בחרי חברת הובלה</option>
+                  <option value="">בחר חברת הובלה</option>
                   {options.transports.map(x => <option key={x.id} value={x.id}>{x.label || x.id}</option>)}
                 </select>
               </div>

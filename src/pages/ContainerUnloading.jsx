@@ -130,7 +130,7 @@ export default function ContainerUnloading({ onClose, user }) {
 
   return (
     <div className="modal-backdrop" dir="rtl">
-      <div className="form-window picking-window">
+      <div className="form-window picking-window container-unloading">
         <div className="form-header">
           <div><div className="frame-kicker">ADAR Portal</div><strong>ניהול פריקת מכולות</strong></div>
           <button type="button" onClick={onClose}>חזרה</button>

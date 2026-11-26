@@ -2961,3 +2961,60 @@
   border-color: #4aa6ff;
   outline: 2px solid rgba(74, 166, 255, 0.25);
 }
+
+.unloading-team-title {
+  margin: 18px 0 4px;
+  color: #26384f;
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.unloading-worker-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.unloading-worker-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 51px;
+  padding: 10px 14px;
+  background: #f6faff;
+  border: 1px solid #dce8f8;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.unloading-worker-option:has(input:checked) {
+  background: #e8f7ea;
+  border-color: #6dc77b;
+}
+
+.container-unloading .unloading-worker-option input,
+.container-unloading .unloading-floor-checkbox input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin: 0;
+  accent-color: #36ad51;
+}
+
+.unloading-floor-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px;
+  border: 1px solid #dce8f8;
+  border-radius: 14px;
+  background: #f6faff;
+  cursor: pointer;
+}
+
+@media (max-width: 540px) {
+  .unloading-worker-list {
+    grid-template-columns: 1fr;
+  }
+}
+

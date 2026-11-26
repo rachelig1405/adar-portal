@@ -117,7 +117,38 @@ def build_container_unloading_router():
         'AIRTABLE_SUPPLIERS_TABLE',
         formula="{הובלת מכולות}=1"
 )
-        
+        workers = records(
+    "AIRTABLE_WORKERS_TABLE",
+    fields=["שם", "תפקיד", "פעיל"]
+)
+
+        warehouse_workers = [
+            {
+                "id": r["id"],
+                "label": str(
+                    r.get("fields", {}).get("שם") or ""
+                ).strip()
+            }
+            for r in workers
+            if r.get("fields", {}).get("פעיל") is True
+            and str(
+                r.get("fields", {}).get("תפקיד") or ""
+            ).strip().lower() == "warehouse"
+            and str(r.get("fields", {}).get("שם") or "").strip()
+        ]
+
+        end_containers = [
+            {
+                "id": r["id"],
+                "label": str(
+                    r.get("fields", {}).get("מספר מכולה") or ""
+                ).strip()
+            }
+            for r in containers
+            if str(
+                r.get("fields", {}).get("סטטוס") or ""
+            ).strip() == "בפריקה"
+        ]
         return {
             'containers': [
                 {'id':r['id'], 'label':str(r.get('fields', {}).get('מספר מכולה') or '').strip()}
@@ -132,6 +163,8 @@ def build_container_unloading_router():
                 {'id':r['id'], 'label':str(r.get('fields', {}).get('מספר מכולה') or '').strip()}
                 for r in containers if str(r.get('fields', {}).get('סטטוס') or '').strip() in ('בפריקה', 'לפני פריקה')
             ],
+            "end_containers": end_containers,
+            "workers": warehouse_workers,
         }
 
     @router.post('/start')
@@ -294,5 +327,207 @@ def build_container_unloading_router():
             raise HTTPException(502, 'שגיאת העלאת צילום') from e
         if not r.ok: raise HTTPException(502, f'שגיאה בשמירת התמונה ({r.status_code})')
         return {'success': True}
+    
+    @router.post("/finish")
+    async def finish_unloading(
+        container_record_id: str = Form(...),
+        forklift_operator: str = Form("[]"),
+        assistant_forklift_operator: str = Form("[]"),
+        pallet_location_worker: str = Form("[]"),
+        pallets_on_floor: bool = Form(False),
+        file: UploadFile = File(...)
+    ):
+        # בדיקת מזהה המכולה
+        if not record_id(container_record_id):
+            raise HTTPException(
+                status_code=422,
+                detail="מזהה המכולה אינו תקין"
+            )
+
+        # פענוח רשימות העובדים
+        def parse_workers(raw, field_name):
+            try:
+                ids = json.loads(raw)
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    422,
+                    f"נתונים לא תקינים בשדה {field_name}"
+                )
+
+            if not isinstance(ids, list):
+                raise HTTPException(
+                    422,
+                    f"השדה {field_name} חייב להיות רשימה"
+                )
+
+            if not ids:
+                raise HTTPException(
+                    422,
+                    f"חובה לבחור לפחות עובד אחד: {field_name}"
+                )
+
+            if (
+                len(ids) > 30
+                or len(ids) != len(set(ids))
+                or not all(record_id(x) for x in ids)
+            ):
+                raise HTTPException(
+                    422,
+                    f"מזהי עובדים לא תקינים: {field_name}"
+                )
+
+            return ids
+
+        forklift_ids = parse_workers(
+            forklift_operator, "מלגזן"
+        )
+        assistant_ids = parse_workers(
+            assistant_forklift_operator, "עוזר מלגזן"
+        )
+        location_ids = parse_workers(
+            pallet_location_worker, "מזין משטחים במיקום"
+        )
+
+        # בדיקת מצב המכולה
+        container = api(
+            "GET",
+            "AIRTABLE_CONTAINERS_TABLE",
+            record=container_record_id
+        )
+
+        status = str(
+            container.get("fields", {}).get("סטטוס") or ""
+        ).strip()
+
+        if status != "בפריקה":
+            raise HTTPException(
+                status_code=409,
+                detail="ניתן לסיים רק מכולה בסטטוס בפריקה"
+            )
+
+        # בדיקת הרשומות בטבלת העובדים
+        workers = records(
+            "AIRTABLE_WORKERS_TABLE",
+            fields=["שם", "תפקיד", "פעיל"]
+        )
+
+        allowed_ids = {
+            r["id"]
+            for r in workers
+            if r.get("fields", {}).get("פעיל") is True
+            and str(
+                r.get("fields", {}).get("תפקיד") or ""
+            ).strip().lower() == "warehouse"
+        }
+
+        selected_ids = set(
+            forklift_ids + assistant_ids + location_ids
+        )
+
+        if not selected_ids.issubset(allowed_ids):
+            raise HTTPException(
+                status_code=422,
+                detail="אחד העובדים אינו פעיל או אינו מחסנאי"
+            )
+
+        # צילום מכולה ריקה הוא חובה
+        photo = await file.read(MAX_IMAGE_SIZE + 1)
+
+        if not photo or len(photo) > MAX_IMAGE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail="חובה לצרף תמונה בגודל עד 10MB"
+            )
+
+        if photo.startswith(b"\xff\xd8\xff"):
+            mime, ext = "image/jpeg", "jpg"
+        elif photo.startswith(b"\x89PNG\r\n\x1a\n"):
+            mime, ext = "image/png", "png"
+        elif (
+            photo[:4] == b"RIFF"
+            and photo[8:12] == b"WEBP"
+        ):
+            mime, ext = "image/webp", "webp"
+        else:
+            raise HTTPException(
+                status_code=415,
+                detail="מותר להעלות JPG, PNG או WEBP בלבד"
+            )
+
+        c = conf()
+
+        field = quote("Attachments", safe="")
+        upload_url = (
+            f"{FILE_API}/{c['AIRTABLE_BASE_ID']}/"
+            f"{container_record_id}/{field}/uploadAttachment"
+        )
+
+        filename = (
+            f"empty_container_{container_record_id}_"
+            f"{int(datetime.now().timestamp())}.{ext}"
+        )
+
+        # קודם שומרים צילום, ורק אחר כך מסיימים פריקה
+        try:
+            upload_response = requests.post(
+                upload_url,
+                headers={
+                    "Authorization":
+                        f"Bearer {c['AIRTABLE_TOKEN']}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "contentType": mime,
+                    "filename": filename,
+                    "file": base64.b64encode(photo).decode("ascii")
+                },
+                timeout=90
+            )
+        except requests.RequestException as exc:
+            raise HTTPException(
+                502, "שגיאת תקשורת בשמירת הצילום"
+            ) from exc
+
+        if not upload_response.ok:
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "שמירת צילום המכולה נכשלה "
+                    f"({upload_response.status_code})"
+                )
+            )
+
+        final_status = (
+            "פריקה הסתיימה מידוף טרם הושלם"
+            if pallets_on_floor
+            else "פריקה הסתיימה"
+        )
+
+        now = datetime.now(
+            ZoneInfo("Asia/Jerusalem")
+        ).isoformat()
+
+        updated = api(
+            "PATCH",
+            "AIRTABLE_CONTAINERS_TABLE",
+            record=container_record_id,
+            payload={
+                "fields": {
+                    "מלגזן": forklift_ids,
+                    "עוזר מלגזן": assistant_ids,
+                    "מזין משטחים במיקום": location_ids,
+                    "שעת סיום": now,
+                    "סטטוס": final_status
+                }
+            }
+        )
+
+        return {
+            "success": True,
+            "container_record_id": updated["id"],
+            "status": final_status,
+            "ended_at": now
+        }
+
 
     return router

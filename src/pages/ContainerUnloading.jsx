@@ -12,6 +12,7 @@ export default function ContainerUnloading({ onClose, user }) {
   const [form, setForm] = useState({ container_record_id: "", supplier_record_id: "", transport_record_id: "", driver_name: "", warehouseChoice: "", customWarehouse: "" });
   const [photoContainer, setPhotoContainer] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
+  const [startPhotoFile, setStartPhotoFile] = useState(null);
 
   async function loadOptions() {
     setLoading(true);
@@ -27,7 +28,16 @@ export default function ContainerUnloading({ onClose, user }) {
   useEffect(() => { loadOptions(); }, []);
   const update = (key, value) => setForm((prev) => ({ ...prev, [key]: value }));
   const warehouse = form.warehouseChoice === "אחר" ? form.customWarehouse.trim() : form.warehouseChoice;
-  const valid = Boolean(form.container_record_id && form.supplier_record_id && form.transport_record_id && form.driver_name.trim() && warehouse && !loading && !saving);
+  const valid = Boolean(
+  form.container_record_id &&
+  form.supplier_record_id &&
+  form.transport_record_id &&
+  form.driver_name.trim() &&
+  warehouse &&
+  startPhotoFile &&
+  !loading &&
+  !saving
+);
 
   async function start(event) {
     event.preventDefault();
@@ -139,10 +149,35 @@ export default function ContainerUnloading({ onClose, user }) {
               <div className="picker-section"><label>שם נהג</label><input required value={form.driver_name} onChange={e => update("driver_name", e.target.value)} placeholder="שם הנהג" /></div>
               <div className="picker-section"><label>מחסן</label>
                 <select required value={form.warehouseChoice} onChange={e => update("warehouseChoice", e.target.value)}>
-                  <option value="">בחרי מחסן</option>
+                  <option value="">בחר מחסן</option>
                   {['100', '200', '300', '600', 'אחר'].map(x => <option key={x} value={x}>{x}</option>)}
                 </select>
                 {form.warehouseChoice === 'אחר' && <input required maxLength={100} value={form.customWarehouse} onChange={e => update("customWarehouse", e.target.value)} placeholder="מספר או שם מחסן אחר" />}
+
+                <div className="picker-section">
+                <label>📷 צילום מכולה (חובה)</label>
+
+                <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    capture="environment"
+                    required
+                    onChange={(e) =>
+                    setStartPhotoFile(e.target.files?.[0] || null)
+                    }
+                />
+
+                {startPhotoFile ? (
+                    <div className="form-message">
+                    ✅ נבחרה תמונה: {startPhotoFile.name}
+                    </div>
+                ) : (
+                    <div className="form-error">
+                    חובה לצלם או להעלות תמונה לפני תחילת הפריקה
+                    </div>
+                )}
+            </div>
+
               </div>
               <button type="submit" className="save-button" disabled={!valid}>{saving ? 'שומר...' : 'אישור תחילת פריקה'}</button>
             </form>

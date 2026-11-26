@@ -156,6 +156,14 @@ def build_container_unloading_router():
         container = api('GET', 'AIRTABLE_CONTAINERS_TABLE', record=body.container_record_id)
         if str(container.get('fields', {}).get('סטטוס') or '').strip() != 'לפני פריקה':
             raise HTTPException(409, 'המכולה אינה בסטטוס לפני פריקה')
+        # בדיקה שקיים צילום מכולה
+        attachments = container.get("fields", {}).get("Attachments") or []
+
+        if not attachments:
+            raise HTTPException(
+                status_code=422,
+                detail="חובה לצלם או להעלות תמונת מכולה לפני תחילת הפריקה"
+            )
         # Verify linked record IDs refer to the intended tables before updating.
         api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.supplier_record_id)
         api('GET', 'AIRTABLE_SUPPLIERS_TABLE', record=body.transport_record_id)

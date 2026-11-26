@@ -108,7 +108,10 @@ def build_container_unloading_router():
         
         containers = records('AIRTABLE_CONTAINERS_TABLE',
                              fields=['מספר מכולה', 'סטטוס'])
-        suppliers = records('AIRTABLE_SUPPLIERS_TABLE')
+        suppliers = records(
+            'AIRTABLE_SUPPLIERS_TABLE',
+            formula="{ספק מכולות}=1"
+)
         transports = suppliers
         return {
             'containers': [

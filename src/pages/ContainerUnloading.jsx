@@ -85,31 +85,33 @@ export default function ContainerUnloading({ onClose, user }) {
         </div>
         <div className="order-form">
           <div className="picker-section" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <div className="unloading-tabs">
-            <button
-                type="button"
-                className={`unloading-tab ${activeTab === "start" ? "active" : ""}`}
-                onClick={() => setActiveTab("start")}
-            >
-                📦 תחילת פריקה
-            </button>
+            
+<div className="unloading-tabs">
+  <button
+            type="button"
+            className={`unloading-tab ${tab === "start" ? "active" : ""}`}
+            onClick={() => setTab("start")}
+        >
+            📦 תחילת פריקה
+        </button>
 
-            <button
-                type="button"
-                className={`unloading-tab ${activeTab === "end" ? "active" : ""}`}
-                onClick={() => setActiveTab("end")}
-            >
-                ✅ סיום פריקה
-            </button>
+        <button
+            type="button"
+            className={`unloading-tab ${tab === "end" ? "active" : ""}`}
+            onClick={() => setTab("end")}
+        >
+            ✅ סיום פריקה
+        </button>
 
-            <button
-                type="button"
-                className={`unloading-tab ${activeTab === "photo" ? "active" : ""}`}
-                onClick={() => setActiveTab("photo")}
-            >
-                📷 תיעוד וצילום
-            </button>
-            </div>
+        <button
+            type="button"
+            className={`unloading-tab ${tab === "photo" ? "active" : ""}`}
+            onClick={() => setTab("photo")}
+        >
+            📷 תיעוד וצילום
+        </button>
+        </div>
+
           </div>
           {loading && <div className="form-message">טוען נתונים...</div>}
           {error && <div className="form-error" role="alert">{error}</div>}

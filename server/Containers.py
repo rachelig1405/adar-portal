@@ -13,7 +13,7 @@ from urllib.parse import quote
 from typing import Callable, Any
 from pydantic import BaseModel, Field
 import requests
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File,Form
 from pydantic import BaseModel, Field,ConfigDict
 
 AIRTABLE = 'https://api.airtable.com/v0'

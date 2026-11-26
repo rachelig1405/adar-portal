@@ -149,6 +149,7 @@ def build_container_unloading_router():
             )
         for val in (body.container_record_id, body.supplier_record_id, body.transport_record_id):
             if not record_id(val): raise HTTPException(422, 'מזהה רשומה אינו תקין')
+        truck_number = (body.truck_number or "").strip()
         warehouse = (body.warehouse or "").strip()
         if not warehouse: raise HTTPException(422, 'חובה להזין מחסן')
         driver = (body.driver_name or "").strip()
@@ -177,6 +178,7 @@ def build_container_unloading_router():
                 'שעת התחלה': now,
                 'עובד מתחיל': [wid],
                 'סטטוס': 'בפריקה',
+                'מספר משאית':truck_number
             }})
         return {'success': True, 'container_record_id': updated['id'], 'warehouse': warehouse, 'started_at': now}
 

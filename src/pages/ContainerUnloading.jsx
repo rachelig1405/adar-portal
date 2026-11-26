@@ -9,7 +9,7 @@ export default function ContainerUnloading({ onClose, user }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [form, setForm] = useState({ container_record_id: "", supplier_record_id: "", transport_record_id: "", driver_name: "", warehouseChoice: "", customWarehouse: "" });
+  const [form, setForm] = useState({ container_record_id: "", supplier_record_id: "", transport_record_id: "", driver_name: "", warehouseChoice: "", customWarehouse: "" ,truck:""});
   const [photoContainer, setPhotoContainer] = useState("");
   const [photoFile, setPhotoFile] = useState(null);
   const [startPhotoFile, setStartPhotoFile] = useState(null);
@@ -89,6 +89,7 @@ export default function ContainerUnloading({ onClose, user }) {
             ? otherWarehouse.trim()
             : warehouse,
             employee_id: user.id,
+            truck_number:form.truck
 
         }),
       });
@@ -179,6 +180,7 @@ export default function ContainerUnloading({ onClose, user }) {
                 </select>
               </div>
               <div className="picker-section"><label>שם נהג</label><input required value={form.driver_name} onChange={e => update("driver_name", e.target.value)} placeholder="שם הנהג" /></div>
+              <div className="picker-section"><label>מספר משאית</label><input required value={form.truck} onChange={e => update("truck", e.target.value)} placeholder="מספר משאית" /></div>
               <div className="picker-section"><label>מחסן</label>
                 <select required value={form.warehouseChoice} onChange={e => update("warehouseChoice", e.target.value)}>
                   <option value="">בחר מחסן</option>
